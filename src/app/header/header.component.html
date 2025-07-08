@@ -1,0 +1,68 @@
+<div class="header-container">
+    <!-- เมฆซ้าย -->
+    <div class="cloud cloud-left">
+        <svg width="220" height="180" viewBox="0 0 112 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.5"
+                d="M9.5 0C24.1355 0 36 11.8645 36 26.5C36 29.6093 35.4613 32.5923 34.4775 35.3643C53.8408 37.9495 68.9283 54.0483 69.9443 73.8662C74.3951 69.0144 80.6154 66 87.5 66C101.031 66 112 77.6406 112 92C112 106.359 101.031 118 87.5 118C75.8936 118 66.1722 109.435 63.6416 97.9365C56.3709 109.394 43.5744 117 29 117C6.35633 117 -12 98.6437 -12 76C-12 66.1395 -8.51877 57.0923 -2.71875 50.0195C-11.2045 45.6021 -17 36.7284 -17 26.5C-17 11.8645 -5.13555 0 9.5 0Z"
+                fill="white" />
+        </svg>
+    </div>
+    <!-- เมฆขวา -->
+    <div class="cloud cloud-right">
+        <svg width="220" height="180" viewBox="0 0 115 99" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.5"
+                d="M116 0C140.853 0 161 20.1472 161 45C161 63.9881 149.239 80.2282 132.604 86.8359C134.147 90.5863 135 94.6934 135 99C135 116.673 120.673 131 103 131C98.1065 131 93.4706 129.899 89.3232 127.936C85.8028 129.268 81.9871 130 78 130C66.5538 130 56.5132 123.989 50.8574 114.953C46.8019 124.391 37.4233 131 26.5 131C11.8645 131 0 119.136 0 104.5C0 89.8645 11.8645 78 26.5 78C35.0451 78 42.6433 82.0461 47.4893 88.3252C51.4188 75.9216 62.702 66.7907 76.2207 66.0498C72.8898 59.7683 71 52.6053 71 45C71 20.1472 91.1472 0 116 0Z"
+                fill="white" />
+        </svg>
+    </div>
+    <div class="header-logo-title">
+        <div class="logo">
+            <img src="https://trevigroup.co/files/trevi-group-nokair-logo.png" alt="NOK AIR">
+        </div>
+        <span class="header-title">NOK AIR</span>
+    </div>
+    <!-- <div class="stepper">
+        <div class="step">
+            <div class="circle">1</div>
+            <div class="label">กรอกข้อมูล</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="circle">2</div>
+            <div class="label">เลือกที่นั่ง</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="circle">3</div>
+            <div class="label">ตรวจสอบข้อมูล</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="circle">4</div>
+            <div class="label">ยืนยันชำระเงิน</div>
+        </div>
+    </div> -->
+    <div class="container-stepper">
+        <div class="progress-bar-custom">
+            <div class="step-custom" [class.active]="currentStep === 1" [class.finished]="currentStep > 1">
+                <div class="circle">1</div>
+                <div class="label">{{ 'Enter_Details' | translate }}</div>
+            </div>
+            <div class="line" [class.finished]="currentStep > 1"></div>
+            <div class="step-custom" [class.active]="currentStep === 2" [class.finished]="currentStep > 2">
+                <div class="circle">2</div>
+                <div class="label">{{ 'Select_Seat' | translate }}</div>
+            </div>
+            <div class="line" [class.finished]="currentStep > 2"></div>
+            <div class="step-custom" [class.active]="currentStep === 3" [class.finished]="currentStep > 3">
+                <div class="circle">3</div>
+                <div class="label">{{ 'Review_Details' | translate }}</div>
+            </div>
+            <div class="line" [class.finished]="currentStep > 3"></div>
+            <div class="step-custom" [class.active]="currentStep === 4">
+                <div class="circle">4</div>
+                <div class="label">{{ 'Confirm_Payment' | translate }}</div>
+            </div>
+        </div>
+    </div>
+</div>

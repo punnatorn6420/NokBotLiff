@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { PassDataService } from './pass-data.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'liff-nok-air';
+  language: string = 'th';
+
+  constructor(private passDataService: PassDataService) {
+    this.passDataService.setLanguage('th');
+  }
+
+  ngOnInit() {
+    this.passDataService.getLanguage().subscribe(language => {
+      this.language = language;
+    });
+  }
 }

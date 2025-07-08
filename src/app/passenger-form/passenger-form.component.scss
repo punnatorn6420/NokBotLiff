@@ -1,0 +1,208 @@
+.number-passenger-scroll {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.number-passenger-box {
+    min-width: 150px;
+    text-align: center;
+    height: 50px;
+    padding: 12px 0;
+    background: #fff;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    color: #ccc;
+    font-size: 16px;
+    font-weight: 400;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.number-passenger-box.active {
+  border: 3px solid #FFD600;
+  color: #222;
+  background: #fffbe6;
+  font-weight: 400;
+}
+
+.number-passenger-box.valid {
+  border: 3px solid #4CAF50;
+  color: #222;
+  background: #f1f8e9;
+}
+
+.number-passenger-box.valid.active {
+  border: 3px solid #4CAF50;
+  color: #222;
+  background: #e8f5e8;
+  font-weight: 400;
+}
+
+.number-passenger-box.invalid {
+  border: 3px solid #f44336;
+  color: #222;
+  background: #ffebee;
+}
+
+.number-passenger-box.invalid.active {
+  border: 3px solid #f44336;
+  color: #222;
+  background: #ffcdd2;
+  font-weight: 400;
+}
+
+.valid-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.invalid-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f44336;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.number-passenger-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.number-passenger-scroll::-webkit-scrollbar-thumb {
+  background: #FFD600;
+  border-radius: 4px;
+}
+
+.form-passenger-container {
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.form-passenger-info {
+    display: flex;
+    flex-direction: column;
+    // background-color: #4CAF50;
+    .form-passenger-info-content {
+        // background-color: #f44336;
+        margin-bottom: -12px;
+        // padding-bottom: 100px;
+    }
+}
+
+.form-passenger-passport {
+    display: flex;
+    flex-direction: column;
+    .form-passenger-passport-content {
+        margin-bottom: -12px;
+        // background-color: #4CAF50;
+    }
+}
+.form-passenger-passport-country {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.form-passenger-contact {
+    display: flex;
+    flex-direction: column;
+    .form-passenger-contact-phone-content {
+        margin-bottom: -12px;
+        // background-color: #4CAF50;
+    }
+    .form-passenger-contact-email-content {
+        margin-bottom: -12px;
+    }
+}
+.form-passenger-contact-phone {
+    display: flex;
+    flex-direction: row;
+    flex: 1 50%;
+    gap: 16px;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    width: 90vw;
+}
+.footer-container-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+}
+.footer-container button {
+    width: 100%;
+    height: 60px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #222;
+}
+
+// เพิ่ม styles สำหรับ validation errors
+mat-form-field {
+  margin-bottom: 8px;
+}
+
+mat-error {
+  font-size: 12px;
+  color: #f44336;
+}
+
+// ปรับปรุง button styles
+button[disabled] {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed;
+}
+
+.yellow-button {
+  background-color: #FFD600 !important;
+  color: #222 !important;
+  border: 2px solid #222 !important;
+}
+
+.yellow-button:hover {
+  background-color: #FFC107 !important;
+}
+    
