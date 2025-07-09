@@ -59,7 +59,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     })
   ],
-  providers: [{ provide: APP_BASE_HREF, useValue: '/botnoi-liff' }],
+  providers: [{ provide: APP_BASE_HREF, useValue: '/botnoi-liff/' }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
