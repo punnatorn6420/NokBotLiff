@@ -2,10 +2,18 @@
     <app-header></app-header>
     <div class="container-passenger-form">
         <div class="number-passenger-scroll">
-            <div *ngFor="let passenger of numberPassengerArray">
+            <!-- <div *ngFor="let passenger of numberPassengerArray">
                 <div class="number-passenger-box" [class.active]="selectedPassenger === passenger"
                     [class.valid]="passengerForms[passenger].valid"
                     [class.invalid]="passengerForms[passenger].invalid && passengerForms[passenger].touched"
+                    (click)="selectPassenger(passenger)">
+                    {{ 'PASSENGER_NUMBER' | translate }} {{ passenger }}
+                </div>
+            </div> -->
+            <div *ngFor="let passenger of numberPassengerArray">
+                <div class="number-passenger-box" [class.active]="selectedPassenger === passenger"
+                    [class.valid]="passengerForms[passenger].valid"
+                    [class.invalid]="hasInvalidTouchedFields(passenger)"
                     (click)="selectPassenger(passenger)">
                     {{ 'PASSENGER_NUMBER' | translate }} {{ passenger }}
                 </div>
@@ -13,8 +21,10 @@
         </div>
         <div class="form-passenger-container">
             <form [formGroup]="currentForm">
-                <p style="margin-bottom: 15px; font-weight: 700; font-size: 20px;">{{ 'PASSENGER_INFO' | translate }} <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
-                <p style="margin-bottom: 20px; font-weight: 400; font-size: 20px;">{{ 'GENERAL_INFORMATION' | translate }}</p>
+                <p style="margin-bottom: 15px; font-weight: 700; font-size: 20px;">{{ 'PASSENGER_INFO' | translate }}
+                    <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
+                <p style="margin-bottom: 20px; font-weight: 400; font-size: 20px;">{{ 'GENERAL_INFORMATION' | translate
+                    }}</p>
                 <div class="form-passenger-info">
                     <mat-form-field class="form-passenger-info-content" appearance="outline">
                         <mat-label>{{ 'PREFIX' | translate }}</mat-label>
@@ -41,6 +51,9 @@
                     <mat-form-field class="form-passenger-info-content" appearance="outline">
                         <mat-label>{{ 'MIDDLE_NAME' | translate }}</mat-label>
                         <input matInput formControlName="middleName">
+                        <mat-error *ngIf="currentForm.get('middleName')?.hasError('pattern')">
+                            {{ 'ERROR_PATTERN_MIDDLE_NAME' | translate }}
+                        </mat-error>
                     </mat-form-field>
                     <br>
                     <mat-form-field class="form-passenger-info-content" appearance="outline">
@@ -56,7 +69,7 @@
                     <br>
                     <mat-form-field class="form-passenger-info-content" appearance="outline">
                         <mat-label>{{ 'BIRTH_DATE' | translate }}</mat-label>
-                        <input matInput [matDatepicker]="birthPicker" required formControlName="birthDate">
+                        <input matInput [matDatepicker]="birthPicker" required formControlName="birthDate" [placeholder]="'BIRTH_DATE_PLACEHOLDER' | translate">
                         <mat-datepicker-toggle matIconSuffix [for]="birthPicker"></mat-datepicker-toggle>
                         <mat-datepicker #birthPicker></mat-datepicker>
                         <mat-error *ngIf="currentForm.get('birthDate')?.hasError('required')">
@@ -175,9 +188,10 @@
 
             <div class="footer-container">
                 <div class="footer-container-text">
-                    <u *ngIf="selectedPassenger < numberPassenger"
-                        (click)="checkPassengerValid(selectedPassenger)">{{ 'NEXT_PASSENGER' | translate }}</u>
-                    <u *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()">{{ 'COMPLETE' | translate }}</u>
+                    <u *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">{{
+                        'NEXT_PASSENGER' | translate }}</u>
+                    <u *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()">{{ 'COMPLETE' | translate
+                        }}</u>
                     <div *ngIf="selectedPassenger < numberPassenger"
                         style="display: flex; align-items: center; justify-content: center;">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -193,7 +207,7 @@
                     (click)="nextStep()" [disabled]="!isAllPassengersValid()">
                     {{ 'CONFIRM' | translate }}
                 </button>
-                 <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
+                <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
                     (click)="nextStep()">
                     ยืนยัน
                 </button> -->

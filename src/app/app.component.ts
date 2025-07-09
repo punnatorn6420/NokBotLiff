@@ -11,7 +11,7 @@ export class AppComponent {
   language: string = 'th';
 
   constructor(private passDataService: PassDataService) {
-    this.passDataService.setLanguage('th');
+    this.passDataService.setLanguage('en');
   }
 
   ngOnInit() {

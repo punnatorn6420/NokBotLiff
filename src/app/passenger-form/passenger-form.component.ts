@@ -94,7 +94,7 @@ export class PassengerFormComponent {
     this.apiService.getRestcountries().subscribe((res: any) => {
       this.convertRestcountries(res);
     });
-    this.numberPassenger = 3;
+    this.numberPassenger = 2;
     this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
 
     this.initializePassengerForms();
@@ -135,7 +135,7 @@ export class PassengerFormComponent {
         this.passengerForms[passengerNumber] = new FormGroup({
           selectedPrefix: new FormControl('', [Validators.required]),
           firstName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
-          middleName: new FormControl(''),
+          middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required, this.minAgeValidator(18)]),
           nationality: new FormControl('', [Validators.required]),
@@ -152,7 +152,7 @@ export class PassengerFormComponent {
         this.passengerForms[passengerNumber] = new FormGroup({
           selectedPrefix: new FormControl('', [Validators.required]),
           firstName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
-          middleName: new FormControl(''),
+          middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required]),
           nationality: new FormControl('', [Validators.required]),
@@ -311,8 +311,34 @@ export class PassengerFormComponent {
     };
   }
 
-  // isAnyFieldFilled(passenger: number): boolean {
+  // isAnyFieldFilled(passenger: any): boolean {
   //   const controls = this.passengerForms[passenger].controls;
   //   return Object.values(controls).some(control => !!control.value);
   // }
+
+  // เพิ่มฟังก์ชันใหม่สำหรับตรวจสอบ field ที่จำเป็นแต่ละตัว
+  isPassengerFieldValid(passenger: number, fieldName: string): boolean {
+    const form = this.passengerForms[passenger];
+    if (!form) return false;
+    
+    const control = form.get(fieldName);
+    if (!control) return true; // ถ้าไม่มี control ให้ถือว่าถูกต้อง
+    
+    return !control.invalid || !control.touched;
+  }
+
+  // ตรวจสอบว่าผู้โดยสารมี field ที่ invalid และ touched หรือไม่
+  hasInvalidTouchedFields(passenger: number): boolean {
+    const form = this.passengerForms[passenger];
+    if (!form) return false;
+    
+    const requiredFields = passenger === 1 
+      ? ['selectedPrefix', 'firstName', 'lastName', 'birthDate', 'nationality', 'country', 'passportNumber', 'issuedBy', 'expireDate', 'phoneNumber', 'email']
+      : ['selectedPrefix', 'firstName', 'lastName', 'birthDate', 'nationality', 'country', 'passportNumber', 'issuedBy', 'expireDate'];
+    
+    return requiredFields.some(fieldName => {
+      const control = form.get(fieldName);
+      return control && control.invalid && control.touched;
+    });
+  }
 }
