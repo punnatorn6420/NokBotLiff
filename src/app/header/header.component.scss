@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 .header-container {
   width: 100%;
   height: 140px;
@@ -96,7 +102,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 22px;
         font-weight: bold;
         margin-bottom: 4px;
         transition: all 0.2s;
@@ -112,9 +118,10 @@
         left: 50%;
         width: max-content;
         transform: translateX(-50%);
-        font-size: 10px;
+        font-size: 16px;
+        font-family: 'DB Ozone X';
         color: #4F4F4F;
-        font-weight: 600;
+        font-weight: bold;
       }
       &.active .circle {
         background: #FFD600;

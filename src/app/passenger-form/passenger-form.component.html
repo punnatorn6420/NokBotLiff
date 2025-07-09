@@ -21,9 +21,9 @@
         </div>
         <div class="form-passenger-container">
             <form [formGroup]="currentForm">
-                <p style="margin-bottom: 15px; font-weight: 700; font-size: 20px;">{{ 'PASSENGER_INFO' | translate }}
+                <p style="margin-bottom: 15px; font-weight: 700; font-size: 23px;">{{ 'PASSENGER_INFO' | translate }}
                     <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
-                <p style="margin-bottom: 20px; font-weight: 400; font-size: 20px;">{{ 'GENERAL_INFORMATION' | translate
+                <p style="margin-bottom: 20px; font-weight: 400; font-size: 22px;">{{ 'GENERAL_INFORMATION' | translate
                     }}</p>
                 <div class="form-passenger-info">
                     <mat-form-field class="form-passenger-info-content" appearance="outline">
@@ -80,7 +80,7 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 20px;">
+                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;">
                     {{ 'PASSPORT_INFO' | translate }}
                 </p>
                 <div class="form-passenger-passport">
@@ -145,14 +145,12 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 20px;"
+                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;"
                     *ngIf="selectedPassenger === 1">{{ 'CONTACT_INFO' | translate }}</p>
                 <div class="form-passenger-contact" *ngIf="selectedPassenger === 1">
                     <div class="form-passenger-contact-phone">
                         <mat-form-field class="form-passenger-contact-phone-content" style="width: 20%;"
                             appearance="outline">
-                            <!-- <mat-label *ngIf="currentForm.get('phonePrefix')?.value === ''">+66</mat-label>
-                            <mat-label *ngIf="currentForm.get('phonePrefix')?.value !== ''">Dial Code</mat-label> -->
                             <input type="text" aria-label="เบอร์โทรศัพท์" matInput formControlName="phonePrefix"
                                 [matAutocomplete]="autoPhonePrefix" placeholder="+66">
                             <mat-autocomplete #autoPhonePrefix="matAutocomplete">
@@ -160,6 +158,23 @@
                                     [value]="option">{{option}}</mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
+                        <!-- <mat-form-field>
+                            <mat-label>States Group</mat-label>
+                            <input type="text"
+                                   matInput
+                                   formControlName="stateGroup"
+                                   required
+                                   [matAutocomplete]="autoGroup">
+                              <mat-autocomplete #autoGroup="matAutocomplete">
+                                @for (group of filteredStateGroupOptions | async; track group) {
+                                  <mat-optgroup [label]="group.letter">
+                                    @for (name of group.names; track name) {
+                                      <mat-option [value]="name">{{name}}</mat-option>
+                                    }
+                                  </mat-optgroup>
+                                }
+                            </mat-autocomplete>
+                          </mat-form-field> -->
                         <mat-form-field class="form-passenger-contact-phone-content" style="width: 80%;"
                             appearance="outline">
                             <mat-label>{{ 'PHONE' | translate }}</mat-label>
@@ -190,8 +205,7 @@
                 <div class="footer-container-text">
                     <u *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">{{
                         'NEXT_PASSENGER' | translate }}</u>
-                    <u *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()">{{ 'COMPLETE' | translate
-                        }}</u>
+                    <u *ngIf="selectedPassenger === numberPassenger"></u>
                     <div *ngIf="selectedPassenger < numberPassenger"
                         style="display: flex; align-items: center; justify-content: center;">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

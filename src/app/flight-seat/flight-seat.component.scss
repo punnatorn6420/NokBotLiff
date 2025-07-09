@@ -1,9 +1,19 @@
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'DB Ozone X' !important;
+}
 .flight-header {
     width: 90%;
     margin: 0 auto;
   p {
     padding-top: 20px;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
   }
   .flight-toggle {
@@ -39,7 +49,7 @@
     min-width: 160px;
     // height: 30px;
     padding: 0.8rem 0;
-    font-size: 16px;
+    font-size: 22px;
     border: none;
     outline: none;
     background: transparent;
@@ -79,7 +89,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 22px;
   color: #111;
   font-weight: 400;
   border: none;
@@ -129,7 +139,7 @@
   height: 50px;
   padding-left: 10px;
   padding-right: 10px;
-  font-size: 1.5rem;
+  font-size: 22px;
   margin-bottom: 20px;
   margin-top: 20px;
   font-weight: 400;
@@ -159,7 +169,7 @@
 }
 
 .passenger-name {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 400;
 }
 
@@ -320,16 +330,26 @@
 .footer-warning-tax {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
   margin-bottom: 20px;
   gap: 5px;
+}
+
+.footer-warning-icon-text-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-warning-icon-in-text {
+  margin-top: -12px;
 }
 
 .footer-warning-text {
   min-width: 260px;
   max-width: 340px;
   margin-right: 16px;
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 400;
   color: #222;
   font-family: inherit;
@@ -342,7 +362,7 @@
   min-height: 60px;
   background: #ffd000;
   color: #111;
-  font-size: 16px;
+  font-size: 22px;
   border: 2px solid #111;
   border-radius: 8px;
   font-family: inherit;
@@ -363,24 +383,28 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 32px;
+  gap: 10px;
   width: 90vw;
 }
 
 .btn-cancel {
   background: #f44336;
   color: #fff;
-  font-size: 16px;
+  font-size: 22px;
   border: none;
   border-radius: 8px;
-  min-width: 80px;
+  min-width: 140px;
   min-height: 60px;
+  max-width: 240px;
   padding: 0 16px;
   font-family: inherit;
   font-weight: 400;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  // overflow: hidden;
+  // text-overflow: ellipsis;
   cursor: pointer;
   transition: filter 0.2s;
 }
@@ -391,28 +415,35 @@
 .btn-confirm {
   background: #ffd000;
   color: #111;
-  font-size: 16px;
+  font-size: 22px;
   border: 2px solid #111;
   border-radius: 8px;
-  min-width: 189px;
+  width: 340px;               
   min-height: 60px;
-  font-family: inherit;
+  font-family: 'DB Ozone X';
   font-weight: 400;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  white-space: nowrap;
   padding: 0 36px;
   cursor: pointer;
   transition: filter 0.2s;
-  gap: 32px;
+  gap: 5;                      
 }
 .btn-confirm:active {
   filter: brightness(0.95);
 }
 
+.btn-confirm-text {
+  white-space: nowrap;
+}
+
 .btn-price {
-  font-size: 16px;
+  margin-left: 5px;
+  font-size: 22px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .detail-seat-price {
@@ -465,7 +496,7 @@
   flex-direction: column;
 }
 .seat-type-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   color: #111;
 }

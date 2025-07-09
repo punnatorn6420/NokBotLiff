@@ -143,21 +143,24 @@
 
     <div class="footer-btn">
         <div class="footer-detail-container">
-            <div class="footer-warning-tax">
-                <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="16" fill="#262626"/>
-                    <text x="16" y="22" text-anchor="middle" font-size="20" fill="#fff" font-family="Arial" font-weight="bold">i</text>
-                </svg>
-                <span class="footer-warning-text">
-                    {{ 'SEAT_SELECTION_FEES_VARY_BY_SEAT_TYPE' | translate }}
-                </span>
-                <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice" *ngIf="isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-warning-icon">
-                    <path d="M13 6L8 11L3 6" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice"  *ngIf="!isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 10L8 5L13 10" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                    
+            <div class="footer-warning-tax" (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice">
+                <div class="footer-warning-icon-text-container">
+                    <svg class="footer-warning-icon-in-text" width="18" height="18" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="16" fill="#262626"/>
+                        <text x="16" y="22" text-anchor="middle" font-size="20" fill="#fff" font-family="Arial" font-weight="bold">i</text>
+                    </svg>
+                    <p class="footer-warning-text">
+                        {{ 'SEAT_SELECTION_FEES_VARY_BY_SEAT_TYPE' | translate }}
+                    </p>
+                </div>
+                <div class="footer-warning-icon-container" (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice">
+                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice" *ngIf="isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-warning-icon">
+                        <path d="M13 6L8 11L3 6" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice"  *ngIf="!isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 10L8 5L13 10" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>             
             </div>
             <div class="detail-seat-price-close" *ngIf="!isShowDetailSeatPrice"></div>
             <div class="detail-seat-price horizontal" *ngIf="isShowDetailSeatPrice">
@@ -215,7 +218,7 @@
         <div *ngIf="selectedSeat && selectedSeat.length > 0" class="select-seat-btn">
             <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button>
             <button class="btn-confirm" (click)="confirmSelectSeat()">
-                <span>{{ 'Confirm_Seat' | translate }}</span>
+                <span class="btn-confirm-text">{{ 'Confirm_Seat' | translate }}</span>
                 <span class="btn-price">{{ selectedSeatPrice | number:'1.2-2' }} THB</span>
             </button>
         </div>

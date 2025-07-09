@@ -1,3 +1,46 @@
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'DB Ozone X';
+}
+mat-label {
+  font-size: 22px;
+  font-weight: 400;
+  color: #222;
+  font-family: 'DB Ozone X';
+}
+
+mat-error {
+  font-family: 'DB Ozone X';
+  font-size: 18px;
+  color: #f44336;
+  font-weight: 400;
+  padding-right: 20px;
+  white-space: nowrap;
+}
+
+::ng-deep .mat-mdc-select-value {
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: #222 !important;
+}
+::ng-deep .mat-mdc-form-field-input-control.mat-mdc-form-field-input-control {
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: #222 !important;
+}
+::ng-deep .mat-mdc-option {
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: #222 !important;
+}
+
+
 .number-passenger-scroll {
   position: sticky;
   top: 0;
@@ -22,7 +65,7 @@
     border: 3px solid #ccc;
     border-radius: 8px;
     color: #ccc;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 400;
     position: relative;
     cursor: pointer;
@@ -164,7 +207,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
 }
@@ -174,7 +217,8 @@
     border-radius: 8px;
     margin-top: 20px;
     margin-bottom: 40px;
-    font-size: 16px;
+    font-size: 22px;
+    font-family: 'DB Ozone X';
     font-weight: 400;
     color: #222;
 }
@@ -184,10 +228,10 @@ mat-form-field {
   margin-bottom: 8px;
 }
 
-mat-error {
-  font-size: 12px;
-  color: #f44336;
-}
+// mat-error {
+//   font-size: 12px;
+//   color: #f44336;
+// }
 
 // ปรับปรุง button styles
 button[disabled] {

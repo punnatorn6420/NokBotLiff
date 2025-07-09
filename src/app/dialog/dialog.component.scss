@@ -1,3 +1,14 @@
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'DB Ozone X';
+}
+
 ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
     border-radius: var(--mdc-dialog-container-shape, var(--mdc-shape-medium, 8px)) !important;
 }
@@ -19,7 +30,7 @@
 }
 
 .dialog-title-custom {
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     color: #222;
 }
@@ -41,7 +52,7 @@
 }
 
 .dialog-message-custom {
-    font-size: 16px;
+    font-size: 18px;
     color: #222;
     line-height: 1.5;
 }
@@ -59,7 +70,7 @@
     border: none !important;
     min-width: 140px;
     height: 60px;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 400;
 }
 
@@ -73,8 +84,10 @@
     color: #222 !important;
     border-radius: 8px !important;
     min-width: 140px;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
+    border: none;
+    border: 1px solid #222;
     box-shadow: none !important;
 }
 
@@ -88,9 +101,15 @@
 }
 
 .dialog-title-alert-seat{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
+}
+.dialog-title-alert-seat-cancel{
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-left: 10px;
 }
 
 .dialog-actions-custom-alert-seat{
@@ -103,10 +122,11 @@
     min-width: 270px;
     min-height: 60px;
     border-radius: 8px !important;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
     color: #000;
-    border: 2px solid #222;
+    border: none;
+    border: 1px solid #222;
     background: #FFD600 !important;
 }
 
@@ -115,7 +135,7 @@
 }
 
 .dialog-title-alert-select-seat{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
 }
@@ -124,11 +144,43 @@
     width: 100%;
     height: 60px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
     color: #000;
-    border: 2px solid #222;
+    border: none;
+    border: 1px solid #222;
     background: #FFD600 !important;
+}
+.btn-confirm-alert-select-seat-cancel{
+    width: 100%;
+    height: 60px;
+    border-radius: 8px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    border: none;
+    background: #F04438 !important;
+}
+
+.dialog-title-alert-seat-not-enough{
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-left: 10px;
+}
+
+.dialog-title-alert-seat-not-include-package{
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-left: 10px;
+}
+
+
+.dialog-header-custom-alert-seat{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .cancel-select-seat{
@@ -136,7 +188,7 @@
 }
 
 .dialog-title-cancel-select-seat{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
 }
@@ -146,7 +198,7 @@
 }
 
 .dialog-title-alert-select-seat-not-enough{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
 }
