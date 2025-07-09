@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY . .
 RUN npm ci
-RUN npm run build -- --base-href /botnoi-liff/
+RUN npm run build
 
 FROM nginx:stable-alpine
 
