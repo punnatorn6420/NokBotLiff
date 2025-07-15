@@ -399,9 +399,53 @@ export class FlightSeatComponent {
 
   ngOnInit() {
     this.passDataService.getFormData().subscribe((data: any) => {
-      this.formData = data as Passenger[];
-      this.passengers = Object.values(this.formData);
+      if (data && Object.keys(data).length > 0) {
+        this.formData = data as Passenger[];
+        this.passengers = Object.values(this.formData);
+
+        // --- check and set seat.status = 'selected' ---
+        // 1. combine seatID that is selected
+        const selectedSeatIDs = this.passengers
+          .map((p: any) => p.seatID)
+          .filter((id: string) => !!id);
+
+        // 2. loop seatMap and set status
+        for (const row of this.seatMap) {
+          for (const seat of row) {
+            if (!seat) continue;
+            if (selectedSeatIDs.includes(seat.label)) {
+              seat.status = 'selected';
+            } else if (seat.status === 'selected') {
+              // if seat is selected but not in selectedSeatIDs, then reset
+              seat.status = 'available';
+            }
+          }
+        }
+        // --- end ---
+
+      } else {
+        this.formData = [];
+        this.passengers = [];
+      }
     });
+
+    this.passDataService.getSeatData().subscribe((data: any) => {
+      if (data && data.length > 0) {
+      this.SelectedSeat = data;
+      this.selectedSeat = this.seatMap.map(row => row.map(seat => ({
+          ...seat, 
+          status: data.includes(seat?.label) ? 'selected' : 'available'
+        })));
+      } else {
+        this.SelectedSeat = [];
+        this.selectedSeat = [];
+      }
+    });
+
+    // this.passDataService.getFormData().subscribe((data: any) => {
+    //   this.formData = data as Passenger[];
+    //   this.passengers = Object.values(this.formData);
+    // });
     
   }
 
@@ -413,16 +457,20 @@ export class FlightSeatComponent {
     this.selectedFlight = flight;
   }
 
+  setPassengerData() {
+    this.passDataService.setFormData(this.passengers);
+  }
+
   selectSeat(seat: any) {
     console.log('จำนวนที่นั่งที่เลือกแล้ว:', this.SelectedSeat.length);
     console.log('จำนวนผู้โดยสาร:', this.passengers.length);
     
-    // ตรวจสอบว่าที่นั่งนี้ถูกเลือกแล้วหรือไม่
+    // check if seat is selected
     if (this.SelectedSeat.includes(seat.label) && seat.status === 'selected') {
-      // ถ้าเลือกแล้ว ให้ยกเลิกการเลือก
+      // if seat is selected, then cancel selection
       seat.status = 'available';
       
-      // หาผู้โดยสารที่มีที่นั่งนี้และลบ seatID ออก
+      // find passenger that has seatID and delete seatID
       const passengerWithSeat = this.passengers.find(p => p.seatID === seat.label);
       if (passengerWithSeat) {
         passengerWithSeat.seatID = '';
@@ -434,13 +482,13 @@ export class FlightSeatComponent {
       return;
     }
     
-    // ตรวจสอบว่าจำนวนที่นั่งที่เลือกแล้วไม่เกินจำนวนผู้โดยสาร
+    // check if selected seat is more than passengers
     if (this.SelectedSeat.length >= this.passengers.length) {
       console.log("ไม่สามารถเลือกที่นั่งเพิ่มได้ เนื่องจากเลือกครบจำนวนผู้โดยสารแล้ว");
       return;
     }
     
-    // ตรวจสอบที่นั่ง exit row
+    // check if seat is exit row
     if (seat.exit) {
       const dialogRef = this.dialog.open(DialogComponent, {
         width: '350px',
@@ -451,10 +499,10 @@ export class FlightSeatComponent {
       });
       dialogRef.afterClosed().subscribe((result: any) => {
         if (result.result === 'confirm') {
-          // ตรวจสอบอีกครั้งหลังจาก dialog ปิด
+          // check again after dialog close
           if (this.SelectedSeat.length < this.passengers.length && seat.status === 'available') {
             seat.status = 'selected';
-            // หาผู้โดยสารคนแรกที่ยังไม่มีที่นั่ง
+            // find first passenger that has no seatID
             const passengerIndex = this.passengers.findIndex(p => !p.seatID || p.seatID === '');
             if (passengerIndex !== -1) {
               this.passengers[passengerIndex].seatID = seat.label;
@@ -468,10 +516,10 @@ export class FlightSeatComponent {
       return;
     }
 
-    // เลือกที่นั่งปกติ
+    // select normal seat
     if (seat.status === 'available') {
       seat.status = 'selected';
-      // หาผู้โดยสารคนแรกที่ยังไม่มีที่นั่ง
+      // find first passenger that has no seatID
       const passengerIndex = this.passengers.findIndex(p => !p.seatID || p.seatID === '');
       if (passengerIndex !== -1) {
         this.passengers[passengerIndex].seatID = seat.label;
@@ -495,6 +543,9 @@ export class FlightSeatComponent {
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result.result === 'confirm') {
+        this.setPassengerData();
+        this.passDataService.setSeatData(this.SelectedSeat);
+        this.router.navigate(['/review']);
         return;
       }
     });
@@ -510,12 +561,19 @@ export class FlightSeatComponent {
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result.result === 'confirm') {
-        this.selectedSeat.forEach(seat => {
-          seat.status = 'available';
-        });
-        // ลบ seatID ทั้งหมดจากผู้โดยสาร
+        // delete seatID from passengers and change seat status in seatMap
         this.passengers.forEach(passenger => {
-          passenger.seatID = '';
+          if (passenger.seatID) {
+            // find seat in seatMap that match seatID
+            for (const row of this.seatMap) {
+              for (const seat of row) {
+                if (seat && seat.label === passenger.seatID) {
+                  seat.status = 'available';
+                }
+              }
+            }
+            passenger.seatID = '';
+          }
         });
         this.selectedSeat = [];
         this.selectedSeatPrice = 0;
@@ -539,12 +597,14 @@ export class FlightSeatComponent {
         }
       });
     } else {
-      console.log("selectedSeat",this.selectedSeat);
+      this.setPassengerData();
+      this.passDataService.setSeatData(this.SelectedSeat);
+      this.router.navigate(['/review']);
     }
   }
 
   getPassengerNameBySeat(seat: any): string {
-    // หาผู้โดยสารที่มี seatID ตรงกับที่นั่งนี้
+    // find passenger that has seatID that match seat.label
     const passenger = this.passengers.find(p => p.seatID === seat.label);
     
     if (passenger) {

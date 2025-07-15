@@ -194,6 +194,10 @@ mat-error {
     gap: 16px;
 }
 
+::ng-deep .cdk-overlay-pane {
+  min-width: 350px !important;
+}
+
 .footer-container {
     display: flex;
     flex-direction: column;

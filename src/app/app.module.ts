@@ -22,7 +22,10 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { APP_BASE_HREF } from '@angular/common';
-
+import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
+import { ReviewPageComponent } from './review-page/review-page.component';
+import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
+import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/', '.json');
 }
@@ -34,7 +37,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     PassengerFormComponent,
     HeaderComponent,
     FlightSeatComponent,
-    DialogComponent
+    DialogComponent,
+    PdpaPageComponent,
+    ReviewPageComponent,
+    ConfirmPayComponent,
+    CounterServicePageComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +64,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    })
+    }),
   ],
   providers: [{ provide: APP_BASE_HREF, useValue: '/botnoi-liff/' }],
   bootstrap: [AppComponent]

@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class PassDataService {
   private formData = new BehaviorSubject<any>(null);
   private language = new BehaviorSubject<string>('th');
+  private seatData = new BehaviorSubject<any>(null);
   constructor() { }
 
   setLanguage(language: string) {
@@ -23,5 +24,13 @@ export class PassDataService {
 
   getFormData() {
     return this.formData.asObservable();
+  }
+
+  setSeatData(data: any) {
+    this.seatData.next(data);
+  }
+
+  getSeatData() {
+    return this.seatData.asObservable();
   }
 }

@@ -21,7 +21,7 @@ interface PassengerData {
   passportNumber: string;
   issuedBy: string;
   expireDate: Date | null;
-  phonePrefix?: string;
+  dialCode?: string;
   phoneNumber?: string;
   email?: string;
 }
@@ -75,22 +75,34 @@ export class PassengerFormComponent {
   countryOptions: string[] = [];
   issuedByOptions: string[] = [];
   phonePrefixOptions: string[] = [];
-  
+  dialCodeOptions: string[] = [];
+    
   filteredNationalityOptions!: Observable<string[]>;
   filteredCountryOptions!: Observable<string[]>;
   filteredIssuedByOptions!: Observable<string[]>;
   filteredPhonePrefixOptions!: Observable<string[]>;
+  filteredDialCodeOptions!: Observable<string[]>;
 
   constructor(private router: Router, 
     private dialog: MatDialog, 
     private apiService: ApiService, 
     private passDataService: PassDataService, 
     private translate: TranslateService) {
-      this.translate.setDefaultLang('th');
-      this.translate.use('th');
+      // this.translate.setDefaultLang('th');
+      // this.translate.use('th');
     }
 
   ngOnInit() {
+    this.passDataService.getFormData().subscribe((data: any) => {
+      if (data && Object.keys(data).length > 0) {
+        this.passengersData = data;
+        this.numberPassenger = Object.keys(this.passengersData).length;
+        this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
+        this.initializePassengerForms();
+        this.loadPassengerData(1);
+      }
+    });
+
     this.apiService.getRestcountries().subscribe((res: any) => {
       this.convertRestcountries(res);
     });
@@ -122,10 +134,34 @@ export class PassengerFormComponent {
     }
 
     this.countryOptions = _data.map((item: any) => item.name);
-    this.phonePrefixOptions = _data.map((item: any) => item.idd);
+    // this.phonePrefixOptions = _data.map((item: any) => item.idd);
     this.issuedByOptions = _data.map((item: any) => item.name);
     this.nationalityOptions = _data.map((item: any) => item.name);
-    console.log(this.phonePrefixOptions);
+    // this.dialCodeOptions = _data.map((item: any) => ({
+    //   letter: item.name,
+    //   names: [item.idd]  // เปลี่ยนเป็น array
+    // }));
+    this.dialCodeOptions = _data.map((item: any) => item.name + ': ' + item.idd);
+    // console.log(this.dialCodeOptions);
+    // console.log(this.phonePrefixOptions);
+  }
+
+  // เพิ่มฟังก์ชันใหม่สำหรับแยกรหัสประเทศ
+  extractDialCode(fullText: string): string {
+    const colonIndex = fullText.indexOf(': ');
+    if (colonIndex !== -1) {
+      return fullText.substring(colonIndex + 2); // ตัดเอาเฉพาะส่วนหลัง ": "
+    }
+    return fullText; // ถ้าไม่มี ":" ให้ส่งคืนข้อความเดิม
+  }
+
+  // เพิ่มฟังก์ชันสำหรับแสดงชื่อประเทศใน autocomplete
+  getDisplayText(fullText: string): string {
+    const colonIndex = fullText.indexOf(': ');
+    if (colonIndex !== -1) {
+      return fullText.substring(0, colonIndex); // ตัดเอาเฉพาะส่วนก่อน ": "
+    }
+    return fullText;
   }
 
   // สร้าง FormGroup สำหรับผู้โดยสารแต่ละคน
@@ -143,7 +179,7 @@ export class PassengerFormComponent {
           passportNumber: new FormControl('', [Validators.required]),
           issuedBy: new FormControl('', [Validators.required]),
           expireDate: new FormControl(null, [Validators.required]),
-          phonePrefix: new FormControl(''),
+          dialCode: new FormControl(''),
           phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d{10}$/)]),
           email: new FormControl('', [Validators.required, Validators.email])
         });
@@ -185,11 +221,24 @@ export class PassengerFormComponent {
 
     // เฉพาะผู้โดยสารคนที่ 1 เท่านั้นที่มี phonePrefix
     if (this.selectedPassenger === 1) {
-      this.filteredPhonePrefixOptions = this.currentForm.get('phonePrefix')!.valueChanges.pipe(
+      // this.filteredPhonePrefixOptions = this.currentForm.get('phonePrefix')!.valueChanges.pipe(
+      //   startWith(''),
+      //   map(value => this._filterPhone(value || '')),
+      // );
+
+      this.filteredDialCodeOptions = this.currentForm.get('dialCode')!.valueChanges.pipe(
         startWith(''),
-        map(value => this._filterPhone(value || '')),
+        map(value => {
+          const stringValue = typeof value === 'string' ? value : '';
+          return this._filterDialCode(stringValue);
+        }),
       );
     }
+
+    // this.filteredDialCodeOptions = this.currentForm.get('dialCode')!.valueChanges.pipe(
+    //   startWith(''),
+    //   map(value => this._filterDialCode(value || '')),
+    // );
   }
 
   private _filterNationality(value: string): string[] {
@@ -207,9 +256,21 @@ export class PassengerFormComponent {
     return this.issuedByOptions.filter(option => option.toLowerCase().includes(filterValue));
   }
 
-  private _filterPhone(value: string): string[] {
+  // private _filterPhone(value: string): string[] {
+  //   const filterValue = value.toLowerCase();
+  //   return this.phonePrefixOptions.filter(option => option.toLowerCase().includes(filterValue));
+  // }
+
+  // private _filterDialCode(value: any): { letter: string; names: string[] }[] {
+  //   const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
+  //   return this.dialCodeOptions.filter(option => 
+  //     option.letter.toLowerCase().includes(filterValue) || 
+  //     option.names.some(name => name.includes(filterValue))
+  //   );
+  // }
+  private _filterDialCode(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.phonePrefixOptions.filter(option => option.toLowerCase().includes(filterValue));
+    return this.dialCodeOptions.filter(option => option.toLowerCase().includes(filterValue));
   }
 
   // บันทึกข้อมูลผู้โดยสารปัจจุบัน
@@ -283,7 +344,7 @@ export class PassengerFormComponent {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result.result === 'confirm') {
         this.passDataService.setFormData(this.passengersData);
-        this.router.navigate(['/seat']);
+        this.router.navigate(['/select-seat']);
         // if (this.selectedPassenger < this.numberPassenger) {
         //   this.selectedPassenger++;
         //   this.loadPassengerData(this.selectedPassenger);
@@ -340,5 +401,13 @@ export class PassengerFormComponent {
       const control = form.get(fieldName);
       return control && control.invalid && control.touched;
     });
+  }
+
+  trackGroup(index: number, group: { letter: string; names: string[] }): string {
+    return group.letter;
+  }
+
+  trackName(index: number, name: string): string {
+    return name;
   }
 }
