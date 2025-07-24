@@ -1,7 +1,7 @@
 <div class="review-page-container">
     <app-header [currentStep]="3"></app-header>
     <div class="review-page-content">
-        <p class="review-page-title">ตรวจสอบข้อมูลการจอง</p>
+        <p class="review-page-title">{{ 'REVIEW_PAGE_TITLE' | translate }}</p>
         <!-- Accordion: Passenger 1 -->
         <div class="accordion passenger" *ngFor="let passenger of passengers; let i = index">
             <div class="accordion-header active">
@@ -15,78 +15,92 @@
                     <path d="M13.5 6L8.5 11L3.5 6" stroke="#262626" stroke-width="1.5" stroke-linecap="round"
                         stroke-linejoin="round" />
                 </svg>
-                <span (click)="togglePassengerInfo(i)" *ngIf="passenger == passengers[0]">ผู้โดยสารคนที่ {{i+1}}
-                    (ผู้จอง)</span>
-                <span (click)="togglePassengerInfo(i)" *ngIf="passenger != passengers[0]">ผู้โดยสารคนที่ {{i+1}}</span>
+                <span (click)="togglePassengerInfo(i)" *ngIf="passenger == passengers[0]">{{ 'REVIEW_PAGE_PASSENGER_1' |
+                    translate }}</span>
+                <span (click)="togglePassengerInfo(i)" *ngIf="passenger != passengers[0]">{{ 'REVIEW_PAGE_PASSENGER' |
+                    translate }} {{i+1}}</span>
             </div>
             <div class="accordion-body" *ngIf="!isPassengerInfoOpen[i]">
                 <div class="passenger-info">
                     <div class="info-section">
-                        <div class="info-title">ข้อมูลทั่วไป</div>
+                        <div class="header-info-passenger">
+                            <div class="info-title">{{ 'REVIEW_PAGE_TITLE_DATA_PASSENGER' | translate }}</div>
+                            <div class="edit-info-passenger" (click)="editInfoPassenger(i)">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.99935 4.50045L11.9993 6.50045M8.66602 13.8338H13.9993M3.33268 11.1671L2.66602 13.8338L5.33268 13.1671L13.0567 5.44312C13.3066 5.19308 13.4471 4.854 13.4471 4.50045C13.4471 4.1469 13.3066 3.80782 13.0567 3.55778L12.942 3.44312C12.692 3.19315 12.3529 3.05273 11.9993 3.05273C11.6458 3.05273 11.3067 3.19315 11.0567 3.44312L3.33268 11.1671Z"
+                                        stroke="#DE3024" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                                <p>แก้ไข</p>
+                            </div>
+                        </div>
                         <div class="info-row">
-                            <div class="info-label">คำนำหน้า:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_TITLE_PASSNEGER' | translate }}</div>
                             <div class="info-value">{{passenger.selectedPrefix}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">ชื่อ (ภาษาอังกฤษ):</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_FIRST_NAME' | translate }}</div>
                             <div class="info-value">{{passenger.firstName}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">ชื่อกลาง (ภาษาอังกฤษ):</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_MIDDLE_NAME' | translate }}</div>
                             <div class="info-value" *ngIf="passenger.middleName">{{passenger.middleName}}</div>
                             <div class="info-value" *ngIf="!passenger.middleName">-</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">นามสกุล (ภาษาอังกฤษ):</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_LAST_NAME' | translate }}</div>
                             <div class="info-value">{{passenger.lastName}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">วัน/เดือน/ปีเกิด:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_BIRTH_DATE' | translate }}</div>
                             <div class="info-value">{{passenger.birthDate | date:'dd/MM/yyyy'}}</div>
                         </div>
                     </div>
                     <div class="info-divider"></div>
                     <div class="info-section">
-                        <div class="info-title">ข้อมูลหนังสือเดินทาง</div>
+                        <div class="info-title">{{ 'REVIEW_PAGE_PASSPORT_TITLE' | translate }}</div>
                         <div class="info-row">
-                            <div class="info-label">สัญชาติ:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_NATIONALITY' | translate }}</div>
                             <div class="info-value">{{passenger.nationality}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">ประเทศ:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_COUNTRY_OF_RESIDENCE' | translate }}</div>
                             <div class="info-value">{{passenger.country}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">หมายเลขหนังสือเดินทาง:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_PASSPORT_NUMBER' | translate }}</div>
                             <div class="info-value">{{passenger.passportNumber}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">ออกโดย:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_ISSUED_BY' | translate }}</div>
                             <div class="info-value">{{passenger.issuedBy}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">วันหมดอายุ:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_PASSPORT_EXPIRY_DATE' | translate }}</div>
                             <div class="info-value">{{passenger.expireDate | date:'dd/MM/yyyy'}}</div>
                         </div>
                     </div>
                     <div class="info-divider" *ngIf="passenger == passengers[0]"></div>
                     <div class="info-section" *ngIf="passenger == passengers[0]">
-                        <div class="info-title">ช่องทางการติดต่อ</div>
+                        <div class="info-title">{{ 'REVIEW_PAGE_CONTACT_INFORMATION' | translate }}</div>
                         <div class="info-row">
-                            <div class="info-label">เบอร์โทรศัพท์มือถือ:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_CONTACT_Mobile_Number' | translate }}</div>
                             <div class="info-value">({{passenger.dialCode}}) {{passenger.phoneNumber}}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">อีเมล:</div>
+                            <div class="info-label">{{ 'REVIEW_PAGE_CONTACT_Email' | translate }}</div>
                             <div class="info-value">{{passenger.email}}</div>
                         </div>
                     </div>
-                    <u class="more-info-btn" (click)="togglePassengerInfo(i)">ย่อข้อมูลผู้โดยสาร</u>
+                    <u class="more-info-btn" (click)="togglePassengerInfo(i)">{{ 'REVIEW_PAGE_CLOSE_DATA_PASSENGER' |
+                        translate }}</u>
                 </div>
             </div>
             <div class="accordion-body" *ngIf="isPassengerInfoOpen[i]">
-                <u style="font-size: 18px; font-weight: 400; color: #858585;"
-                    (click)="togglePassengerInfo(i)">ดูข้อมูลผู้โดยสาร</u>
+                <u style="font-size: 18px; font-weight: 400; color: #858585;" (click)="togglePassengerInfo(i)">{{
+                    'REVIEW_PAGE_OPEN_DATA_PASSENGER' | translate }}</u>
             </div>
         </div>
         <!-- Flight Info -->
@@ -113,7 +127,7 @@
     </div> -->
 
         <div class="container-flight-card">
-            <p class="info-title">ข้อมูลการเดินทาง</p>
+            <p class="info-title">{{ 'REVIEW_PAGE_TRAVEL_INFORMATION' | translate }}</p>
             <div class="flight-section">
                 <div class="flight-card-stack">
                     <div class="flight-card-tab">
@@ -216,19 +230,50 @@
                     <span>{{passengerSeat.seatID}}</span></div>
             </div>
         </div> -->
+
         <ng-container *ngIf="hasSeatPassengers()">
             <div class="container-Seat-flight">
-                <div class="info-title">บริการเสริม</div>
+                <div class="info-title">{{ 'REVIEW_PAGE_ADDITIONAL_SERVICES' | translate }}</div>
                 <div class="passenger-list">
-                    <div class="passenger-seat-title">ที่นั่งผู้โดยสาร</div>
-                    <ng-container *ngFor="let passengerSeat of passengers">
-                        <div class="list-item" *ngIf="passengerSeat.seatID && passengerSeat.seatID !== ''">
-                            {{passengerSeat.firstName}} <span>{{passengerSeat.seatID}}</span>
+                    <div class="passenger-seat-title">
+                        <p>{{ 'REVIEW_PAGE_SEAT_SELECTION' | translate }}</p>
+                        <div class="edit-info-seat" (click)="editInfoSelectSeat()">
+                            <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M9.99935 4.50045L11.9993 6.50045M8.66602 13.8338H13.9993M3.33268 11.1671L2.66602 13.8338L5.33268 13.1671L13.0567 5.44312C13.3066 5.19308 13.4471 4.854 13.4471 4.50045C13.4471 4.1469 13.3066 3.80782 13.0567 3.55778L12.942 3.44312C12.692 3.19315 12.3529 3.05273 11.9993 3.05273C11.6458 3.05273 11.3067 3.19315 11.0567 3.44312L3.33268 11.1671Z"
+                                    stroke="#DE3024" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <p>{{ 'REVIEW_PAGE_EDIT' | translate }}</p>
                         </div>
-                    </ng-container>
+                    </div>
+                    <!-- <ng-container *ngFor="let passenger of passengers; let i = index">
+                <div class="list-item" *ngIf="getPassengerSeat(i)">
+                    {{passenger.firstName}} {{passenger.lastName}} <span>{{getPassengerSeat(i)}}</span>
+                </div>
+            </ng-container> -->
+                    <!-- ขาไป -->
+                    <div>
+                        <div>ขาไป</div>
+                        <ng-container *ngFor="let passenger of passengers; let i = index">
+                          <div class="list-item" *ngIf="getPassengerSeat(i, 'inbound')">
+                            {{passenger.firstName}} {{passenger.lastName}} <span>{{getPassengerSeat(i, 'inbound')}}</span>
+                          </div>
+                        </ng-container>
+                      </div>
+                      <div>
+                        <div>ขากลับ</div>
+                        <ng-container *ngFor="let passenger of passengers; let i = index">
+                          <div class="list-item" *ngIf="getPassengerSeat(i, 'outbound')">
+                            {{passenger.firstName}} {{passenger.lastName}} <span>{{getPassengerSeat(i, 'outbound')}}</span>
+                          </div>
+                        </ng-container>
+                      </div>
                 </div>
             </div>
         </ng-container>
+
         <!-- Special Bundle -->
         <div class="info-title">Special Bundle</div>
         <div class="special-bundle">
@@ -264,8 +309,8 @@
         </div>
         <!-- Actions -->
         <div class="review-page-actions">
-            <button class="back-btn" (click)="goBack()">กลับไปขั้นตอนก่อนหน้า</button>
-            <button class="confirm-btn" (click)="goNext()">ยืนยัน</button>
+            <button class="back-btn" (click)="goBack()"> {{ 'REVIEW_PAGE_GOBACK' | translate }}</button>
+            <button class="confirm-btn" (click)="goNext()"> {{ 'REVIEW_PAGE_CONFIRM' | translate }}</button>
         </div>
     </div>
 </div>

@@ -1,9 +1,12 @@
+
 @font-face {
-    font-family: 'DB Ozone X';
-    src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DBOzoneX.woff2') format('woff2'),
+       url('../../assets/font/DBOzoneX.woff') format('woff'),
+       url('../../assets/font/DBOzoneX.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 * {
   font-family: 'DB Ozone X';
@@ -182,7 +185,7 @@
     .total-note {
         font-size: 14px;
         color: #ff0101;
-        font-family: 'DB Ozone X';
+        // font-family: 'DB Ozone X';
     }
 }
 .total-amount {
@@ -209,8 +212,8 @@
   border: none;
   border-radius: 8px;
   padding: 12px 0;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 400;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -223,8 +226,8 @@
   border: 1px solid #000000;
   border-radius: 8px;
   padding: 14px 0;
-  font-size: 17px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 400;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(255,193,7,0.10);
   transition: background 0.2s;

@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import html2canvas from 'html2canvas';
-
+// import { TranslateService } from '@ngx-translate/core';
+import { PassDataService } from '../pass-data.service';
 @Component({
   selector: 'app-counter-service-page',
   templateUrl: './counter-service-page.component.html',
@@ -8,6 +9,19 @@ import html2canvas from 'html2canvas';
 })
 export class CounterServicePageComponent {
   @ViewChild('screenshotContainer', { static: false }) screenshotContainer!: ElementRef;
+
+  constructor(
+    // private translate: TranslateService,
+    private passDataService: PassDataService
+  ) {
+    // this.passDataService.getLanguage().subscribe((language) => {
+    //   this.switchLanguage(language);
+    // });
+  }
+
+    // switchLanguage(language: string) {
+    //   this.translate.use(language);
+    // }
 
   async saveImage() {
     if (!this.screenshotContainer) {

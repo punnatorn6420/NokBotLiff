@@ -1,17 +1,34 @@
+<app-loading *ngIf="isLoading"></app-loading>
 <div class="flight-seat-container">
     <app-header [currentStep]="2"></app-header>
     <div class="flight-seat-content">
         <div class="flight-header">
-            <p>{{ 'SELECT_SEAT' | translate }}</p>
-            <!-- <div class="flight-toggle">
-                <div class="toggle-indicator" [class.right]="selectedFlight === 'outbound'"></div>
-                <button class="toggle-btn" [ngClass]="{'active': selectedFlight === 'inbound'}"
+            <p>{{ selectedFlight === 'inbound' ? ('SELECT_SEAT_OUTBOUND' | translate) : ('SELECT_SEAT_INBOUND' | translate) }}</p>
+            <div class="flight-tabs">
+                <button class="tab-btn" [ngClass]="{'active': selectedFlight === 'inbound'}"
                     (click)="toggleFlight('inbound')">{{ 'DEPARTURE' | translate }}</button>
-                <button class="toggle-btn" [ngClass]="{'active': selectedFlight === 'outbound'}"
+                <button class="tab-btn" [ngClass]="{'active': selectedFlight === 'outbound'}"
                     (click)="toggleFlight('outbound')">{{ 'RETURN' | translate }}</button>
-            </div> -->
-            <div class="flight-toggle-one-way">
-                <button class="toggle-btn-one-way">{{ 'ONE_WAY' | translate }}</button>
+            </div>
+            <div class="flight-header-connect-flight" *ngIf="isConnectFlight">
+                <div class="togle-connect-flight">
+                    <div class="flight-segment-container">
+                        <div class="flight-segment" 
+                             [ngClass]="{'active': connectFlight === 'flight1'}"
+                             (click)="connectFlight = 'flight1'"
+                             >
+                            <span class="flight-number">ไฟลต์ 1</span>
+                            <span class="flight-route">(CNX → DMK)</span>
+                        </div>
+                        <div class="flight-segment" 
+                             [ngClass]="{'active': connectFlight === 'flight2'}"
+                             (click)="connectFlight = 'flight2'"
+                             >
+                            <span class="flight-number">ไฟลต์ 2</span>
+                            <span class="flight-route">(DMK → HDY)</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -19,11 +36,11 @@
     <div class="passenger-list">
         <div class="passenger-list-content">
             <div class="scroll-container">
-                <div class="passenger-box" *ngFor="let passenger of passengers" [ngClass]="{
-                    'has-seat': passenger.seatID && passenger.seatID !== '',
-                    'no-seat': !passenger.seatID || passenger.seatID === ''
+                <div class="passenger-box" *ngFor="let passenger of passengers; let i = index" [ngClass]="{
+                    'has-seat': hasSeat(i),
+                    'no-seat': !hasSeat(i)
                 }">
-                    <ng-container *ngIf="passenger.seatID && passenger.seatID !== ''">
+                    <ng-container *ngIf="hasSeat(i)">
                         <svg class="icon-select-seat" width="24" height="24" viewBox="0 0 16 17" fill="none">
                             <circle cx="8" cy="8.5" r="7" fill="#FFFBEA" stroke="#069553" stroke-width="2"/>
                             <path d="M5.33301 8.5L7.33301 10.5L11.333 6.5" stroke="#069553" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -169,21 +186,21 @@
                   <span class="seat-color-box premium-plus"></span>
                   <div class="seat-type-info">
                     <div class="seat-type-title">{{ 'Nok_Premium_Seat_Front_Row' | translate }}</div>
-                    <div class="seat-type-price">500.00 THB</div>
+                    <div class="seat-type-price">{{ premiumPlusPrice | number:'1.2-2' }} THB</div>
                   </div>
                 </div>
                 <div class="seat-type-row">
                   <span class="seat-color-box premium"></span>
                   <div class="seat-type-info">
                     <div class="seat-type-title">{{ 'Nok_Premium_Seat' | translate }}</div>
-                    <div class="seat-type-price">350.00 THB</div>
+                    <div class="seat-type-price">{{ premiumPrice | number:'1.2-2' }} THB</div>
                   </div>
                 </div>
                 <div class="seat-type-row">
                   <span class="seat-color-box regular"></span>
                   <div class="seat-type-info">
                     <div class="seat-type-title">{{ 'Nok_Happy_Seat' | translate }}</div>
-                    <div class="seat-type-price"><span class="old-price">150.00 THB</span> <span class="free-price">0 THB</span></div>
+                    <div class="seat-type-price"><span class="old-price">{{ regularPrice | number:'1.2-2' }} THB</span> <span class="free-price">0 THB</span></div>
                   </div>
                 </div>
               </div>

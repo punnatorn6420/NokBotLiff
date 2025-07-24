@@ -31,25 +31,25 @@
                     </svg>                    
             </div>
             <span class="title">
-                <p>การจองสำเร็จ</p>
-                <p>ขอบคุณที่ใช้บริการนกแอร์</p>
+                <p>{{ 'COUNTER_SERVICE_TITLE1' | translate }}</p>
+                <p>{{ 'COUNTER_SERVICE_TITLE2' | translate }}</p>
             </span>
             <span class="warning">
-                <p>หากไม่ชำระเงินภายใน 2568-06-27 12:19 การจองของคุณจะถูกยกเลิก</p>
-                <p style="margin-top: -10px;">หมายเลขอ้างอิงการชำระเงิน คือ 81088508</p>
+                <p>{{ 'COUNTER_SERVICE_WARNNING' | translate }}</p>
+                <p style="margin-top: -10px;">{{ 'COUNTER_SERVICE_WARNNING_2' | translate }}</p>
             </span>
             <div class="container-booking-number-ref">
                 <div class="box-left">
-                    <p style="font-size: 16px; margin-top: 15px;">Booking Number</p>
+                    <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_BOOKING_NUMBER' | translate }}</p>
                     <p style="font-size: 24px; margin-top: -10px;">81088508</p>
                 </div>
                 <div class="box-right">
-                    <p style="font-size: 16px; margin-top: 15px;">Booking Reference (PNR)</p>
+                    <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_BOOKING_REFERENCE' | translate }}</p>
                     <P style="font-size: 24px; margin-top: -10px;">A12B34</P>
                 </div>
             </div>
             <div class="container-name">
-                <p style="font-size: 16px; margin-top: 15px;">ชื่อผู้โดยสาร (ผู้จอง)</p>
+                <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_Passenger_Name' | translate }}</p>
                 <p style="font-size: 22px; margin-top: -10px;">Miss. Saralee Yeesaeng</p>
             </div>
             <div class="flight-info">
@@ -110,6 +110,6 @@
     </div>
 
     <div class="button-save">
-        <button (click)="saveImage()">บันทึกรูปภาพ</button>
+        <button (click)="saveImage()">{{ 'COUNTER_SAVE_IMAGE' | translate }}</button>
     </div>
 </div>

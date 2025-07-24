@@ -42,9 +42,11 @@
   "ERROR_REQUIRED_EMAIL": "Please enter your email",
   "ERROR_EMAIL": "Please enter a valid email address",
   "PASSENGER_NUMBER": "Passenger",
+  "LOADING": "Loading...",
 
 
-  "SELECT_SEAT": "Select Seat",
+  "SELECT_SEAT_OUTBOUND": "Select Seat Outbound",
+  "SELECT_SEAT_INBOUND": "Select Seat Inbound",
   "DEPARTURE": "Departure",
   "RETURN": "Return",
   "ONE_WAY": "One Way",
@@ -208,5 +210,61 @@
   "PDPA_ANNOUNCEMENT_DATE": "Announced on May 25, 2022",
   
   "PDPA_ACCEPT_TEXT": "I have read and understood the terms and conditions for the collection, use and disclosure of personal data and will comply clearly",
-  "PDPA_CONFIRM_BUTTON": "Confirm"
+  "PDPA_CONFIRM_BUTTON": "Confirm",
+
+
+  "REVIEW_PAGE_TITLE": "Review Your Booking",
+  "REVIEW_PAGE_PASSENGER_1": "Passenger 1 (Primary passenger)",
+  "REVIEW_PAGE_PASSENGER": "Passenger",
+  "REVIEW_PAGE_TITLE_DATA_PASSENGER": "General Information",
+  "REVIEW_PAGE_TITLE_PASSNEGER": "Title:",
+  "REVIEW_PAGE_FIRST_NAME": "First Name (English):",
+  "REVIEW_PAGE_MIDDLE_NAME": "Middle Name (English):",
+  "REVIEW_PAGE_LAST_NAME": "Last Name (English):",
+  "REVIEW_PAGE_BIRTH_DATE": "Date of Birth:",
+  "REVIEW_PAGE_PASSPORT_TITLE": "Passport Information",
+  "REVIEW_PAGE_NATIONALITY": "Nationality:",
+  "REVIEW_PAGE_COUNTRY_OF_RESIDENCE": "Country of residence:",
+  "REVIEW_PAGE_PASSPORT_NUMBER": "Passport Number:",
+  "REVIEW_PAGE_ISSUED_BY": "Issued By:",
+  "REVIEW_PAGE_PASSPORT_EXPIRY_DATE": "Passport Expiry Date:",
+  "REVIEW_PAGE_CONTACT_INFORMATION": "Contact Information",
+  "REVIEW_PAGE_CONTACT_Mobile_Number": "Mobile Number:",
+  "REVIEW_PAGE_CONTACT_Email": "Email:",
+  "REVIEW_PAGE_EDIT": "Edit",
+  "REVIEW_PAGE_CLOSE_DATA_PASSENGER": "Show Less",
+  "REVIEW_PAGE_OPEN_DATA_PASSENGER": "Show More",
+
+  "REVIEW_PAGE_TRAVEL_INFORMATION": "Travel Information",
+
+  "REVIEW_PAGE_ADDITIONAL_SERVICES": "Additional Services",
+  "REVIEW_PAGE_SEAT_SELECTION": "Seat Selection",
+
+  "REVIEW_PAGE_GOBACK": "Back to Previous Step",
+  "REVIEW_PAGE_CONFIRM": "Confirm",
+
+  "CONFRIM_PAGE_FARE_TITLE": "Fare Details",
+  "CONFRIM_PAGE_Subtotal_Outbound": "Subtotal (Outbound)",
+  "CONFRIM_PAGE_Subtotal_Inbound": "Subtotal (Return)",
+  "CONFIRM_PAGE_Additional_Services": "Additional Services",
+  "CONFIRM_PAGE_Seat_Selection": "Seat Selection",
+  "CONFIRM_PAGE_Total_Add-on_Package_Fee": "Total Add-on Package Fee",
+  "CONFIRM_PAGE_Taxes": "Taxes",
+  "CONFIRM_PAGE_Total_Tax": "Total Tax",
+  "CONFIRM_PAGE_Payment_Method": "Payment Method",
+  "CONFIRM_PAGE_Payment_Service_Fee": "Payment Service Fee",
+  "CONFIRM_PAFE_per_transaction": "per transaction",
+  "CONFIRM_PAGE_Grand_Total": "Grand Total",
+  "CONFIRM_PAGE_Including_service_fees": "Including service fees",
+  "CONFIRM_PAGE_Back_to_Previous_Step": "Back to Previous Step",
+  "CONFIRM_PAGE_Confirm": "Confirm Booking",
+
+  "COUNTER_SERVICE_TITLE1": "Booking Successful",
+  "COUNTER_SERVICE_TITLE2": "Thank you for flying with Nok Air",
+  "COUNTER_SERVICE_WARNNING": "If payment is not completed by 27 June 2025, 12:19 PM, your booking will be cancelled.",
+  "COUNTER_SERVICE_WARNNING_2": "Your payment reference number is 81088508",
+  "COUNTER_SERVICE_BOOKING_NUMBER": "Booking Number",
+  "COUNTER_SERVICE_BOOKING_REFERENCE": "Booking Reference (PNR)",
+  "COUNTER_SERVICE_Passenger_Name": "ชื่อผู้โดยสาร (ผู้จอง)",
+  "COUNTER_SAVE_IMAGE": "บันทึกรูปภาพ"
 }

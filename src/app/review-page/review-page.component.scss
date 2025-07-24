@@ -1,9 +1,12 @@
+
 @font-face {
-    font-family: 'DB Ozone X';
-    src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DBOzoneX.woff2') format('woff2'),
+       url('../../assets/font/DBOzoneX.woff') format('woff'),
+       url('../../assets/font/DBOzoneX.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 * {
   font-family: 'DB Ozone X';
@@ -65,6 +68,41 @@
   flex-direction: column;
   gap: 12px;
 }
+.header-info-passenger{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .edit-info-passenger{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto; // เปลี่ยนจาก 97px เป็น auto เพื่อให้ปรับตามเนื้อหา
+    gap: 4px;
+    padding: 8px 12px; // ปรับ padding ให้สมดุล
+    font-size: 18px;
+    font-weight: 600; // เปลี่ยนจาก 400 เป็น 600 เพื่อให้ตัวหนาขึ้น
+    color: #DE3024;
+    background-color: #FFCDC9;
+    cursor: pointer;
+    border-radius: 100px;
+    border: none;
+    outline: none;
+    transition: all 0.2s ease; // เพิ่ม transition
+    
+    &:hover {
+      background-color: #FFB8B3; // เพิ่ม hover effect
+    }
+    
+    svg {
+      flex-shrink: 0; // ป้องกัน icon หดตัว
+    }
+    
+    p {
+      margin: 0; // ลบ margin ของ p tag
+      white-space: nowrap; // ป้องกันข้อความขึ้นบรรทัดใหม่
+    }
+  }
+}
 .info-section {
   margin-bottom: 8px;
 }
@@ -77,6 +115,39 @@
   font-weight: 600;
   font-size: 18px;
   margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .edit-info-seat{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto; // เปลี่ยนจาก 97px เป็น auto เพื่อให้ปรับตามเนื้อหา
+    gap: 4px;
+    padding: 8px 12px; // ปรับ padding ให้สมดุล
+    font-size: 18px;
+    font-weight: 600; // เปลี่ยนจาก 400 เป็น 600 เพื่อให้ตัวหนาขึ้น
+    color: #DE3024;
+    background-color: #FFCDC9;
+    cursor: pointer;
+    border-radius: 100px;
+    border: none;
+    outline: none;
+    transition: all 0.2s ease; // เพิ่ม transition
+    
+    &:hover {
+      background-color: #FFB8B3; // เพิ่ม hover effect
+    }
+    
+    svg {
+      flex-shrink: 0; // ป้องกัน icon หดตัว
+    }
+    
+    p {
+      margin: 0; // ลบ margin ของ p tag
+      white-space: nowrap; // ป้องกันข้อความขึ้นบรรทัดใหม่
+    }
+  }
 }
 .info-row {
   display: flex;
@@ -298,7 +369,7 @@
 
 .passenger-list {
   border-radius: 10px;
-  padding: 12px 14px;
+  // padding: 12px 14px;
   margin-bottom: 14px;
 }
 .list-title {

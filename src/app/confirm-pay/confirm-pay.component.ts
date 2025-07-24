@@ -11,6 +11,10 @@ export class ConfirmPayComponent {
 
   constructor(private router: Router) {}
 
+  ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   goBack() {
     this.router.navigate(['/review']);
   }

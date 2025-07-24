@@ -26,6 +26,7 @@ import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
 import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
+import { LoadingComponent } from './loading/loading.component';
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/', '.json');
 }
@@ -41,7 +42,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     PdpaPageComponent,
     ReviewPageComponent,
     ConfirmPayComponent,
-    CounterServicePageComponent
+    CounterServicePageComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,

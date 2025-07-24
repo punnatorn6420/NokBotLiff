@@ -22,6 +22,7 @@ export class PdpaPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.passDataService.getLanguage().subscribe(language => {
       this.switchLanguage(language as 'th' | 'en');
     });

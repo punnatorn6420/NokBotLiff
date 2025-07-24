@@ -8,7 +8,16 @@ export class PassDataService {
   private formData = new BehaviorSubject<any>(null);
   private language = new BehaviorSubject<string>('th');
   private seatData = new BehaviorSubject<any>(null);
+  private passengerInfo = new BehaviorSubject<any>(null);
   constructor() { }
+
+  setPassengerInfo(data: any) {
+    this.passengerInfo.next(data);
+  }
+
+  getPassengerInfo() {
+    return this.passengerInfo.asObservable();
+  }
 
   setLanguage(language: string) {
     this.language.next(language);

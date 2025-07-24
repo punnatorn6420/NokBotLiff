@@ -20,7 +20,11 @@
             </div>
         </div>
         <div class="form-passenger-container">
-            <form [formGroup]="currentForm">
+            <div *ngIf="!currentForm" class="loading-container">
+                <!-- <p>{{ 'LOADING' | translate }}</p> -->
+                 <app-loading></app-loading>
+            </div>
+            <form *ngIf="currentForm" [formGroup]="currentForm">
                 <p style="margin-bottom: 15px; font-weight: 700; font-size: 23px;">{{ 'PASSENGER_INFO' | translate }} <span *ngIf="selectedPassenger !== 1"> {{ selectedPassenger }}</span>
                     <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
                 <p style="margin-bottom: 20px; font-weight: 400; font-size: 22px;">{{ 'GENERAL_INFORMATION' | translate
@@ -155,7 +159,14 @@
                                 [matAutocomplete]="autoDialCode" placeholder="+66">
                             <mat-autocomplete #autoDialCode="matAutocomplete">
                                 <mat-option *ngFor="let option of filteredDialCodeOptions | async"
-                                    [value]="extractDialCode(option)">{{getDisplayText(option)}}</mat-option>
+                                    [value]="extractDialCode(option)">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <img [src]="getFlagUrl(option)" 
+                                             [alt]="getDisplayText(option)" 
+                                             style="width: 20px; height: 15px; object-fit: cover; border-radius: 2px;">
+                                        <span>{{getDisplayText(option)}}</span>
+                                    </div>
+                                </mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
                         <mat-form-field class="form-passenger-contact-phone-content" style="width: 80%;"

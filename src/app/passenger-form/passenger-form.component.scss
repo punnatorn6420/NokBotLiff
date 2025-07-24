@@ -1,6 +1,9 @@
+
 @font-face {
   font-family: 'DB Ozone X';
-  src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
+  src: url('../../assets/font/DBOzoneX.woff2') format('woff2'),
+       url('../../assets/font/DBOzoneX.woff') format('woff'),
+       url('../../assets/font/DBOzoneX.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -57,12 +60,15 @@ mat-error {
 }
 
 .number-passenger-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
     min-width: 150px;
     text-align: center;
     height: 50px;
     padding: 12px 0;
     background: #fff;
-    border: 3px solid #ccc;
+    border: 1px solid #ccc;
     border-radius: 8px;
     color: #ccc;
     font-size: 22px;
@@ -73,33 +79,40 @@ mat-error {
 }
 
 .number-passenger-box.active {
-  border: 3px solid #FFD600;
+  border: 1px solid #FCCD01;
   color: #222;
-  background: #fffbe6;
+  background: #FFFAE6;
   font-weight: 400;
 }
 
 .number-passenger-box.valid {
-  border: 3px solid #4CAF50;
+  border: 1px solid #4CAF50;
   color: #222;
-  background: #f1f8e9;
+  background: #ECFDF2;
 }
 
 .number-passenger-box.valid.active {
-  border: 3px solid #4CAF50;
+  border: 1px solid #4CAF50;
   color: #222;
-  background: #e8f5e8;
+  background: #ECFDF2;
   font-weight: 400;
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
 .number-passenger-box.invalid {
-  border: 3px solid #f44336;
+  border: 1px solid #f44336;
   color: #222;
   background: #ffebee;
 }
 
 .number-passenger-box.invalid.active {
-  border: 3px solid #f44336;
+  border: 1px solid #f44336;
   color: #222;
   background: #ffcdd2;
   font-weight: 400;

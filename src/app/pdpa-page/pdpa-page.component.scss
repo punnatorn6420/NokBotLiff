@@ -1,9 +1,12 @@
+
 @font-face {
-    font-family: 'DB Ozone X';
-    src: url('../../assets/font/DB Ozone X.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  font-family: 'DB Ozone X';
+  src: url('../../assets/font/DBOzoneX.woff2') format('woff2'),
+       url('../../assets/font/DBOzoneX.woff') format('woff'),
+       url('../../assets/font/DBOzoneX.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 * {
     font-family: 'DB Ozone X';
@@ -90,6 +93,10 @@
 
 
 .pdpa-checkbox-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
     position: fixed;
     bottom: 0;
     width: 100%;

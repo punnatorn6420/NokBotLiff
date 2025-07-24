@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms'
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { ApiService } from '../api.service';
@@ -26,24 +26,6 @@ interface PassengerData {
   email?: string;
 }
 
-interface Restcountries {
-  name: {
-    common: string;
-    official: string;
-    nativeName: {
-      [languageCode: string]: {
-        official: string;
-        common: string;
-      };
-    };
-  };
-  idd: {
-    root: string;
-    suffixes: string[];
-  };
-}
-
-
 @Component({
   selector: 'app-passenger-form',
   templateUrl: './passenger-form.component.html',
@@ -61,7 +43,7 @@ export class PassengerFormComponent {
   passengerForms: { [key: number]: FormGroup } = {};
 
   // FormGroup ปัจจุบัน
-  currentForm!: FormGroup;
+  currentForm: FormGroup | null = null;
 
   prefix = [
     { value: 'MR', label: 'MR' },
@@ -75,7 +57,7 @@ export class PassengerFormComponent {
   countryOptions: string[] = [];
   issuedByOptions: string[] = [];
   phonePrefixOptions: string[] = [];
-  dialCodeOptions: string[] = [];
+  dialCodeOptions: any[] = []; // Changed to any[] to accommodate flag, name, idd, displayText
     
   filteredNationalityOptions!: Observable<string[]>;
   filteredCountryOptions!: Observable<string[]>;
@@ -85,87 +67,168 @@ export class PassengerFormComponent {
 
   constructor(private router: Router, 
     private dialog: MatDialog, 
+    private route: ActivatedRoute,
     private apiService: ApiService, 
     private passDataService: PassDataService, 
     private translate: TranslateService) {
       // this.translate.setDefaultLang('th');
       // this.translate.use('th');
+      this.route.queryParams.subscribe((params: any) => {
+        this.selectedPassenger = params.passengerIndex+1;
+        console.log("selectedPassenger",this.selectedPassenger);
+      });
     }
 
   ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // ตั้งค่าเริ่มต้นก่อน
+    this.passDataService.getPassengerInfo().subscribe((data: any) => {
+      const adults = data?.flight_search?.adults ?? 0;
+      const children = data?.flight_search?.children ?? 0;
+      const infants = data?.flight_search?.infants ?? 0;
+      this.numberPassenger = Number(adults) + Number(children) + Number(infants);
+      console.log("getPassengerInfo passenger-form", this.numberPassenger);
+      this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
+      this.initializePassengerForms();
+      
+      // ตั้งค่า currentForm หลังจาก initializePassengerForms
+      if (this.numberPassenger > 0) {
+        this.currentForm = this.passengerForms[1];
+        this.selectedPassenger = 1;
+        this.setupAutocompleteFilters();
+      }
+    });
+
+    // โหลดข้อมูลจาก service และโหลดข้อมูลเพียงครั้งเดียว
     this.passDataService.getFormData().subscribe((data: any) => {
       if (data && Object.keys(data).length > 0) {
+        console.log("getFormData passenger-form",data);
+        // มีข้อมูลจาก service - อัปเดตและโหลด
         this.passengersData = data;
         this.numberPassenger = Object.keys(this.passengersData).length;
         this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
         this.initializePassengerForms();
-        this.loadPassengerData(1);
+        this.loadAllPassengerData(this.passengersData);
+      } else {
+        // ไม่มีข้อมูลจาก service - โหลดข้อมูลเริ่มต้น
+        this.loadAllPassengerData(this.passengersData);
       }
     });
 
+    // โหลดข้อมูลประเทศ
     this.apiService.getRestcountries().subscribe((res: any) => {
       this.convertRestcountries(res);
     });
-    this.numberPassenger = 2;
-    this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
 
-    this.initializePassengerForms();
-    this.loadPassengerData(1);
+    // ตั้งค่า autocomplete filters หลังจากโหลดข้อมูลเสร็จ
     setTimeout(() => {
       this.setupAutocompleteFilters();
     }, 1000);
 
-    this.passDataService.getLanguage().subscribe(language => {
-      this.switchLanguage(language as 'th' | 'en');
-    });
+    // ตั้งค่าภาษา
+    // this.passDataService.getLanguage().subscribe(language => {
+    //   this.switchLanguage(language as 'th' | 'en');
+    // });
   }
 
-  switchLanguage(lang: 'th' | 'en') {
-    this.translate.use(lang);
-  }
+  // switchLanguage(lang: 'th' | 'en') {
+  //   this.translate.use(lang);
+  // }
 
   convertRestcountries(res: any) {
-    let _data = [];
+    let _data: any[] = [];
     for (let i = 0; i < res.length; i++) {
-      _data.push({
-        name: res[i].name.common,
-        idd: res[i].idd.root + res[i].idd.suffixes.join('')
+      const country = res[i];
+      const root = country.idd.root;
+      const suffixes = country.idd.suffixes || [];
+      
+      // สร้างรายการรหัสประเทศทั้งหมด
+      const allDialCodes: string[] = [];
+      
+      // กรณีพิเศษสำหรับ USA - แสดงแค่ root
+      if (country.cca2 === 'US') {
+        allDialCodes.push(root);
+      } else {
+        // ประเทศอื่นๆ - เพิ่มเฉพาะ root + suffixes ทุกตัว (ไม่รวม root เปล่าๆ)
+        suffixes.forEach((suffix: string) => {
+          allDialCodes.push(root + suffix);
+        });
+        
+        // ถ้าไม่มี suffixes ให้เพิ่ม root เปล่าๆ
+        if (suffixes.length === 0) {
+          allDialCodes.push(root);
+        }
+      }
+      
+      // สร้างข้อมูลสำหรับแต่ละรหัสประเทศ
+      allDialCodes.forEach(dialCode => {
+        _data.push({
+          flag: country.flags.png,
+          name: country.name.common,
+          idd: dialCode,
+          displayText: `${country.name.common} (${dialCode})`
+        });
       });
     }
 
-    this.countryOptions = _data.map((item: any) => item.name);
-    // this.phonePrefixOptions = _data.map((item: any) => item.idd);
-    this.issuedByOptions = _data.map((item: any) => item.name);
-    this.nationalityOptions = _data.map((item: any) => item.name);
-    // this.dialCodeOptions = _data.map((item: any) => ({
-    //   letter: item.name,
-    //   names: [item.idd]  // เปลี่ยนเป็น array
-    // }));
-    this.dialCodeOptions = _data.map((item: any) => item.name + ': ' + item.idd);
-    // console.log(this.dialCodeOptions);
-    // console.log(this.phonePrefixOptions);
+    this.countryOptions = res.map((item: any) => item.name.common);
+    this.issuedByOptions = res.map((item: any) => item.name.common);
+    this.nationalityOptions = res.map((item: any) => item.name.common);
+    
+    // เก็บข้อมูล dialCode ทั้งหมด
+    this.dialCodeOptions = _data;
   }
 
-  // เพิ่มฟังก์ชันใหม่สำหรับแยกรหัสประเทศ
-  extractDialCode(fullText: string): string {
-    const colonIndex = fullText.indexOf(': ');
-    if (colonIndex !== -1) {
-      return fullText.substring(colonIndex + 2); // ตัดเอาเฉพาะส่วนหลัง ": "
+  // ปรับปรุงฟังก์ชัน extractDialCode
+  extractDialCode(option: any): string {
+    if (typeof option === 'string') {
+      // กรณีที่ option เป็น string (backward compatibility)
+      const colonIndex = option.indexOf(': ');
+      if (colonIndex !== -1) {
+        return option.substring(colonIndex + 2);
+      }
+      return option;
     }
-    return fullText; // ถ้าไม่มี ":" ให้ส่งคืนข้อความเดิม
+    // กรณีที่ option เป็น object
+    return option.idd;
   }
 
-  // เพิ่มฟังก์ชันสำหรับแสดงชื่อประเทศใน autocomplete
-  getDisplayText(fullText: string): string {
-    const colonIndex = fullText.indexOf(': ');
-    if (colonIndex !== -1) {
-      return fullText.substring(0, colonIndex); // ตัดเอาเฉพาะส่วนก่อน ": "
+  // ปรับปรุงฟังก์ชัน getDisplayText
+  getDisplayText(option: any): string {
+    if (typeof option === 'string') {
+      // กรณีที่ option เป็น string (backward compatibility)
+      const colonIndex = option.indexOf(': ');
+      if (colonIndex !== -1) {
+        return option.substring(0, colonIndex);
+      }
+      return option;
     }
-    return fullText;
+    // กรณีที่ option เป็น object
+    return option.displayText;
+  }
+
+  // เพิ่มฟังก์ชันใหม่สำหรับดึง URL ของ flag
+  getFlagUrl(option: any): string {
+    if (typeof option === 'string') {
+      // กรณีที่ option เป็น string (backward compatibility)
+      const parts = option.split(': ');
+      if (parts.length >= 3) {
+        return parts[0]; // flag URL
+      }
+      return '';
+    }
+    // กรณีที่ option เป็น object
+    return option.flag;
   }
 
   // สร้าง FormGroup สำหรับผู้โดยสารแต่ละคน
   private initializePassengerForms() {
+    if (!this.numberPassengerArray || this.numberPassengerArray.length === 0) {
+      console.error('numberPassengerArray is empty or undefined');
+      return;
+    }
+    
     for (const passengerNumber of this.numberPassengerArray) {
       if (passengerNumber === 1) {
         this.passengerForms[passengerNumber] = new FormGroup({
@@ -200,10 +263,14 @@ export class PassengerFormComponent {
         });
       }
     }
+    
+    console.log('Passenger forms initialized:', this.passengerForms);
   }
 
   // ตั้งค่า autocomplete filters
   private setupAutocompleteFilters() {
+    if (!this.currentForm) return;
+
     this.filteredNationalityOptions = this.currentForm.get('nationality')!.valueChanges.pipe(
       startWith(''),
       map(value => this._filterNationality(value || '')),
@@ -268,14 +335,21 @@ export class PassengerFormComponent {
   //     option.names.some(name => name.includes(filterValue))
   //   );
   // }
-  private _filterDialCode(value: string): string[] {
+  private _filterDialCode(value: string): any[] {
     const filterValue = value.toLowerCase();
-    return this.dialCodeOptions.filter(option => option.toLowerCase().includes(filterValue));
+    return this.dialCodeOptions.filter(option => {
+      if (typeof option === 'string') {
+        return option.toLowerCase().includes(filterValue);
+      }
+      return option.name.toLowerCase().includes(filterValue) || 
+             option.idd.toLowerCase().includes(filterValue);
+    });
   }
 
   // บันทึกข้อมูลผู้โดยสารปัจจุบัน
   private saveCurrentPassengerData() {
-    if (this.currentForm) {
+    console.log("saveCurrentPassengerData",this.currentForm);
+    if (this.currentForm && this.currentForm.valid) {
       this.passengersData[this.selectedPassenger] = this.currentForm.value;
     }
   }
@@ -285,12 +359,41 @@ export class PassengerFormComponent {
     // อัปเดต FormGroup ปัจจุบัน
     this.currentForm = this.passengerForms[passengerNumber];
     
+    if (!this.currentForm) {
+      console.error(`Form for passenger ${passengerNumber} not found`);
+      return;
+    }
+    
     const data = this.passengersData[passengerNumber];
-    if (data && this.currentForm) {
+    if (data) {
       this.currentForm.patchValue(data);
     }
 
     // อัปเดต autocomplete filters สำหรับ FormGroup ใหม่
+    this.setupAutocompleteFilters();
+  }
+
+  // เพิ่มฟังก์ชันใหม่สำหรับโหลดข้อมูลผู้โดยสารทุกคน
+  private loadAllPassengerData(data: any) {
+    // โหลดข้อมูลผู้โดยสารทุกคน
+    for (const passengerNumber of this.numberPassengerArray) {
+      const _data = data[passengerNumber];
+      if (_data && this.passengerForms[passengerNumber]) {
+        this.passengerForms[passengerNumber].patchValue(_data);
+      }
+    }
+    
+    // ตั้งค่า currentForm เป็นผู้โดยสารคนแรก
+    this.currentForm = this.passengerForms[1];
+    this.selectedPassenger = 1;
+    
+    // ตรวจสอบว่า currentForm มีค่าหรือไม่
+    if (!this.currentForm) {
+      console.error('Form for passenger 1 not found');
+      return;
+    }
+    
+    // อัปเดต autocomplete filters
     this.setupAutocompleteFilters();
   }
 
@@ -305,7 +408,10 @@ export class PassengerFormComponent {
   // }
 
   isAllPassengersValid(): boolean {
-    return this.numberPassengerArray.every(passengerNumber => this.passengerForms[passengerNumber]?.valid);
+    return this.numberPassengerArray.every(passengerNumber => {
+      const form = this.passengerForms[passengerNumber];
+      return form && form.valid;
+    });
   }
 
   selectPassenger(passenger: number) {
@@ -328,8 +434,8 @@ export class PassengerFormComponent {
   }
 
   nextStep() {
-    console.log(this.passengerForms[this.selectedPassenger]);
-    console.log(this.passengerForms);
+    // console.log(this.passengerForms[this.selectedPassenger]);
+    // console.log(this.passengerForms);
     this.saveCurrentPassengerData();
     if (!this.isAllPassengersValid()) {
       return;
@@ -356,10 +462,16 @@ export class PassengerFormComponent {
   }
 
   checkPassengerValid(passenger: number) {
-    if (this.passengerForms[passenger].valid) {
+    const form = this.passengerForms[passenger];
+    if (!form) {
+      console.error(`Form for passenger ${passenger} not found`);
+      return;
+    }
+    
+    if (form.valid) {
       this.nextPassenger();
     } else {
-      this.passengerForms[passenger].markAllAsTouched();
+      form.markAllAsTouched();
     }
   }
 
