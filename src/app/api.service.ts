@@ -20,9 +20,7 @@ export class ApiService {
     return this.http.post(`${"http://localhost:4000/api/liff/get-passenger-info"}`, body, { headers });
   }
 
-  getSeatMap() {
-    var journeyKey = "DMKCNX20250725010000THB:_DD13220250725:1664777";
-    var fareKey = "DMKCNX20250725010000THB_148:URALIT00";
+  getSeatMap(journeyKey?: string, fareKey?: string) {
     const body = {
       journeyKey: journeyKey,
       fareKey: fareKey

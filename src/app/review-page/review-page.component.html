@@ -94,6 +94,18 @@
                             <div class="info-value">{{passenger.email}}</div>
                         </div>
                     </div>
+                    <div class="info-divider" *ngIf="passenger.needsSpecialAssistance"></div>
+                    <div class="special-assistance-container" *ngIf="passenger.needsSpecialAssistance">
+                        <p class="special-assistance-title" *ngIf="passenger.needsSpecialAssistance">ผู้โดยสารต้องการความช่วยเหลือพิเศษ</p>
+                        <p class="special-assistance-item" *ngIf="passenger.disabledVision">ผู้บกพร่องทางสายตา/ตาบอด</p>
+                        <p class="special-assistance-item" *ngIf="passenger.disabledHearing">ผู้บกพร่องทางการได้ยิน/หูหนวก</p>
+                        <p class="special-assistance-item" *ngIf="passenger.monk">พระภิกษุ</p>
+                        <p class="special-assistance-item" *ngIf="passenger.nun">แม่ชี</p>
+                        <p class="special-assistance-item" *ngIf="passenger.pregnantWoman">สตรีตั้งครรภ์</p>
+                        <p class="special-assistance-item" *ngIf="passenger.wheelchairUser">รถเข็น วีลเเชร์</p>
+                        <p class="special-assistance-item" *ngIf="passenger.unaccompaniedMinor">เด็กเดินทางคนเดียว</p>
+                        <p class="special-assistance-item" *ngIf="passenger.other">อื่นๆ (ระบุ) {{passenger.otherReason}}</p>
+                    </div>
                     <u class="more-info-btn" (click)="togglePassengerInfo(i)">{{ 'REVIEW_PAGE_CLOSE_DATA_PASSENGER' |
                         translate }}</u>
                 </div>

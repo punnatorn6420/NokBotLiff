@@ -6,6 +6,7 @@ import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
 import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
+import { AlertErrorComponent } from './alert-error/alert-error.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
   {
     path: 'counter-service',
     component: CounterServicePageComponent
+  },
+  {
+    path: 'error',
+    component: AlertErrorComponent
   }
 ];
 

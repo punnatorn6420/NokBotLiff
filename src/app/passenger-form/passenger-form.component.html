@@ -193,6 +193,77 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
+
+                <div class="special-assistance-container" style="margin-top: 20px;">
+                    <div class="main-assistance-header">
+                        <div class="yellow-checkbox" [class.checked]="currentForm.get('needsSpecialAssistance')?.value === true" (click)="toggleMainAssistance()">
+                            <div class="checkmark" *ngIf="currentForm.get('needsSpecialAssistance')?.value === true">✓</div>
+                        </div>
+                        <span class="main-title">ผู้โดยสารต้องการความช่วยเหลือพิเศษ</span>
+                    </div>
+                    
+                    <div class="assistance-options" *ngIf="currentForm.get('needsSpecialAssistance')?.value === true">
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('disabledVision')?.value === true" (click)="toggleOption('disabledVision')">
+                                <div class="checkmark" *ngIf="currentForm.get('disabledVision')?.value === true">✓</div>
+                            </div>
+                            <span>ผู้บกพร่องทางสายตา/ตาบอด</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('disabledHearing')?.value === true" (click)="toggleOption('disabledHearing')">
+                                <div class="checkmark" *ngIf="currentForm.get('disabledHearing')?.value === true">✓</div>
+                            </div>
+                            <span>ผู้บกพร่องทางการได้ยิน/หูหนวก</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('monk')?.value === true" (click)="toggleOption('monk')">
+                                <div class="checkmark" *ngIf="currentForm.get('monk')?.value === true">✓</div>
+                            </div>
+                            <span>พระภิกษุ</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('nun')?.value === true" (click)="toggleOption('nun')">
+                                <div class="checkmark" *ngIf="currentForm.get('nun')?.value === true">✓</div>
+                            </div>
+                            <span>แม่ชี</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('pregnantWoman')?.value === true" (click)="toggleOption('pregnantWoman')">
+                                <div class="checkmark" *ngIf="currentForm.get('pregnantWoman')?.value === true">✓</div>
+                            </div>
+                            <span>สตรีตั้งครรภ์</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('wheelchairUser')?.value === true" (click)="toggleOption('wheelchairUser')">
+                                <div class="checkmark" *ngIf="currentForm.get('wheelchairUser')?.value === true">✓</div>
+                            </div>
+                            <span>รถเข็น วีลแชร์</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('unaccompaniedMinor')?.value === true" (click)="toggleOption('unaccompaniedMinor')">
+                                <div class="checkmark" *ngIf="currentForm.get('unaccompaniedMinor')?.value === true">✓</div>
+                            </div>
+                            <span>เด็กเดินทางคนเดียว</span>
+                        </div>
+                        
+                        <div class="assistance-option">
+                            <div class="white-checkbox" [class.checked]="currentForm.get('other')?.value === true" (click)="toggleOption('other')">
+                                <div class="checkmark" *ngIf="currentForm.get('other')?.value === true">✓</div>
+                            </div>
+                            <span>อื่นๆ<input matInput formControlName="otherReason" placeholder="โปรดระบุ"></span>
+                        </div>
+                        
+                        <div class="contact-info">
+                            <span>สามารถติดต่อเจ้าที่เพื่อสอบถาม โทร 1318</span>
+                        </div>
+                    </div>
+                </div>
             </form>
 
             <div class="footer-container">

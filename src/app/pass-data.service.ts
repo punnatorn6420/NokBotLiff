@@ -9,6 +9,7 @@ export class PassDataService {
   private language = new BehaviorSubject<string>('th');
   private seatData = new BehaviorSubject<any>(null);
   private passengerInfo = new BehaviorSubject<any>(null);
+  private totalPrice = new BehaviorSubject<number>(0);
   constructor() { }
 
   setPassengerInfo(data: any) {
@@ -41,5 +42,18 @@ export class PassDataService {
 
   getSeatData() {
     return this.seatData.asObservable();
+  }
+
+  // เพิ่มฟังก์ชันสำหรับดึงข้อมูล flight data
+  getFlightData(): any {
+    return this.passengerInfo.value;
+  }
+
+  setTotalPrice(totalPrice: number) {
+    this.totalPrice.next(totalPrice);
+  }
+
+  getTotalPrice() {
+    return this.totalPrice.asObservable();
   }
 }

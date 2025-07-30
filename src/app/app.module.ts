@@ -18,7 +18,7 @@ import { FlightSeatComponent } from './flight-seat/flight-seat.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { APP_BASE_HREF } from '@angular/common';
@@ -27,6 +27,10 @@ import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
 import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
 import { LoadingComponent } from './loading/loading.component';
+import { HttpErrorInterceptorInterceptor } from './http-error-interceptor.interceptor';
+import { AlertErrorComponent } from './alert-error/alert-error.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/', '.json');
 }
@@ -43,7 +47,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReviewPageComponent,
     ConfirmPayComponent,
     CounterServicePageComponent,
-    LoadingComponent
+    LoadingComponent,
+    AlertErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -60,6 +65,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatDialogModule,
     MatIconModule,
     HttpClientModule,
+    MatCheckboxModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -68,7 +74,10 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
   ],
-  providers: [{ provide: APP_BASE_HREF, useValue: '/botnoi-liff/' }],
+  providers: [
+    { provide: APP_BASE_HREF, useValue: '/botnoi-liff/' },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptorInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

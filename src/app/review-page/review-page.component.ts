@@ -17,6 +17,16 @@ interface Passenger {
   phoneNumber?: string;
   dialCode?: string;
   selectedPrefix: string;
+  needsSpecialAssistance?: boolean;
+  disabledVision?: boolean;
+  disabledHearing?: boolean;
+  monk?: boolean;
+  nun?: boolean;
+  pregnantWoman?: boolean;
+  wheelchairUser?: boolean;
+  unaccompaniedMinor?: boolean;
+  other?: boolean;
+  otherReason?: string;
   // seatID: string;
 }
 

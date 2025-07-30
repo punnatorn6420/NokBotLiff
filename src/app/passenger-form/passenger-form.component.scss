@@ -266,4 +266,119 @@ button[disabled] {
 .yellow-button:hover {
   background-color: #FFC107 !important;
 }
+
+// Special Assistance Styles
+.special-assistance-container {
+  margin-top: 20px;
+}
+
+.main-assistance-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.yellow-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #858585;
+  background-color: #FCCD01;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.yellow-checkbox.checked {
+  border: 1px solid #FCCD01;
+  background-color: #FCCD01;
+}
+
+.yellow-checkbox:not(.checked) {
+  background-color: white;
+}
+
+.yellow-checkbox .checkmark {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.main-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+}
+
+.assistance-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-left: 10px;
+}
+
+.assistance-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.white-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #858585;
+  background-color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.white-checkbox.checked {
+  background-color: #FCCD01;
+  border-color: #FCCD01;
+}
+
+.white-checkbox .checkmark {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.assistance-option span {
+  font-size: 20px;
+  font-weight: 400;
+  color: #222;
+}
+
+.contact-info {
+  margin-top: 10px;
+  color: #f44336;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.contact-info span {
+  color: #f44336;
+}
+
+.assistance-option input {
+  border: none;
+  border-bottom: 1px solid #000;
+  outline: none;
+  background: transparent;
+  width: 200px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #222;
+  margin-left: 8px;
+}
+
+.assistance-option input::placeholder {
+  color: #999;
+  font-size: 18px;
+}
     

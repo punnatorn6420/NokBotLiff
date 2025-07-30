@@ -3,44 +3,70 @@
     <app-header [currentStep]="2"></app-header>
     <div class="flight-seat-content">
         <div class="flight-header">
-            <p>{{ selectedFlight === 'inbound' ? ('SELECT_SEAT_OUTBOUND' | translate) : ('SELECT_SEAT_INBOUND' | translate) }}</p>
-            <div class="flight-tabs">
-                <button class="tab-btn" [ngClass]="{'active': selectedFlight === 'inbound'}"
-                    (click)="toggleFlight('inbound')">{{ 'DEPARTURE' | translate }}</button>
-                <button class="tab-btn" [ngClass]="{'active': selectedFlight === 'outbound'}"
-                    (click)="toggleFlight('outbound')">{{ 'RETURN' | translate }}</button>
-            </div>
-            <div class="flight-header-connect-flight" *ngIf="isConnectFlight">
-                <div class="togle-connect-flight">
-                    <div class="flight-segment-container">
-                        <div class="flight-segment" 
-                             [ngClass]="{'active': connectFlight === 'flight1'}"
-                             (click)="connectFlight = 'flight1'"
-                             >
-                            <span class="flight-number">ไฟลต์ 1</span>
-                            <span class="flight-route">(CNX → DMK)</span>
-                        </div>
-                        <div class="flight-segment" 
-                             [ngClass]="{'active': connectFlight === 'flight2'}"
-                             (click)="connectFlight = 'flight2'"
-                             >
-                            <span class="flight-number">ไฟลต์ 2</span>
-                            <span class="flight-route">(DMK → HDY)</span>
-                        </div>
-                    </div>
-                </div>
+            <h1 class="main-title" *ngIf="tripType === 'round-trip' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – {{ getCurrentDirectionLabel() }}</h1>
+            <h1 class="main-title" *ngIf="tripType === 'one-way' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – เทียวเดียว</h1>
+            <h1 class="main-title" *ngIf="!isConnectFlight">เลือกที่นั่งผู้โดยสาร</h1>
+
+            <div class="flight-one-way" *ngIf="tripType === 'one-way' && !isConnectFlight">
+                <p>One way</p>
             </div>
         </div>
     </div>
 
     <div class="passenger-list">
+        <div class="flight-seat-content">
+            <div class="flight-header">
+                <!-- <h1 class="main-title" *ngIf="tripType === 'round-trip' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – {{ getCurrentDirectionLabel() }}</h1>
+                <h1 class="main-title" *ngIf="tripType === 'one-way' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – เทียวเดียว</h1>
+                <h1 class="main-title" *ngIf="!isConnectFlight">เลือกที่นั่งผู้โดยสาร – {{ getCurrentDirectionLabel() }}</h1> -->
+                
+                <!-- Tab ขาไป/ขากลับ -->
+                <div class="flight-tabs" *ngIf="isConnectFlight && tripType === 'round-trip'" >
+                    <button class="tab-btn" 
+                        [ngClass]="{'active': !isInboundDirection()}"
+                        (click)="switchDirection('outbound')">
+                        ขาไป
+                    </button>
+                    <button class="tab-btn" 
+                        [ngClass]="{'active': isInboundDirection()}"
+                        (click)="switchDirection('inbound')">
+                        ขากลับ
+                    </button>
+                </div>
+                <div class="flight-round-trip" *ngIf="tripType === 'round-trip'  && !isConnectFlight" style="padding-top: 5px;">
+                    <div class="flight-round-trip-tabs">
+                        <button class="tab-btn" 
+                            [ngClass]="{'active': !isInboundDirection()}"
+                            (click)="switchDirection('outbound')">
+                            ขาไป
+                        </button>
+                        <button class="tab-btn" 
+                            [ngClass]="{'active': isInboundDirection()}"
+                            (click)="switchDirection('inbound')">
+                            ขากลับ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Flight Segment สำหรับ Connect Flight -->
+                <div class="flight-segment-container" *ngIf="getCurrentDirectionSegments().length > 1 && isConnectFlight">
+                    <button class="segment-btn" 
+                        *ngFor="let segment of getCurrentDirectionSegments()"
+                        [ngClass]="{'active': currentSegmentKey === segment.key}"
+                        (click)="switchSegment(segment.key)">
+                        <span class="flight-number">ไฟลต์ {{ getFlightNumber(segment.key) }}</span>
+                        <span class="flight-route">({{ getFlightRoute(segment.key) }})</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="passenger-list-content">
             <div class="scroll-container">
                 <div class="passenger-box" *ngFor="let passenger of passengers; let i = index" [ngClass]="{
-                    'has-seat': hasSeat(i),
-                    'no-seat': !hasSeat(i)
+                    'has-seat': hasSeatInServiceSegments(i),
+                    'no-seat': !hasSeatInServiceSegments(i)
                 }">
-                    <ng-container *ngIf="hasSeat(i)">
+                    <ng-container *ngIf="hasSeatInServiceSegments(i)">
                         <svg class="icon-select-seat" width="24" height="24" viewBox="0 0 16 17" fill="none">
                             <circle cx="8" cy="8.5" r="7" fill="#FFFBEA" stroke="#069553" stroke-width="2"/>
                             <path d="M5.33301 8.5L7.33301 10.5L11.333 6.5" stroke="#069553" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -200,8 +226,13 @@
                   <span class="seat-color-box regular"></span>
                   <div class="seat-type-info">
                     <div class="seat-type-title">{{ 'Nok_Happy_Seat' | translate }}</div>
-                    <div class="seat-type-price"><span class="old-price">{{ regularPrice | number:'1.2-2' }} THB</span> <span class="free-price">0 THB</span></div>
-                  </div>
+                    <!-- <div class="seat-type-price"><span class="old-price">{{ regularPrice | number:'1.2-2' }} THB</span> <span class="free-price" *ngIf="freeSeatInbound || freeSeatOutbound">0 THB</span></div> -->
+                    <div class="seat-type-price">
+                        <span class="old-price" *ngIf="getCurrentSegmentFreeSeat()">{{ regularPrice | number:'1.2-2' }} THB</span> 
+                        <span *ngIf="!getCurrentSegmentFreeSeat()">{{ regularPrice | number:'1.2-2' }} THB</span> 
+                        <span class="free-price" *ngIf="getCurrentSegmentFreeSeat()">0 THB</span>
+                      </div>
+                </div>
                 </div>
               </div>
               <div class="legend-right">
@@ -236,7 +267,7 @@
             <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button>
             <button class="btn-confirm" (click)="confirmSelectSeat()">
                 <span class="btn-confirm-text">{{ 'Confirm_Seat' | translate }}</span>
-                <span class="btn-price">{{ selectedSeatPrice | number:'1.2-2' }} THB</span>
+                <span class="btn-price">{{ getTotalPrice() | number:'1.2-2' }} THB</span>
             </button>
         </div>
         <button *ngIf="!selectedSeat || selectedSeat.length === 0" class="btn-no-select" (click)="onNextStep()">{{ 'NEXT_STEP_NO_SELECT_SEAT' | translate }}</button>

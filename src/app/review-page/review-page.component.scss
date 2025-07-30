@@ -103,6 +103,23 @@
     }
   }
 }
+
+.special-assistance-container {
+  margin-top: 12px;
+  .special-assistance-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #ff3131;
+    margin-bottom: 6px;
+  }
+  .special-assistance-item {  
+    font-size: 18px;
+    font-weight: 400;
+    color: #ff3131;
+    margin-bottom: 6px;
+  }
+}
+
 .info-section {
   margin-bottom: 8px;
 }

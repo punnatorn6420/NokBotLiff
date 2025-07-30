@@ -65,6 +65,17 @@ export class PassengerFormComponent {
   filteredPhonePrefixOptions!: Observable<string[]>;
   filteredDialCodeOptions!: Observable<string[]>;
 
+  needsSpecialAssistance: boolean = false;
+  disabledVision: boolean = false;
+  disabledHearing: boolean = false;
+  monk: boolean = false;
+  nun: boolean = false;
+  pregnantWoman: boolean = false;
+  wheelchairUser: boolean = false;
+  unaccompaniedMinor: boolean = false;
+  other: boolean = false;
+  otherReason: string = '';
+
   constructor(private router: Router, 
     private dialog: MatDialog, 
     private route: ActivatedRoute,
@@ -244,7 +255,17 @@ export class PassengerFormComponent {
           expireDate: new FormControl(null, [Validators.required]),
           dialCode: new FormControl(''),
           phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d{10}$/)]),
-          email: new FormControl('', [Validators.required, Validators.email])
+          email: new FormControl('', [Validators.required, Validators.email]),
+          needsSpecialAssistance: new FormControl(false),
+          disabledVision: new FormControl(false),
+          disabledHearing: new FormControl(false),
+          monk: new FormControl(false),
+          nun: new FormControl(false),
+          pregnantWoman: new FormControl(false),
+          wheelchairUser: new FormControl(false),
+          unaccompaniedMinor: new FormControl(false),
+          other: new FormControl(false),
+          otherReason: new FormControl('')
         });
       } else {
         // ผู้โดยสารคนที่ 2+ - ไม่ต้องกรอก contact (ไม่มี FormControl สำหรับ contact)
@@ -258,8 +279,18 @@ export class PassengerFormComponent {
           country: new FormControl('', [Validators.required]),
           passportNumber: new FormControl('', [Validators.required]),
           issuedBy: new FormControl('', [Validators.required]),
-          expireDate: new FormControl(null, [Validators.required])
+          expireDate: new FormControl(null, [Validators.required]),
+          needsSpecialAssistance: new FormControl(false),
+          disabledVision: new FormControl(false),
+          disabledHearing: new FormControl(false),
+          monk: new FormControl(false),
+          nun: new FormControl(false),
+          pregnantWoman: new FormControl(false),
           // ไม่มี phonePrefix, phoneNumber, email สำหรับผู้โดยสารคนที่ 2+
+          wheelchairUser: new FormControl(false),
+          unaccompaniedMinor: new FormControl(false),
+          other: new FormControl(false),
+          otherReason: new FormControl('')
         });
       }
     }
@@ -521,5 +552,44 @@ export class PassengerFormComponent {
 
   trackName(index: number, name: string): string {
     return name;
+  }
+
+  // Methods for special assistance checkbox handling
+  toggleMainAssistance() {
+    if (!this.currentForm) return;
+    
+    const currentValue = this.currentForm.get('needsSpecialAssistance')?.value;
+    this.currentForm.patchValue({
+      needsSpecialAssistance: !currentValue
+    });
+
+    if (currentValue === false) {
+      this.ClearAllSpecialAssistance();
+    }
+  }
+
+  toggleOption(optionName: string) {
+    if (!this.currentForm) return;
+    
+    const currentValue = this.currentForm.get(optionName)?.value;
+    this.currentForm.patchValue({
+      [optionName]: !currentValue
+    });
+  }
+
+  ClearAllSpecialAssistance() {
+    if (!this.currentForm) return;
+    
+    this.currentForm.patchValue({
+      disabledVision: false,
+      disabledHearing: false,
+      monk: false,
+      nun: false,
+      pregnantWoman: false,
+      wheelchairUser: false,
+      unaccompaniedMinor: false,
+      other: false,
+      otherReason: ''
+    });
   }
 }
