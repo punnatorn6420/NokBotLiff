@@ -21,6 +21,7 @@ export class DialogComponent {
   }
 
   isDialog: string = this.data.isDialog;
+  message: string = this.data.message || '';
 
   onClose(): void {
     this.dialogRef.close({
@@ -37,5 +38,9 @@ export class DialogComponent {
   switchLanguage(lang: 'th' | 'en') {
     console.log(lang);
     this.translate.use(lang);
+  }
+
+  getWarningMessage(): string {
+    return this.message;
   }
 }

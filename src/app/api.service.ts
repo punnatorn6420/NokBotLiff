@@ -14,10 +14,10 @@ export class ApiService {
 
   getPassengerInfo() {
     const body = {
-     "user_id": "U197dceb79bc625b5811cfa6174397c88"
+     "user_id": "U197dceb79bc625b5811cfa6174397c86"
     }
     const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${"http://localhost:4000/api/liff/get-passenger-info"}`, body, { headers });
+    return this.http.post(`${"https://ddservices-uat.nokair.com/botnoi-api/api/liff/get-passenger-info"}`, body, { headers });
   }
 
   getSeatMap(journeyKey?: string, fareKey?: string) {
@@ -26,6 +26,6 @@ export class ApiService {
       fareKey: fareKey
     }
     const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${"http://localhost:4000/api/liff/retrieve-seat-map"}`, body, { headers });
+    return this.http.post(`${"https://ddservices-uat.nokair.com/botnoi-api/api/liff/retrieve-seat-map"}`, body, { headers });
   }
 }

@@ -5,10 +5,9 @@
         <div class="flight-header">
             <h1 class="main-title" *ngIf="tripType === 'round-trip' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – {{ getCurrentDirectionLabel() }}</h1>
             <h1 class="main-title" *ngIf="tripType === 'one-way' && isConnectFlight">เลือกที่นั่งผู้โดยสาร – เทียวเดียว</h1>
-            <h1 class="main-title" *ngIf="!isConnectFlight">เลือกที่นั่งผู้โดยสาร</h1>
-
-            <div class="flight-one-way" *ngIf="tripType === 'one-way' && !isConnectFlight">
-                <p>One way</p>
+            <h1 class="main-title" *ngIf="tripType === 'round-trip' && !isConnectFlight">เลือกที่นั่งผู้โดยสาร - {{ getCurrentDirectionLabel() }}</h1>
+            <div class="main-title" *ngIf="tripType === 'one-way' && !isConnectFlight">
+                <p>เลือกที่นั่งผู้โดยสาร – เทียวเดียว</p>
             </div>
         </div>
     </div>
@@ -33,8 +32,8 @@
                         ขากลับ
                     </button>
                 </div>
-                <div class="flight-round-trip" *ngIf="tripType === 'round-trip'  && !isConnectFlight" style="padding-top: 5px;">
-                    <div class="flight-round-trip-tabs">
+                <div class="flight-tabs" *ngIf="tripType === 'round-trip'  && !isConnectFlight" style="padding-top: 5px;">
+                    <!-- <div class="flight-round-trip-tabs">
                         <button class="tab-btn" 
                             [ngClass]="{'active': !isInboundDirection()}"
                             (click)="switchDirection('outbound')">
@@ -45,7 +44,17 @@
                             (click)="switchDirection('inbound')">
                             ขากลับ
                         </button>
-                    </div>
+                    </div> -->
+                    <button class="tab-btn" 
+                        [ngClass]="{'active': !isInboundDirection()}"
+                        (click)="switchDirection('outbound')">
+                        ขาไป
+                    </button>
+                    <button class="tab-btn" 
+                        [ngClass]="{'active': isInboundDirection()}"
+                        (click)="switchDirection('inbound')">
+                        ขากลับ
+                    </button>
                 </div>
                 
                 <!-- Flight Segment สำหรับ Connect Flight -->
@@ -205,8 +214,8 @@
                     </svg>
                 </div>             
             </div>
-            <div class="detail-seat-price-close" *ngIf="!isShowDetailSeatPrice"></div>
-            <div class="detail-seat-price horizontal" *ngIf="isShowDetailSeatPrice">
+            <div class="detail-seat-price-close" *ngIf="isShowDetailSeatPrice"></div>
+            <div class="detail-seat-price horizontal" *ngIf="!isShowDetailSeatPrice">
               <div class="legend-left">
                 <div class="seat-type-row">
                   <span class="seat-color-box premium-plus"></span>
@@ -263,13 +272,13 @@
               </div>
             </div>
         </div>
-        <div *ngIf="selectedSeat && selectedSeat.length > 0" class="select-seat-btn">
+        <div *ngIf="hasSelectedSeatsInAnySegment()" class="select-seat-btn">
             <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button>
             <button class="btn-confirm" (click)="confirmSelectSeat()">
                 <span class="btn-confirm-text">{{ 'Confirm_Seat' | translate }}</span>
                 <span class="btn-price">{{ getTotalPrice() | number:'1.2-2' }} THB</span>
             </button>
         </div>
-        <button *ngIf="!selectedSeat || selectedSeat.length === 0" class="btn-no-select" (click)="onNextStep()">{{ 'NEXT_STEP_NO_SELECT_SEAT' | translate }}</button>
+        <button *ngIf="!hasSelectedSeatsInAnySegment()" class="btn-no-select" (click)="onNextStep()">{{ 'NEXT_STEP_NO_SELECT_SEAT' | translate }}</button>
     </div>
 </div>
