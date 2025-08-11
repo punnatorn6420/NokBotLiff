@@ -24,7 +24,7 @@
                 <!-- <p>{{ 'LOADING' | translate }}</p> -->
                  <app-loading></app-loading>
             </div>
-            <form *ngIf="currentForm" [formGroup]="currentForm">
+            <form *ngIf="currentForm" [formGroup]="currentForm" (ngSubmit)="validateAndScrollToError()">
                 <p style="margin-bottom: 15px; font-weight: 700; font-size: 23px;">{{ 'PASSENGER_INFO' | translate }} <span *ngIf="selectedPassenger !== 1"> {{ selectedPassenger }}</span>
                     <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
                 <p style="margin-bottom: 20px; font-weight: 400; font-size: 22px;">{{ 'GENERAL_INFORMATION' | translate
@@ -172,13 +172,13 @@
                         <mat-form-field class="form-passenger-contact-phone-content" style="width: 80%;"
                             appearance="outline">
                             <mat-label>{{ 'PHONE' | translate }}</mat-label>
-                            <input matInput required formControlName="phoneNumber" inputmode="numeric" pattern="[0-9]*">
+                            <input matInput required formControlName="phoneNumber" inputmode="numeric" pattern="[0-9]*" (input)="onPhoneNumberInput($event)">
                             <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_PHONE' | translate }}
                             </mat-error>
-                            <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('pattern')">
+                            <!-- <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('pattern')">
                                 {{ 'ERROR_PATTERN_PHONE' | translate }}
-                            </mat-error>
+                            </mat-error> -->
                         </mat-form-field>
                     </div>
                     <br>
@@ -268,10 +268,10 @@
 
             <div class="footer-container">
                 <div class="footer-container-text">
-                    <u *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">{{
-                        'NEXT_PASSENGER' | translate }}</u>
-                    <u *ngIf="selectedPassenger === numberPassenger"></u>
-                    <div *ngIf="selectedPassenger < numberPassenger"
+                    <!-- <u *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">{{
+                        'NEXT_PASSENGER' | translate }}</u> -->
+                    <!-- <u *ngIf="selectedPassenger === numberPassenger"></u> -->
+                    <!-- <div *ngIf="selectedPassenger < numberPassenger"
                         style="display: flex; align-items: center; justify-content: center;">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2.5 8H13.5" stroke="#262626" stroke-width="1.5" stroke-linecap="round"
@@ -279,13 +279,18 @@
                             <path d="M9 3.5L13.5 8L9 12.5" stroke="#262626" stroke-width="1.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                    </div>
+                    </div> -->
                 </div>
-                <br>
-                <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
-                    (click)="nextStep()" [disabled]="!isAllPassengersValid()">
-                    {{ 'CONFIRM' | translate }}
+                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">
+                    กรอกข้อมูลผู้โดยสารคนต่อไป
                 </button>
+                <button class="next-passenger-button" *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">
+                    ยืนยัน
+                </button>
+                <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
+                    (click)="nextStep()" [disabled]="!isAllPassengersValid()" *ngIf="selectedPassenger === numberPassenger">
+                    {{ 'CONFIRM' | translate }}
+                </button> -->
                 <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
                     (click)="nextStep()">
                     ยืนยัน

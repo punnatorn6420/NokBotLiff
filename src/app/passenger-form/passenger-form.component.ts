@@ -254,7 +254,7 @@ export class PassengerFormComponent {
           issuedBy: new FormControl('', [Validators.required]),
           expireDate: new FormControl(null, [Validators.required]),
           dialCode: new FormControl(''),
-          phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d{10}$/)]),
+          phoneNumber: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
           needsSpecialAssistance: new FormControl(false),
           disabledVision: new FormControl(false),
@@ -462,15 +462,73 @@ export class PassengerFormComponent {
       this.selectedPassenger++;
       this.loadPassengerData(this.selectedPassenger);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // scroll to first error
+  scrollToFirstError() {
+    setTimeout(() => {
+      const firstErrorElement = document.querySelector('mat-error:not([style*="display: none"])');
+      if (firstErrorElement) {
+        const formField = firstErrorElement.closest('mat-form-field');
+        if (formField) {
+          const inputElement = formField.querySelector('input, mat-select, textarea');
+          if (inputElement) {
+            // scroll to input and focus
+            inputElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+            // focus at input
+            (inputElement as HTMLElement).focus();
+          } else {
+            // if not found input, scroll to form-field
+            formField.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }
+      }
+    }, 100);
+  }
+
+  // scroll to field error
+  scrollToFieldError(fieldName: string) {
+    setTimeout(() => {
+      const formField = document.querySelector(`[formControlName="${fieldName}"]`)?.closest('mat-form-field');
+      if (formField) {
+        const inputElement = formField.querySelector('input, mat-select, textarea');
+        if (inputElement) {
+          inputElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          (inputElement as HTMLElement).focus();
+        }
+      }
+    }, 100);
+  }
+
+  // next step
   nextStep() {
-    // console.log(this.passengerForms[this.selectedPassenger]);
-    // console.log(this.passengerForms);
     this.saveCurrentPassengerData();
     if (!this.isAllPassengersValid()) {
+      // find first passenger with error
+      for (const passengerNumber of this.numberPassengerArray) {
+        const form = this.passengerForms[passengerNumber];
+        if (form && form.invalid) {
+          // change to passenger with error
+          this.selectPassenger(passengerNumber);
+          form.markAllAsTouched();
+          // scroll to first error
+          this.scrollToFirstError();
+          return;
+        }
+      }
       return;
     }
+    
     const dialogRef = this.dialog.open(DialogComponent, {
       width: '350px',
       disableClose: true,
@@ -480,18 +538,20 @@ export class PassengerFormComponent {
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result.result === 'confirm') {
-        this.passDataService.setFormData(this.passengersData);
+        this.setPassengerData();
         this.router.navigate(['/select-seat']);
-        // if (this.selectedPassenger < this.numberPassenger) {
-        //   this.selectedPassenger++;
-        //   this.loadPassengerData(this.selectedPassenger);
-        // } else {
-        //   this.router.navigate(['/seat']);
-        // }
       }
     });
   }
 
+  setPassengerData() {
+    if (this.passengersData[1].dialCode === '') {
+      this.passengersData[1].dialCode = '+66';
+    }
+    this.passDataService.setFormData(this.passengersData);
+  }
+
+  // check passenger valid
   checkPassengerValid(passenger: number) {
     const form = this.passengerForms[passenger];
     if (!form) {
@@ -503,6 +563,7 @@ export class PassengerFormComponent {
       this.nextPassenger();
     } else {
       form.markAllAsTouched();
+      this.scrollToFirstError();
     }
   }
 
@@ -520,18 +581,18 @@ export class PassengerFormComponent {
   //   return Object.values(controls).some(control => !!control.value);
   // }
 
-  // เพิ่มฟังก์ชันใหม่สำหรับตรวจสอบ field ที่จำเป็นแต่ละตัว
+  // check field valid
   isPassengerFieldValid(passenger: number, fieldName: string): boolean {
     const form = this.passengerForms[passenger];
     if (!form) return false;
     
     const control = form.get(fieldName);
-    if (!control) return true; // ถ้าไม่มี control ให้ถือว่าถูกต้อง
+    if (!control) return true; // if no control, consider it valid
     
     return !control.invalid || !control.touched;
   }
 
-  // ตรวจสอบว่าผู้โดยสารมี field ที่ invalid และ touched หรือไม่
+  // check if passenger has invalid and touched fields
   hasInvalidTouchedFields(passenger: number): boolean {
     const form = this.passengerForms[passenger];
     if (!form) return false;
@@ -554,7 +615,7 @@ export class PassengerFormComponent {
     return name;
   }
 
-  // Methods for special assistance checkbox handling
+  // toggle main assistance checkbox
   toggleMainAssistance() {
     if (!this.currentForm) return;
     
@@ -591,5 +652,37 @@ export class PassengerFormComponent {
       other: false,
       otherReason: ''
     });
+  }
+
+  validateAndScrollToError() {
+    if (!this.currentForm) return;
+    
+    if (this.currentForm.invalid) {
+      this.currentForm.markAllAsTouched();
+      this.scrollToFirstError();
+    }
+  }
+
+  validateFieldAndScroll(fieldName: string) {
+    if (!this.currentForm) return;
+    
+    const control = this.currentForm.get(fieldName);
+    if (control && control.invalid && control.touched) {
+      this.scrollToFieldError(fieldName);
+    }
+  }
+
+  onPhoneNumberInput(event: any) {
+    if (!this.currentForm) return;
+    
+    const phoneControl = this.currentForm.get('phoneNumber');
+    if (!phoneControl) return;
+    
+    let value = event.target.value;
+    
+    if (value.startsWith('0') && value.length > 1) {
+      value = value.substring(1);
+      phoneControl.setValue(value, { emitEvent: false });
+    }
   }
 }
