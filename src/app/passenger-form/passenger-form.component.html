@@ -14,7 +14,8 @@
                 <div class="number-passenger-box" [class.active]="selectedPassenger === passenger"
                     [class.valid]="passengerForms[passenger].valid"
                     [class.invalid]="hasInvalidTouchedFields(passenger)"
-                    (click)="selectPassenger(passenger)">
+                    [class.disabled]="!canSelectPassenger(passenger)"
+                    (click)="canSelectPassenger(passenger) && selectPassenger(passenger)">
                     {{ 'PASSENGER_NUMBER' | translate }} {{ passenger }}
                 </div>
             </div>
@@ -92,26 +93,38 @@
                         <mat-form-field class="form-passenger-passport-content" appearance="outline">
                             <mat-label>{{ 'NATIONALITY' | translate }}</mat-label>
                             <input type="text" aria-label="สัญชาติ" matInput formControlName="nationality"
-                                [matAutocomplete]="autoNationality">
-                            <mat-autocomplete #autoNationality="matAutocomplete">
+                                [matAutocomplete]="autoNationality" #natTrigger="matAutocompleteTrigger" (focus)="natTrigger.openPanel()" (blur)="autoSelectIfSingle('nationality')">
+                            <mat-autocomplete #autoNationality="matAutocomplete" (closed)="autoSelectIfSingle('nationality')">
                                 <mat-option *ngFor="let option of filteredNationalityOptions | async"
                                     [value]="option">{{option}}</mat-option>
                             </mat-autocomplete>
                             <mat-error *ngIf="currentForm.get('nationality')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_NATIONALITY' | translate }}
                             </mat-error>
+                            <mat-error *ngIf="currentForm.get('nationality')?.hasError('pattern')">
+                                กรุณาเลือกกรอกภาษาอังกฤษ
+                            </mat-error>
+                            <mat-error *ngIf="currentForm.get('nationality')?.hasError('notFound')">
+                                ไม่พบข้อมูล
+                            </mat-error>
                         </mat-form-field>
 
                         <mat-form-field class="form-passenger-passport-content" appearance="outline">
                             <mat-label>{{ 'COUNTRY' | translate }}</mat-label>
                             <input type="text" aria-label="ประเทศ" matInput formControlName="country"
-                                [matAutocomplete]="autoCountry">
-                            <mat-autocomplete #autoCountry="matAutocomplete">
+                                [matAutocomplete]="autoCountry" #countryTrigger="matAutocompleteTrigger" (focus)="countryTrigger.openPanel()" (blur)="autoSelectIfSingle('country')">
+                            <mat-autocomplete #autoCountry="matAutocomplete" (closed)="autoSelectIfSingle('country')">
                                 <mat-option *ngFor="let option of filteredCountryOptions | async"
                                     [value]="option">{{option}}</mat-option>
                             </mat-autocomplete>
                             <mat-error *ngIf="currentForm.get('country')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_COUNTRY' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="currentForm.get('country')?.hasError('pattern')">
+                                กรุณาเลือกกรอกภาษาอังกฤษ
+                            </mat-error>
+                            <mat-error *ngIf="currentForm.get('country')?.hasError('notFound')">
+                                ไม่พบข้อมูล
                             </mat-error>
                         </mat-form-field>
                     </div>
@@ -129,13 +142,19 @@
                     <mat-form-field class="form-passenger-passport-content" appearance="outline">
                         <mat-label>{{ 'ISSUED_BY' | translate }}</mat-label>
                         <input type="text" aria-label="ออกโดย" matInput formControlName="issuedBy"
-                            [matAutocomplete]="autoIssuedBy">
-                        <mat-autocomplete #autoIssuedBy="matAutocomplete">
+                            [matAutocomplete]="autoIssuedBy" #issuedByTrigger="matAutocompleteTrigger" (focus)="issuedByTrigger.openPanel()" (blur)="autoSelectIfSingle('issuedBy')">
+                        <mat-autocomplete #autoIssuedBy="matAutocomplete" (closed)="autoSelectIfSingle('issuedBy')">
                             <mat-option *ngFor="let option of filteredIssuedByOptions | async"
                                 [value]="option">{{option}}</mat-option>
                         </mat-autocomplete>
                         <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('required')">
                             {{ 'ERROR_REQUIRED_ISSUED_BY' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('pattern')">
+                            กรุณาเลือกกรอกภาษาอังกฤษ
+                        </mat-error>
+                        <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('notFound')">
+                            ไม่พบข้อมูล
                         </mat-error>
                     </mat-form-field>
                     <br>
@@ -147,6 +166,9 @@
                         <mat-error *ngIf="currentForm.get('expireDate')?.hasError('required')">
                             {{ 'ERROR_REQUIRED_EXPIRE_DATE' | translate }}
                         </mat-error>
+                        <mat-error *ngIf="currentForm.get('expireDate')?.hasError('pastDate')">
+                            {{ 'ERROR_PAST_EXPIRE_DATE' | translate }}
+                        </mat-error>
                     </mat-form-field>
                 </div>
                 <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;"
@@ -156,8 +178,8 @@
                         <mat-form-field class="form-passenger-contact-phone-content" style="width: 80px;"
                             appearance="outline">
                             <input type="text" aria-label="เบอร์โทรศัพท์" matInput formControlName="dialCode"
-                                [matAutocomplete]="autoDialCode" placeholder="+66">
-                            <mat-autocomplete #autoDialCode="matAutocomplete">
+                                [matAutocomplete]="autoDialCode" #dialCodeTrigger="matAutocompleteTrigger" (focus)="dialCodeTrigger.openPanel()" placeholder="+66" (blur)="autoSelectIfSingleDialCode()">
+                            <mat-autocomplete #autoDialCode="matAutocomplete" (closed)="autoSelectIfSingleDialCode()">
                                 <mat-option *ngFor="let option of filteredDialCodeOptions | async"
                                     [value]="extractDialCode(option)">
                                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -281,7 +303,7 @@
                         </svg>
                     </div> -->
                 </div>
-                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">
+                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)" [ngClass]="{'yellow-button': passengerForms[selectedPassenger].valid}">
                     กรอกข้อมูลผู้โดยสารคนต่อไป
                 </button>
                 <button class="next-passenger-button" *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">

@@ -43,6 +43,98 @@ mat-error {
   color: #222 !important;
 }
 
+::ng-deep .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #000;
+  --mdc-outlined-text-field-hover-outline-color: #000;
+  --mdc-outlined-text-field-focus-outline-color: #000;
+  --mdc-outlined-text-field-error-outline-color: #f44336;
+  --mdc-outlined-text-field-error-hover-outline-color: #f44336;
+  --mdc-outlined-text-field-error-focus-outline-color: #f44336;
+}
+
+/* บังคับแดงเมื่อมี mat-error แสดง แม้ยังไม่ติดคลาส invalid */
+::ng-deep .mat-mdc-form-field:has(.mat-mdc-form-field-error) .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field:has(.mat-mdc-form-field-error) .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field:has(.mat-mdc-form-field-error) .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mat-mdc-form-field:has(mat-error) .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field:has(mat-error) .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field:has(mat-error) .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)):hover .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)):hover .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)):hover .mdc-notched-outline__trailing {
+  border-color: #000 !important;
+}
+
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)).mat-focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)).mat-focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)).mat-focused .mdc-notched-outline__trailing {
+  border-color: #000 !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mdc-text-field--invalid .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--invalid .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--invalid .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused.mat-mdc-form-field-invalid .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-focused.mat-mdc-form-field-invalid .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field.mat-focused.mat-mdc-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid:hover .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid:hover .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid:hover .mdc-notched-outline__trailing {
+  border-color: #f44336 !important;
+}
+
+::ng-deep .mdc-text-field--invalid:not(.mdc-text-field--disabled) .mdc-floating-label {
+  color: #f44336 !important;
+}
+
+// *
+
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)).mat-focused .mdc-floating-label {
+  color: #000 !important;
+}
+
+::ng-deep .mdc-text-field:not(.mdc-text-field--invalid).mdc-text-field--focused .mdc-floating-label {
+  color: #000 !important;
+}
+
+// v
+::ng-deep .mat-mdc-form-field:not(.mat-mdc-form-field-invalid):not(:has(.mat-mdc-form-field-error)).mat-focused .mat-mdc-select-arrow {
+  color: #000 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-select.mat-mdc-select-invalid .mat-mdc-select-arrow {
+  color: #f44336 !important;
+}
+
+// check
+
+::ng-deep .mat-mdc-option-pseudo-checkbox.mat-pseudo-checkbox-checked.mat-pseudo-checkbox-minimal.ng-star-inserted{
+  display: none !important;
+}
+
+// name
+::ng-deep .mdc-list-item__primary-text{
+  color: #222 !important;
+}
+
 
 .number-passenger-scroll {
   position: sticky;
@@ -260,11 +352,7 @@ button[disabled] {
 .yellow-button {
   background-color: #FFD600 !important;
   color: #222 !important; 
-  border: 2px solid #222 !important;
-}
-
-.yellow-button:hover {
-  background-color: #FFC107 !important;
+  border: 1px solid #222 !important;
 }
 
 // Special Assistance Styles
@@ -392,4 +480,10 @@ button[disabled] {
   background-color: #FFD600;
   color: #222;
   border: 1px solid #222;
+}
+
+.number-passenger-box.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
 }

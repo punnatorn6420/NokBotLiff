@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, tap, pairwise } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
@@ -63,7 +63,13 @@ export class PassengerFormComponent {
   filteredCountryOptions!: Observable<string[]>;
   filteredIssuedByOptions!: Observable<string[]>;
   filteredPhonePrefixOptions!: Observable<string[]>;
-  filteredDialCodeOptions!: Observable<string[]>;
+  filteredDialCodeOptions!: Observable<any[]>;
+
+  // เก็บผลกรองล่าสุดไว้ใช้ตอน blur
+  lastFilteredNationalityOptions: string[] = [];
+  lastFilteredCountryOptions: string[] = [];
+  lastFilteredIssuedByOptions: string[] = [];
+  lastFilteredDialCodeOptions: any[] = [];
 
   needsSpecialAssistance: boolean = false;
   disabledVision: boolean = false;
@@ -85,8 +91,11 @@ export class PassengerFormComponent {
       // this.translate.setDefaultLang('th');
       // this.translate.use('th');
       this.route.queryParams.subscribe((params: any) => {
-        this.selectedPassenger = params.passengerIndex+1;
-        console.log("selectedPassenger",this.selectedPassenger);
+        const idx = Number(params?.passengerIndex);
+        if (!isNaN(idx)) {
+          this.selectedPassenger = idx;
+        }
+        console.log("selectedPassenger", this.selectedPassenger);
       });
     }
 
@@ -105,8 +114,11 @@ export class PassengerFormComponent {
       
       // ตั้งค่า currentForm หลังจาก initializePassengerForms
       if (this.numberPassenger > 0) {
-        this.currentForm = this.passengerForms[1];
-        this.selectedPassenger = 1;
+        const fallbackPassenger = 1;
+        const selected = Number(this.selectedPassenger);
+        const validSelected = !isNaN(selected) && selected >= 1 && selected <= this.numberPassenger ? selected : fallbackPassenger;
+        this.selectedPassenger = validSelected;
+        this.currentForm = this.passengerForms[this.selectedPassenger];
         this.setupAutocompleteFilters();
       }
     });
@@ -189,6 +201,8 @@ export class PassengerFormComponent {
     
     // เก็บข้อมูล dialCode ทั้งหมด
     this.dialCodeOptions = _data;
+
+    this.revalidateOptionControls();
   }
 
   // ปรับปรุงฟังก์ชัน extractDialCode
@@ -248,11 +262,23 @@ export class PassengerFormComponent {
           middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required, this.minAgeValidator(18)]),
-          nationality: new FormControl('', [Validators.required]),
-          country: new FormControl('', [Validators.required]),
+          nationality: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.nationalityOptions)
+          ]),
+          country: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.countryOptions)
+          ]),
           passportNumber: new FormControl('', [Validators.required]),
-          issuedBy: new FormControl('', [Validators.required]),
-          expireDate: new FormControl(null, [Validators.required]),
+          issuedBy: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.issuedByOptions)
+          ]),
+          expireDate: new FormControl(null, [Validators.required, this.notPastDateValidator()]),
           dialCode: new FormControl(''),
           phoneNumber: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
@@ -267,6 +293,11 @@ export class PassengerFormComponent {
           other: new FormControl(false),
           otherReason: new FormControl('')
         });
+        // พรีโหลดข้อมูลจาก service ถ้ามี เพื่อให้ฟอร์ม valid ตั้งแต่เริ่มต้น
+        const prefill = (this.passengersData && this.passengersData[passengerNumber]) ? this.passengersData[passengerNumber] : null;
+        if (prefill) {
+          this.passengerForms[passengerNumber].patchValue(prefill);
+        }
       } else {
         // ผู้โดยสารคนที่ 2+ - ไม่ต้องกรอก contact (ไม่มี FormControl สำหรับ contact)
         this.passengerForms[passengerNumber] = new FormGroup({
@@ -275,11 +306,23 @@ export class PassengerFormComponent {
           middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required]),
-          nationality: new FormControl('', [Validators.required]),
-          country: new FormControl('', [Validators.required]),
+          nationality: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.nationalityOptions)
+          ]),
+          country: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.countryOptions)
+          ]),
           passportNumber: new FormControl('', [Validators.required]),
-          issuedBy: new FormControl('', [Validators.required]),
-          expireDate: new FormControl(null, [Validators.required]),
+          issuedBy: new FormControl('', [
+            Validators.required,
+            Validators.pattern(/^[a-zA-Z\s]+$/),
+            this.optionExistsValidator(() => this.issuedByOptions)
+          ]),
+          expireDate: new FormControl(null, [Validators.required, this.notPastDateValidator()]),
           needsSpecialAssistance: new FormControl(false),
           disabledVision: new FormControl(false),
           disabledHearing: new FormControl(false),
@@ -292,6 +335,11 @@ export class PassengerFormComponent {
           other: new FormControl(false),
           otherReason: new FormControl('')
         });
+        // พรีโหลดข้อมูลจาก service ถ้ามี เพื่อให้ฟอร์ม valid ตั้งแต่เริ่มต้น
+        const prefill = (this.passengersData && this.passengersData[passengerNumber]) ? this.passengersData[passengerNumber] : null;
+        if (prefill) {
+          this.passengerForms[passengerNumber].patchValue(prefill);
+        }
       }
     }
     
@@ -304,39 +352,46 @@ export class PassengerFormComponent {
 
     this.filteredNationalityOptions = this.currentForm.get('nationality')!.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterNationality(value || '')),
+      map((curr) => {
+        const currStr = (curr ?? '').toString();
+        const options = this._filterNationality(currStr);
+        this.lastFilteredNationalityOptions = options;
+        return options;
+      })
     );
 
     this.filteredCountryOptions = this.currentForm.get('country')!.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterCountry(value || '')),
+      map((curr) => {
+        const currStr = (curr ?? '').toString();
+        const options = this._filterCountry(currStr);
+        this.lastFilteredCountryOptions = options;
+        return options;
+      })
     );
 
     this.filteredIssuedByOptions = this.currentForm.get('issuedBy')!.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterIssuedBy(value || '')),
+      map((curr) => {
+        const currStr = (curr ?? '').toString();
+        const options = this._filterIssuedBy(currStr);
+        this.lastFilteredIssuedByOptions = options;
+        return options;
+      })
     );
 
-    // เฉพาะผู้โดยสารคนที่ 1 เท่านั้นที่มี phonePrefix
+    // เฉพาะผู้โดยสารคนที่ 1 เท่านั้นที่มี dialCode
     if (this.selectedPassenger === 1) {
-      // this.filteredPhonePrefixOptions = this.currentForm.get('phonePrefix')!.valueChanges.pipe(
-      //   startWith(''),
-      //   map(value => this._filterPhone(value || '')),
-      // );
-
       this.filteredDialCodeOptions = this.currentForm.get('dialCode')!.valueChanges.pipe(
         startWith(''),
-        map(value => {
-          const stringValue = typeof value === 'string' ? value : '';
-          return this._filterDialCode(stringValue);
-        }),
+        map((curr) => {
+          const currStr = typeof curr === 'string' ? curr : '';
+          const options = this._filterDialCode(currStr);
+          this.lastFilteredDialCodeOptions = options;
+          return options;
+        })
       );
     }
-
-    // this.filteredDialCodeOptions = this.currentForm.get('dialCode')!.valueChanges.pipe(
-    //   startWith(''),
-    //   map(value => this._filterDialCode(value || '')),
-    // );
   }
 
   private _filterNationality(value: string): string[] {
@@ -377,6 +432,40 @@ export class PassengerFormComponent {
     });
   }
 
+  private optionExistsValidator(getOptions: () => string[]): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = (control.value ?? '').toString().trim();
+      if (value === '') return null;
+      const options = getOptions() || [];
+      // ถ้ายังไม่ได้โหลดตัวเลือก ให้ถือว่าผ่านไปก่อนเพื่อไม่ให้ฟอร์ม invalid โดยไม่จำเป็น
+      if (options.length === 0) return null;
+      const exists = options.some(opt => opt.toLowerCase() === value.toLowerCase());
+      return exists ? null : { notFound: true };
+    };
+  }
+
+  // private dialCodeExistsValidator(): ValidatorFn {
+  //   return (control: AbstractControl): ValidationErrors | null => {
+  //     const value = (control.value ?? '').toString().trim();
+  //     if (value === '') return null;
+  //     const exists = (this.dialCodeOptions || []).some(opt => {
+  //       if (typeof opt === 'string') return opt === value;
+  //       return this.extractDialCode(opt) === value;
+  //     });
+  //     return exists ? null : { notFound: true };
+  //   };
+  // }
+
+  private revalidateOptionControls() {
+    Object.values(this.passengerForms).forEach(form => {
+      if (!form) return;
+      ['nationality', 'country', 'issuedBy', 'dialCode'].forEach(name => {
+        const c = form.get(name);
+        if (c) c.updateValueAndValidity({ onlySelf: true });
+      });
+    });
+  }
+
   // บันทึกข้อมูลผู้โดยสารปัจจุบัน
   private saveCurrentPassengerData() {
     console.log("saveCurrentPassengerData",this.currentForm);
@@ -414,9 +503,11 @@ export class PassengerFormComponent {
       }
     }
     
-    // ตั้งค่า currentForm เป็นผู้โดยสารคนแรก
-    this.currentForm = this.passengerForms[1];
-    this.selectedPassenger = 1;
+    const fallbackPassenger = 1;
+    const selected = Number(this.selectedPassenger);
+    const validSelected = !isNaN(selected) && selected >= 1 && selected <= this.numberPassenger ? selected : fallbackPassenger;
+    this.selectedPassenger = validSelected;
+    this.currentForm = this.passengerForms[this.selectedPassenger];
     
     // ตรวจสอบว่า currentForm มีค่าหรือไม่
     if (!this.currentForm) {
@@ -445,9 +536,31 @@ export class PassengerFormComponent {
     });
   }
 
+  getFirstInvalidPassenger(): number {
+    for (const passengerNumber of this.numberPassengerArray) {
+      const form = this.passengerForms[passengerNumber];
+      if (!form || form.invalid) {
+        return passengerNumber;
+      }
+    }
+    return this.numberPassenger + 1;
+  }
+
+  canSelectPassenger(passenger: number): boolean {
+    if (this.isAllPassengersValid()) return true;
+    const firstInvalid = this.getFirstInvalidPassenger();
+    // อนุญาตให้เลือกได้ตั้งแต่คนแรกจนถึงคนที่ยังไม่ครบ (ย้อนกลับได้ แต่ห้ามข้ามไปข้างหน้า)
+    return passenger <= firstInvalid;
+  }
+
   selectPassenger(passenger: number) {
-    // บันทึกข้อมูลผู้โดยสารปัจจุบันก่อนเปลี่ยน
+    // บันทึกข้อมูลผู้โดยสารปัจจุบันก่อนเปลี่ยน 
     this.saveCurrentPassengerData();
+
+    // ป้องกันการเลือกผู้โดยสารที่ยังไม่ถึงคิว
+    if (!this.canSelectPassenger(passenger)) {
+      return;
+    }
     
     // เปลี่ยนไปยังผู้โดยสารที่เลือก
     this.selectedPassenger = passenger;
@@ -467,30 +580,30 @@ export class PassengerFormComponent {
 
   // scroll to first error
   scrollToFirstError() {
-    setTimeout(() => {
-      const firstErrorElement = document.querySelector('mat-error:not([style*="display: none"])');
-      if (firstErrorElement) {
-        const formField = firstErrorElement.closest('mat-form-field');
-        if (formField) {
-          const inputElement = formField.querySelector('input, mat-select, textarea');
-          if (inputElement) {
-            // scroll to input and focus
-            inputElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center' 
-            });
-            // focus at input
-            (inputElement as HTMLElement).focus();
-          } else {
-            // if not found input, scroll to form-field
-            formField.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center' 
-            });
-          }
+    const attemptScroll = () => {
+      const formElement = document.querySelector('form');
+      if (!formElement) return;
+
+      // หา control ที่ invalid ตัวแรกภายใต้ฟอร์ม
+      const invalidControl = formElement.querySelector(
+        'input.ng-invalid, textarea.ng-invalid, mat-select.ng-invalid'
+      ) as HTMLElement | null;
+
+      if (invalidControl) {
+        const container = invalidControl.closest('mat-form-field') ?? invalidControl;
+        (container as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof (invalidControl as any).focus === 'function') {
+          (invalidControl as HTMLElement).focus();
         }
       }
-    }, 100);
+    };
+
+    // รอให้ Angular render error state เสร็จก่อนค่อยเลื่อน
+    setTimeout(() => {
+      attemptScroll();
+      // เผื่อกรณี DOM ยังอัปเดตไม่สมบูรณ์ ลองอีกครั้งสั้นๆ
+      setTimeout(() => attemptScroll(), 120);
+    }, 0);
   }
 
   // scroll to field error
@@ -573,6 +686,19 @@ export class PassengerFormComponent {
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
       return age >= minAge ? null : { minAge: true };
+    };
+  }
+
+  notPastDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (!value) return null;
+      const inputDate = new Date(value);
+      if (isNaN(inputDate.getTime())) return null;
+      const today = new Date();
+      inputDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return inputDate < today ? { pastDate: true } : null;
     };
   }
 
@@ -683,6 +809,40 @@ export class PassengerFormComponent {
     if (value.startsWith('0') && value.length > 1) {
       value = value.substring(1);
       phoneControl.setValue(value, { emitEvent: false });
+    }
+  }
+
+  autoSelectIfSingle(controlName: 'nationality' | 'country' | 'issuedBy') {
+    if (!this.currentForm) return;
+    const control = this.currentForm.get(controlName);
+    if (!control) return;
+    const currentValue = control.value;
+    if (currentValue === null || currentValue === undefined || currentValue === '') return;
+
+    let options: string[] = [];
+    if (controlName === 'nationality') options = this.lastFilteredNationalityOptions;
+    if (controlName === 'country') options = this.lastFilteredCountryOptions;
+    if (controlName === 'issuedBy') options = this.lastFilteredIssuedByOptions;
+
+    if (options.length === 1 && currentValue !== options[0]) {
+      control.setValue(options[0], { emitEvent: false });
+    }
+  }
+
+  autoSelectIfSingleDialCode() {
+    if (!this.currentForm) return;
+    const control = this.currentForm.get('dialCode');
+    if (!control) return;
+    const currentValue = control.value;
+    if (currentValue === null || currentValue === undefined || currentValue === '') return;
+
+    const options = this.lastFilteredDialCodeOptions;
+    if (options.length === 1) {
+      const only = options[0];
+      const selected = typeof only === 'string' ? only : this.extractDialCode(only);
+      if (currentValue !== selected) {
+        control.setValue(selected, { emitEvent: false });
+      }
     }
   }
 }

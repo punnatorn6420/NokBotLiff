@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { PassDataService } from '../pass-data.service';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-pdpa-page',
@@ -10,11 +11,16 @@ import { PassDataService } from '../pass-data.service';
 })
 export class PdpaPageComponent implements OnInit {
   isAccepted = false;
+  userId = '';
 
   constructor(
     private router: Router, 
     private translate: TranslateService, 
-    private passDataService: PassDataService) {
+    private passDataService: PassDataService,
+    private apiService: ApiService) {
+      this.passDataService.getUserId().subscribe((userId: string) => {
+        this.userId = userId;
+      });
   }
 
   onAcceptChange(event: Event) {
@@ -42,6 +48,8 @@ export class PdpaPageComponent implements OnInit {
   }
 
   onConfirm() {
-    this.router.navigate(['/form']);
+    this.apiService.setPDPA(this.userId, this.isAccepted).subscribe(() => {
+      this.router.navigate(['/form']);
+    });
   }
 }

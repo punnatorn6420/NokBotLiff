@@ -10,6 +10,7 @@ export class PassDataService {
   private seatData = new BehaviorSubject<any>(null);
   private passengerInfo = new BehaviorSubject<any>(null);
   private totalPrice = new BehaviorSubject<number>(0);
+  private userId = new BehaviorSubject<string>('');
   constructor() { }
 
   setPassengerInfo(data: any) {
@@ -55,5 +56,13 @@ export class PassDataService {
 
   getTotalPrice() {
     return this.totalPrice.asObservable();
+  }
+
+  setUserId(userId: string) {
+    this.userId.next(userId);
+  }
+
+  getUserId() {
+    return this.userId.asObservable();
   }
 }

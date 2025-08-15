@@ -63,8 +63,13 @@
                         *ngFor="let segment of getCurrentDirectionSegments()"
                         [ngClass]="{'active': currentSegmentKey === segment.key}"
                         (click)="switchSegment(segment.key)">
-                        <span class="flight-number">ไฟลต์ {{ getFlightNumber(segment.key) }}</span>
-                        <span class="flight-route">({{ getFlightRoute(segment.key) }})</span>
+                        <!-- <span class="flight-number">{{ getOriginName(segment.key) }}</span> -->
+                        <!-- <span class="flight-route">({{ getFlightRoute(segment.key) }})</span> -->
+                        <div class="flight-route-container">
+                            <div class="flight-origin">{{ getOriginAirportName(segment.key) }}</div>
+                            <div class="flight-route-icon"> → </div>
+                            <div class="flight-destination">{{ getDestinationAirportName(segment.key) }}</div>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -81,7 +86,8 @@
                             <path d="M5.33301 8.5L7.33301 10.5L11.333 6.5" stroke="#069553" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </ng-container>
-                    <span class="passenger-name">{{passenger.firstName}} {{passenger.middleName}} {{passenger.lastName}}</span>
+                    <span class="passenger-name">{{passenger.firstName}} {{passenger.lastName}}</span>
+                    <span class="passenger-seat" *ngIf="passengerSeatMap[i]"> : {{ passengerSeatMap[i] }}</span>
                 </div>
             </div>
         </div>
@@ -206,10 +212,10 @@
                     </p>
                 </div>
                 <div class="footer-warning-icon-container" (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice">
-                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice" *ngIf="isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-warning-icon">
+                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice" *ngIf="!isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-warning-icon">
                         <path d="M13 6L8 11L3 6" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice"  *ngIf="!isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg (click)="isShowDetailSeatPrice = !isShowDetailSeatPrice"  *ngIf="isShowDetailSeatPrice" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 10L8 5L13 10" stroke="#262626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>             
@@ -273,7 +279,8 @@
             </div>
         </div>
         <div *ngIf="hasSelectedSeatsInAnySegment()" class="select-seat-btn">
-            <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button>
+            <!-- <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button> -->
+             <button class="btn-go-back" (click)="goToPassengerForm()">ย้อนกลับ</button>
             <button class="btn-confirm" (click)="confirmSelectSeat()">
                 <span class="btn-confirm-text">{{ 'Confirm_Seat' | translate }}</span>
                 <span class="btn-price">{{ getTotalPrice() | number:'1.2-2' }} THB</span>

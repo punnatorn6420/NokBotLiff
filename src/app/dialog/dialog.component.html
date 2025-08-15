@@ -107,8 +107,8 @@
     <div class="dialog-actions-custom-alert-seat">
         <button mat-raised-button color="primary" class="btn-confirm-alert-select-seat-cancel" (click)="onConfirm()">{{
             'ALERT_CANCEL_SELECT_SEAT_CONFIRM' | translate }}</button>
-        <button mat-raised-button color="primary" class="btn-confirm-alert-select-seat" (click)="onClose()">{{
-            'ALERT_CANCEL_SELECT_SEAT_BACK' | translate }}</button>
+        <!-- <button mat-raised-button color="primary" class="btn-confirm-alert-select-seat" (click)="onClose()">{{
+            'ALERT_CANCEL_SELECT_SEAT_BACK' | translate }}</button> -->
     </div>
 </div>
 
@@ -133,7 +133,9 @@
             </mat-icon>
         </button>
     </div>
-    <p class="dialog-message-custom">{{ 'ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE' | translate }}</p>
+    <p class="dialog-message-custom">{{ 'ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE_FIRST' | translate }}</p>
+    <p class="dialog-message-custom" style="margin-bottom: 0; margin-top: -10px;">{{ message }}</p>
+    <p class="dialog-message-custom">{{ 'ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE_SECOND' | translate }}</p>
     <div class="dialog-actions-custom-alert-seat">
         <button mat-raised-button color="primary" class="btn-confirm-alert-select-seat" (click)="onConfirm()">{{
             'ALERT_SELECT_SEAT_NOT_ENOUGH_CONFIRM' | translate }}</button>

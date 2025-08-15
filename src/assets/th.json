@@ -37,6 +37,7 @@
   "ERROR_REQUIRED_PASSPORT": "กรุณากรอกหมายเลขหนังสือเดินทาง",
   "ERROR_REQUIRED_ISSUED_BY": "กรุณาเลือก",
   "ERROR_REQUIRED_EXPIRE_DATE": "กรุณาเลือกวันหมดอายุของหนังสือเดินทาง",
+  "ERROR_PAST_EXPIRE_DATE": "กรุณาเลือกวันหมดอายุของหนังสือเดินทางให้ถูกต้อง",
   "ERROR_REQUIRED_PHONE": "กรุณากรอกเบอร์โทรศัพท์",
   "ERROR_PATTERN_PHONE": "เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก",
   "ERROR_REQUIRED_EMAIL": "กรุณากรอกอีเมล",
@@ -77,7 +78,7 @@
   "ALERT_EXIT_MESSAGE_9": "ไม่ต้องใช้สายคาดเข็มขัดนิรภัย เพราะอาจทำให้สะดุดล้มได้",
   "ALERT_EXIT_MESSAGE_10": "ไม่ได้ขอรับบริการวีลเเชร์",
 
-  "ALERT_SELECT_SEAT_TITLE": "คุณยังไม่ได้เลือกที่นั่ง",
+  "ALERT_SELECT_SEAT_TITLE": "กรุณาเลือกที่นั่ง",
   "ALERT_SELECT_SEAT_MESSAGE": "เนื่องจากแพ็กเกจเสริมที่ท่านเลือกครอบคลุมสิทธิ์ในการเลือกที่นั่งได้โดยไม่เสียค่าใช้จ่ายเพิ่มเติม",
   "ALERT_SELECT_SEAT_CONFIRM": "เลือกที่นั่ง",
 
@@ -86,8 +87,9 @@
   "ALERT_CANCEL_SELECT_SEAT_CONFIRM": "ยกเลิก",
   "ALERT_CANCEL_SELECT_SEAT_BACK": "กลับไปเลือกที่นั่งต่อ",
 
-  "ALERT_SELECT_SEAT_NOT_ENOUGH_TITLE": "เลือกที่นั่งยังไม่ครอบคลุมทั้งหมด",
-  "ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE": "มีผู้โดยสารที่ยังไม่ได้เลือกที่นั่ง กรุณาตรวจสอบและเลือกที่นั่งให้ครบทุกท่าน",
+  "ALERT_SELECT_SEAT_NOT_ENOUGH_TITLE": "เลือกที่นั่งยังไม่ครบถ้วน",
+  "ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE_FIRST": "มีผู้โดยสารที่ยังไม่ได้เลือกที่นั่ง",
+  "ALERT_SELECT_SEAT_NOT_ENOUGH_MESSAGE_SECOND": "กรุณาตรวจสอบและเลือกที่นั่งให้ครบทุกท่าน",
   "ALERT_SELECT_SEAT_NOT_ENOUGH_CONFIRM": "เลือกที่นั่ง",
 
   "ALERT_SELECT_NOT_INCLUDE_PACKAGE_TITLE": "การเลือกที่นั่งพรีเมียม ไม่รวมในแพ็กเกจ",

@@ -170,14 +170,20 @@
                 transition: all 0.3s ease;
                 background: transparent;
                 
-                .flight-number {
+                .flight-origin {
                     font-size: 22px;
                     font-weight: 700;
                     color: #666;
                     margin-bottom: 2px;
                 }
                 
-                .flight-route {
+                .flight-route-icon   {
+                    font-size: 22px;
+                    font-weight: 700;
+                    color: #666;
+                }
+                
+                .flight-destination {
                     font-size: 22px;
                     font-weight: 700;
                     color: #666;
@@ -186,12 +192,16 @@
                 &.active {
                     background: #222;
                     
-                    .flight-number {
+                    .flight-origin {
                         color: #fff;
                     }
                     
-                    .flight-route {
+                    .flight-route-icon {
                         color: #ccc;
+                    }
+
+                    .flight-destination {
+                        color: #fff;
                     }
                 }
                 
@@ -201,6 +211,28 @@
             }
         }
     }
+}
+
+.flight-route-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  .flight-origin{
+      font-size: 22px;
+      font-weight: 700;
+      // color: #666;
+  }
+  .flight-route-icon{
+      font-size: 22px;
+      font-weight: 700;
+      // color: #666;
+  }
+  .flight-destination{
+      font-size: 22px;
+      font-weight: 700;
+      // color: #666;
+  }
 }
 
 // .flight-round-trip-tabs{
@@ -328,8 +360,8 @@
 }
 
 .passenger-box.has-seat {
-  background: #FFFBEA;
-  border: 1px solid #FFD600;
+  background: #ECFDF2;
+  border: 1px solid #069553;
 }
 
 .passenger-box.no-seat {
@@ -471,7 +503,7 @@
   &.premium-plus { background: #d44a0a; color: #fff; }
   &.premium { background: #ff9800; color: #fff; }
   &.regular { background: #ffd600; color: #222; }
-  &.selected { background: #a6e22e; color: #222; border: 2px solid #222; }
+  &.selected { background: #a6e22e; color: #222; border: 1px solid #222; }
 }
 .seat.available { background: #ffd600; color: #222; }
 .seat.unavailable { background: #eee; color: #bbb; cursor: not-allowed; }
@@ -587,6 +619,23 @@
 }
 .btn-cancel:active {
   filter: brightness(0.95);
+}
+
+.btn-go-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #D2D2D2;
+  color: #676767;
+  font-size: 22px;
+  border: none;
+  border-radius: 8px;
+  min-width: 140px;
+  min-height: 60px;
+  max-width: 240px;
+  padding: 0 16px;
+  font-weight: 400;
+  cursor: pointer;
 }
 
 .btn-confirm {

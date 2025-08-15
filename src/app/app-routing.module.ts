@@ -10,7 +10,7 @@ import { AlertErrorComponent } from './alert-error/alert-error.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'pdpa',
     component: PdpaPageComponent
   },
   {
