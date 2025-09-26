@@ -87,6 +87,8 @@ interface ConvertedSeatData {
   price: number;
   totalSeats: number;
   selectedCount: number;
+  // map: passengerIndex -> seatLabel
+  seatMap: { [key: number]: string };
 }
 
 interface SelectedSeat {
@@ -231,8 +233,9 @@ export class ReviewPageComponent {
     
     flightSegments.forEach(segment => {
       if (seatData[segment]) {
-        // แปลงข้อมูลที่นั่งเป็น array
-        const seatArray = Object.values(seatData[segment]);
+        // เก็บ map เดิม (passengerIndex -> seatLabel) และแปลงข้อมูลที่นั่งเป็น array
+        const seatMapObj = seatData[segment] as { [key: number]: string };
+        const seatArray = Object.values(seatMapObj);
         const selectedSeats = seatData[`${segment}SelectedSeat`] || [];
         const price = seatData[`${segment}Price`] || 0;
         
@@ -242,7 +245,8 @@ export class ReviewPageComponent {
           selectedSeats: selectedSeats,
           price: price,
           totalSeats: seatArray.length,
-          selectedCount: selectedSeats.length
+          selectedCount: selectedSeats.length,
+          seatMap: seatMapObj
         });
       }
     });
@@ -251,6 +255,35 @@ export class ReviewPageComponent {
     this.seatData = convertedData;
     console.log("Converted seat data:", convertedData);
     return convertedData;
+  }
+
+  // หาข้อมูล segment
+  private getSegmentData(segment: string): ConvertedSeatData | undefined {
+    return this.seatData.find(item => item.segment === segment);
+  }
+
+  // ดึงรายการที่นั่งที่เลือกของ segment
+  getSelectedSeatsForSegment(segment: string): SelectedSeat[] {
+    const seg = this.getSegmentData(segment);
+    return seg && Array.isArray(seg.selectedSeats) ? seg.selectedSeats : [];
+  }
+
+  // หา passengerIndex จาก seat label ใน segment
+  getPassengerIndexBySeat(segment: string, label: string): number {
+    const seg = this.getSegmentData(segment);
+    if (!seg || !seg.seatMap) return -1;
+    const entries = Object.entries(seg.seatMap);
+    for (const [idxStr, seatLabel] of entries) {
+      if (seatLabel === label) return parseInt(idxStr, 10);
+    }
+    return -1;
+  }
+
+  // แสดงชื่อผู้โดยสารจาก index
+  getPassengerNameByIndex(index: number): string {
+    const p = this.passengers && this.passengers[index];
+    if (!p) return '';
+    return `${p.firstName} ${p.lastName}`.trim();
   }
 
   // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งตาม segment และ passenger index
@@ -508,6 +541,19 @@ export class ReviewPageComponent {
     if (!flights || flights.length === 0) return '';
     
     return flights.map(flight => flight.flightNumber).join(' | ');
+  }
+
+  getSpecialAssistanceList(passenger: Passenger): string {
+    const items: string[] = [];
+    if (passenger.monk) items.push('พระภิกษุ');
+    if (passenger.nun) items.push('แม่ชี');
+    if (passenger.disabledVision) items.push('ผู้บกพร่องทางสายตา/ตาบอด');
+    if (passenger.disabledHearing) items.push('ผู้บกพร่องทางการได้ยิน/หูหนวก');
+    if (passenger.pregnantWoman) items.push('สตรีตั้งครรภ์');
+    if (passenger.wheelchairUser) items.push('รถเข็น วีลเเชร์');
+    if (passenger.unaccompaniedMinor) items.push('เด็กเดินทางคนเดียว');
+    if (passenger.other) items.push(`อื่นๆ (ระบุ) ${passenger.otherReason || ''}`.trim());
+    return items.join(', ');
   }
 
   togglePassengerInfo(index: number) {

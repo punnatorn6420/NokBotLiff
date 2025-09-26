@@ -12,7 +12,7 @@
   "MIDDLE_NAME": "Middle Name [English]",
   "LAST_NAME": "Last Name [English]",
   "BIRTH_DATE": "Date of Birth",
-  "BIRTH_DATE_PLACEHOLDER": "MM/DD/YYYY",
+  "BIRTH_DATE_PLACEHOLDER": "DD/MM/YYYY",
   "PASSPORT_INFO": "Passport Information",
   "NATIONALITY": "Nationality",
   "COUNTRY": "Country of Residence",
@@ -242,7 +242,7 @@
   "REVIEW_PAGE_ADDITIONAL_SERVICES": "Additional Services",
   "REVIEW_PAGE_SEAT_SELECTION": "Seat Selection",
 
-  "REVIEW_PAGE_GOBACK": "Back to Previous Step",
+  "REVIEW_PAGE_GOBACK": "Back",
   "REVIEW_PAGE_CONFIRM": "Confirm",
 
   "CONFRIM_PAGE_FARE_TITLE": "Fare Details",

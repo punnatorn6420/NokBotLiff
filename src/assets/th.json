@@ -12,7 +12,7 @@
   "MIDDLE_NAME": "ชื่อกลาง [อังกฤษ]",
   "LAST_NAME": "กรอกนามสกุลภาษา [อังกฤษ]",
   "BIRTH_DATE": "วันเดือนปีเกิด",
-  "BIRTH_DATE_PLACEHOLDER": "เดือน/วัน/ปี",
+  "BIRTH_DATE_PLACEHOLDER": "วัน/เดือน/ปี",
   "PASSPORT_INFO": "ข้อมูลหนังสือเดินทาง",
   "NATIONALITY": "สัญชาติ",
   "COUNTRY": "ประเทศ",
@@ -241,7 +241,7 @@
   "REVIEW_PAGE_ADDITIONAL_SERVICES": "บริการเสริม",
   "REVIEW_PAGE_SEAT_SELECTION": "ที่นั่งผู้โดยสาร",
 
-  "REVIEW_PAGE_GOBACK": "กลับไปที่ขั้นตอนก่อนหน้า",
+  "REVIEW_PAGE_GOBACK": "ย้อนกลับ",
   "REVIEW_PAGE_CONFIRM": "ยืนยัน",
 
   "CONFRIM_PAGE_FARE_TITLE": "ค่าโดยสาร",
@@ -257,7 +257,7 @@
   "CONFIRM_PAFE_per_transaction": "ต่อรายการ",
   "CONFIRM_PAGE_Grand_Total": "สรุปราคาทั้งหมด",
   "CONFIRM_PAGE_Including_service_fees": "รวมค่าธรรมเนียมการชำระเงินแล้ว",
-  "CONFIRM_PAGE_Back_to_Previous_Step": "กลับไปที่ขั้นตอนก่อนหน้า",
+  "CONFIRM_PAGE_Back_to_Previous_Step": "ย้อนกลับ",
   "CONFIRM_PAGE_Confirm": "ยืนยันการจองตั๋ว",
 
   "COUNTER_SERVICE_TITLE1": "การจองสำเร็จ",

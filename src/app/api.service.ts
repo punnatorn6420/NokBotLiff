@@ -5,8 +5,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApiService {
-  baseUrl = "https://ddservices-uat.nokair.com/botnoi-api/api/liff";
-  // baseUrl = "http://localhost:4000/api/liff";
+  // baseUrl = "https://ddservices-uat.nokair.com/botnoi-api/api/liff";
+  baseUrl = "http://localhost:4000/api/liff";
+  bookingBaseUrl = "http://localhost:4000/api/booking";
 
   constructor(private http: HttpClient) { }
 
@@ -38,6 +39,12 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/get-passenger-info`, body, { headers });
   }
 
+  getServiceBundle(userId: string, language: string, currency: string) {
+    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    const params = { user_id: userId, language, currency } as const;
+    return this.http.get(`${this.bookingBaseUrl}/list_service_bundle`, { headers, params });
+  }
+
   getSeatMap(journeyKey?: string, fareKey?: string) {
     const body = {
       journeyKey: journeyKey,
@@ -45,5 +52,10 @@ export class ApiService {
     }
     const headers = new HttpHeaders().set('X-Api-Key', 'dev');
     return this.http.post(`${this.baseUrl}/retrieve-seat-map`, body, { headers });
+  }
+
+  getPricingSummary(payload: any) {
+    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl}/pricing-summary-service`, payload, { headers });
   }
 }

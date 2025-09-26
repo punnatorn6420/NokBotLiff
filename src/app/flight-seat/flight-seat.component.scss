@@ -218,18 +218,19 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  font-size: clamp(16px, 4.5vw, 22px);
   .flight-origin{
-      font-size: 22px;
+      font-size: inherit;
       font-weight: 700;
       // color: #666;
   }
   .flight-route-icon{
-      font-size: 22px;
+      font-size: inherit;
       font-weight: 700;
       // color: #666;
   }
   .flight-destination{
-      font-size: 22px;
+      font-size: inherit;
       font-weight: 700;
       // color: #666;
   }
@@ -344,7 +345,7 @@
 .passenger-box {
   display: flex;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 16px;
   height: 50px;
   padding-left: 10px;
   padding-right: 10px;
@@ -356,12 +357,25 @@
   min-width: max-content;
   box-sizing: border-box;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
+  position: relative;
+}
+
+.remove-seat-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .passenger-box.has-seat {
   background: #ECFDF2;
-  border: 1px solid #069553;
+  border: 2px solid #069553;
 }
 
 .passenger-box.no-seat {
@@ -377,9 +391,59 @@
   display: block;
 }
 
+/* Service Bundle pill badge on top-left of passenger item */
+.has-service-container {
+  position: absolute;
+  top: -0.9em;
+  left: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.2em 0.6em;
+  background: #D65609;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  font-size: 0.6em; /* scale with .passenger-box font-size */
+}
+.has-service-container p {
+  margin: 0;
+  color: #fff;
+  font-size: 1em; /* follow container */
+  font-weight: 700;
+  line-height: 1;
+}
+.has-service-container svg {
+  width: 0.9em;
+  height: 0.9em;
+}
+
 .passenger-name {
   font-size: 22px;
   font-weight: 400;
+}
+
+/* จุดกระพริบหน้าชื่อผู้โดยสารที่กำลังเลือกอยู่ */
+.passenger-box.is-selecting {
+  border-color: #FCCD01;
+  box-shadow: 0 0 0 3px rgba(252, 205, 1, 0.15) inset;
+}
+.selecting-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #FCCD01;
+  box-shadow: 0 0 0 0 rgba(252, 205, 1, 0.7);
+  animation: pulse-dot 1.2s infinite ease-in-out;
+  vertical-align: middle;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(252, 205, 1, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(252, 205, 1, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(252, 205, 1, 0); }
 }
 
 .flight-seat-select-container{
@@ -567,12 +631,12 @@
 
 .btn-no-select {
   width: 90vw;
-  max-width: 600px;
+  max-width: 500px;
   min-height: 60px;
   background: #ffd000;
   color: #111;
   font-size: 22px;
-  border: 2px solid #111;
+  border: 1px solid #111;
   border-radius: 8px;
   font-family: inherit;
   font-weight: 400;
@@ -626,7 +690,7 @@
   align-items: center;
   justify-content: center;
   background: #D2D2D2;
-  color: #676767;
+  color: #000000;
   font-size: 22px;
   border: none;
   border-radius: 8px;
@@ -642,7 +706,7 @@
   background: #ffd000;
   color: #111;
   font-size: 22px;
-  border: 2px solid #111;
+  border: 1px solid #111;
   border-radius: 8px;
   width: 340px;               
   min-height: 60px;
@@ -679,6 +743,52 @@
   margin-bottom: 18px;
 }
 
+@media (min-width: 768px) {
+  .detail-seat-price {
+    display: flex;
+    flex-direction: column !important;
+    // justify-content: center !important;
+    // align-items: center !important;
+    // background-color: #069553;
+  }
+  .detail-seat-price.horizontal {
+    flex-direction: column !important;
+    // justify-content: center !important;
+    // align-items: center !important;
+  }
+  .legend-left {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: center;
+    // align-items: center;
+    // gap: 24px;
+    width: 100%;
+    // min-width: 0;
+    // background-color: #069095;
+  }
+  .legend-right {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: center;
+    // align-items: center;
+    // gap: 24px;
+    width: 100%;
+    // min-width: 0;
+    // background-color: #069095;
+  }
+
+  .seat-type-row {
+    flex-direction: column !important;
+    // align-items: center;
+    // white-space: nowrap;
+    // margin-bottom: 0 !important;
+    flex: 0 0 220px; /* equal width */
+    min-width: 220px;
+    max-width: 220px;
+    text-align: center;
+  }
+}
+
 .detail-seat-price.horizontal {
   flex-direction: row;
   justify-content: space-between;
@@ -688,13 +798,13 @@
   max-width: 100%;
   margin-bottom: 18px;
 }
-.legend-left, .legend-right {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  min-width: 180px;
-  max-width: 240px;
-}
+// .legend-left, .legend-right {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 18px;
+//   min-width: 180px;
+//   max-width: 240px;
+// }
 
 .seat-type-row {
   display: flex;

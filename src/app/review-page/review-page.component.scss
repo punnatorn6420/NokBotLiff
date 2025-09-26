@@ -24,6 +24,15 @@
   font-family: 'DB Ozone X';
 }
 
+// @media screen and (min-width: 768px) {
+//   .review-page-content {
+//     max-width: 60vw;
+//     margin: 0 auto;
+//     margin-top: 18px;
+//     font-family: 'DB Ozone X';
+//   }
+// }
+
 .review-page-title{
   font-size: 22px;
   font-weight: 700;
@@ -76,48 +85,57 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: auto; // เปลี่ยนจาก 97px เป็น auto เพื่อให้ปรับตามเนื้อหา
+    width: auto; 
     gap: 4px;
-    padding: 8px 12px; // ปรับ padding ให้สมดุล
-    font-size: 18px;
-    font-weight: 600; // เปลี่ยนจาก 400 เป็น 600 เพื่อให้ตัวหนาขึ้น
+    padding: 8px 12px; 
+    font-size: 20px;
+    font-weight: 600; 
     color: #DE3024;
     background-color: #FFCDC9;
     cursor: pointer;
     border-radius: 100px;
     border: none;
     outline: none;
-    transition: all 0.2s ease; // เพิ่ม transition
+    transition: all 0.2s ease; 
     
     &:hover {
-      background-color: #FFB8B3; // เพิ่ม hover effect
+      background-color: #FFB8B3; 
     }
     
     svg {
-      flex-shrink: 0; // ป้องกัน icon หดตัว
+      flex-shrink: 0; 
     }
     
     p {
-      margin: 0; // ลบ margin ของ p tag
-      white-space: nowrap; // ป้องกันข้อความขึ้นบรรทัดใหม่
+      margin: 0; 
+      white-space: nowrap; 
     }
   }
 }
 
 .special-assistance-container {
   margin-top: 12px;
+  background: #FEF7D6;
+  border-radius: 2px;
+  padding: 14px 16px;
+  text-align: center;
   .special-assistance-title {
     font-size: 22px;
-    font-weight: 600;
-    color: #ff3131;
-    margin-bottom: 6px;
+    font-weight: 700;
+    color: #8B7101;
+    margin: 0 0 4px 0;
   }
-  .special-assistance-item {  
-    font-size: 18px;
+  .special-assistance-sub {
+    font-size: 20px;
     font-weight: 400;
-    color: #ff3131;
-    margin-bottom: 6px;
+    color: #8B7101;
+    margin: 0;
   }
+}
+
+.title-header-passenger{
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .info-section {
@@ -130,7 +148,7 @@
 }
 .passenger-seat-title {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
@@ -169,7 +187,7 @@
 .info-row {
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
   color: #858585;
   .info-label {
@@ -178,6 +196,7 @@
   }
   .info-value {
     width: 100vw;
+    font-size: 20px;
     font-weight: 400;
   }
 }
@@ -191,7 +210,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   margin-top: 8px;
   margin-bottom: 12px;
@@ -213,13 +232,13 @@
     display: flex;
     align-items: center;
     font-weight: bold;
-    font-size: 1.35rem;
+    font-size: 20px;
     position: relative;
     z-index: 1;
     // width: 100%;
     height: 60px;
     .flight-card-tab-icon {
-      font-size: 1.7rem;
+      font-size: 20px;
       margin-right: 12px;
   
       // svg, mat-icon {
@@ -234,7 +253,7 @@
       // background-color: #888;
     }
     .flight-card-tab-title {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       color: #222;
       // background-color: #f93c3c;
@@ -290,7 +309,7 @@
     margin-bottom: 18px;
   }
   .flight-date {
-    font-size: 14px;
+    font-size: 20px;
     color: #222;
     font-weight: 500;
   }
@@ -302,9 +321,10 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    font-size: 20px;
   }
   .flight-code {
-    font-size: 14px;
+    font-size: 20px;
     color: #222;
     font-weight: 400;
   }
@@ -368,15 +388,12 @@
     align-items: center;
     width: 100%;
     margin-top: 18px;
-    font-size: 14px;
+    font-size: 18px;
     color: #222;
   }
-  // .flight-place {
-  //   font-weight: 400;
-  //   color: #111;
-  //   min-width: 120px;
-  //   text-align: center;
-  // }
+  .flight-place {
+    font-size: 20px;
+  }
   .flight-stop {
     color: #bdbdbd;
     font-weight: bold;
@@ -392,12 +409,12 @@
 .list-title {
   font-weight: 600;
   margin-bottom: 6px;
-  font-size: 0.98rem;
+  font-size: 20px;
 }
 .list-item{
     display: flex;
     justify-content: space-between;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 400;
     color: #858585;
     margin-bottom: 2px;
@@ -409,8 +426,19 @@
 .passenger-list span {
   border-radius: 6px;
   padding: 1px 8px;
-  font-size: 0.93rem;
+  font-size: 20px;
   font-weight: 600;
+}
+
+.title-type-seat{
+  font-weight: 600;
+  font-size: 20px;
+  .list-item{
+    font-size: 20px;
+  }
+  .seat-info{
+    font-size: 20px;
+  }
 }
 
 .special-bundle {
@@ -444,21 +472,21 @@
 }
 .bundle-desc {
   flex: 1;
-  font-size: 18px;
+  font-size: 20px;
   color: #222;
   ul {
     padding-left: 18px;
     margin: 0;
   }
   li {
-    font-size: 18px;
+    font-size: 20px;
     color: #222;
   }
 }
 .bundle-price {
   display: flex;
   gap: 10px;
-  font-size: 18px;
+  font-size: 20px;
 }
 .price {
   color: #000000;
@@ -468,18 +496,76 @@
 .old-price {
   color: #bbb;
   text-decoration: line-through;
-  font-size: 18px;
+  font-size: 20px;
 }
 .discount {
   color: #e74c3c;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
+}
+
+.no-bundle-info{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #b3b3b3;
+  font-size: 22px;
+  margin: 14px 0 22px 0;
+  &::before, &::after{
+    content: '';
+    height: 2px;
+    background-color: #c9c9c9;
+    flex: 1 1 0;
+    border-radius: 2px;
+  }
+}
+
+.no-seat-info-text{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #b3b3b3;
+  font-size: 22px;
+  margin: 14px 0 22px 0;
+  &::before, &::after{
+    content: '';
+    height: 2px;
+    background-color: #c9c9c9;
+    flex: 1 1 0;
+    border-radius: 2px;
+  }
+}
+
+.review-page-actions-space {
+  height: 160px;
+}
+
+.action-container{
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-top: 1px solid #e1e1e1;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .review-page-actions {
+  max-width: 500px;
+  padding-top: 40px;
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 10px;
-  margin-top: 50px;
+  // margin-top: 50px;
+  width: 90%;
   margin-bottom: 60px;
 }
 .back-btn {
@@ -495,12 +581,10 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.back-btn:hover {
-  background: #d0d0d0;
-}
 .confirm-btn {
   flex: 1;
   background: #FCCD01;
+  height: 60px;
   color: #222;
   border: none;
   border: 1px solid #000000;
@@ -510,7 +594,4 @@
   font-weight: 400;
   cursor: pointer;
   transition: background 0.2s;
-}
-.confirm-btn:hover {
-  background: #ffd633;
 }

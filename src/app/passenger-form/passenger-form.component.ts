@@ -1,14 +1,67 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, startWith, tap, pairwise } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map, startWith, take, filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { ApiService } from '../api.service';
 import { PassDataService } from '../pass-data.service';
-import { TranslateService } from '@ngx-translate/core';
+// import { TranslateService } from '@ngx-translate/core';
+
+interface BundleDetail {
+  serviceCode: string;
+  serviceName: string;
+  description: string;
+}
+
+interface Bundle {
+  icon: string;
+  title: string;
+  price: number;
+  original: number;
+  discount?: number;
+  serviceCode: string;
+  serviceCodeDetail?: string;
+  paxTypeCode?: string;
+  flightNumber?: string;
+  details: BundleDetail[];
+}
+
+// อินเตอร์เฟซชุดใหม่ให้ตรงกับโครงสร้าง Service Bundle จาก API
+interface BundledServiceItem {
+  serviceCode: string;
+  serviceName: string;
+  description: string;
+  currency: string;
+  departureDate: string; // ISO string
+  flightNumber: string;
+  paxTypeCode: string; // e.g., 'Adult' | 'Child'
+}
+
+interface ServiceBundle {
+  serviceCode: string;
+  serviceName: string;
+  description: string;
+  promotionalText: string;
+  imageUrl: string;
+  currency: string;
+  departureDate: string; // ISO string
+  flightNumber: string;
+  paxTypeCode: string; // e.g., 'Adult' | 'Child'
+  originalAmount: number;
+  amount: number;
+  vatAmount: number;
+  amountIncludingVat: number;
+  discountPercentage: number;
+  bundledServices: BundledServiceItem[];
+}
+
+interface ServiceBundleResponse {
+  inbound: ServiceBundle[];
+  outbound: ServiceBundle[];
+}
 
 interface PassengerData {
   selectedPrefix: string;
@@ -24,6 +77,20 @@ interface PassengerData {
   dialCode?: string;
   phoneNumber?: string;
   email?: string;
+  needsSpecialAssistance?: boolean;
+  disabledVision?: boolean;
+  disabledHearing?: boolean;
+  monk?: boolean;
+  nun?: boolean;
+  pregnantWoman?: boolean;
+  wheelchairUser?: boolean;
+  unaccompaniedMinor?: boolean;
+  other?: boolean;
+  otherReason?: string;
+  outboundBundleIndex?: number | null;
+  outboundBundle?: Bundle | null;
+  returnBundleIndex?: number | null;
+  returnBundle?: Bundle | null;
 }
 
 @Component({
@@ -32,9 +99,19 @@ interface PassengerData {
   styleUrls: ['./passenger-form.component.scss']
 })
 export class PassengerFormComponent {
+  // ระบุว่าเที่ยวบินเป็นต่างประเทศหรือไม่ (ใช้กำหนดการแสดง/บังคับฟิลด์พาสปอร์ต)
+  isInternationalTrip: boolean = false;
+  @ViewChild('passengerScroll', { static: false }) passengerScrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChildren('passengerBox') passengerBoxes?: QueryList<ElementRef<HTMLDivElement>>;
+
   selectedPassenger = 1;
   numberPassenger = 0;
   numberPassengerArray: number[] = [];
+  
+  // จำนวนผู้โดยสารที่คาดหวังจาก flight_search
+  expectedAdults = 0;
+  expectedChildren = 0;
+  expectedInfants = 0;
   
   // เก็บข้อมูลผู้โดยสารแต่ละคน
   passengersData: { [key: number]: PassengerData } = {};
@@ -56,13 +133,11 @@ export class PassengerFormComponent {
   nationalityOptions: string[] = [];
   countryOptions: string[] = [];
   issuedByOptions: string[] = [];
-  phonePrefixOptions: string[] = [];
   dialCodeOptions: any[] = []; // Changed to any[] to accommodate flag, name, idd, displayText
     
   filteredNationalityOptions!: Observable<string[]>;
   filteredCountryOptions!: Observable<string[]>;
   filteredIssuedByOptions!: Observable<string[]>;
-  filteredPhonePrefixOptions!: Observable<string[]>;
   filteredDialCodeOptions!: Observable<any[]>;
 
   // เก็บผลกรองล่าสุดไว้ใช้ตอน blur
@@ -71,23 +146,248 @@ export class PassengerFormComponent {
   lastFilteredIssuedByOptions: string[] = [];
   lastFilteredDialCodeOptions: any[] = [];
 
-  needsSpecialAssistance: boolean = false;
-  disabledVision: boolean = false;
-  disabledHearing: boolean = false;
-  monk: boolean = false;
-  nun: boolean = false;
-  pregnantWoman: boolean = false;
-  wheelchairUser: boolean = false;
-  unaccompaniedMinor: boolean = false;
-  other: boolean = false;
-  otherReason: string = '';
+  isLoading = false;
+
+  // ลบ state ระดับคอมโพเนนต์สำหรับ Special Assistance ออก เพื่อใช้ค่าจากฟอร์มแทน
+
+  // Bundle UI data
+  outboundBundles: Bundle[] = [
+    { icon: 'seat', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'bag', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'bag', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'hand', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'vip', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+  ];
+
+  returnBundles: Bundle[] = [
+    { icon: 'seat', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'bag', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'bag', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'hand', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+    { icon: 'vip', title: 'xxx', price: 0, original: 0, discount: 0, serviceCode: 'xxx', details: [
+      { serviceCode: '', serviceName: '', description: 'xxx' },
+      { serviceCode: '', serviceName: '', description: 'xxx' }
+    ] },
+  ];
+
+  // สถานะการแสดงผล bundle (แสดง 4 ก่อน ถ้าเกินค่อยกดดูเพิ่มเติม)
+  showAllOutboundBundles = false;
+  showAllReturnBundles = false;
+  private serviceBundleRaw: ServiceBundleResponse | null = null;
+
+  get currentOutboundBundleList(): Bundle[] {
+    return this.getBundlesForPassenger(this.selectedPassenger, 'outbound');
+  }
+
+  get visibleOutboundBundles(): Bundle[] {
+    const list = this.currentOutboundBundleList;
+    return this.showAllOutboundBundles ? list : list.slice(0, 3);
+  }
+
+  get currentReturnBundleList(): Bundle[] {
+    return this.getBundlesForPassenger(this.selectedPassenger, 'inbound');
+  }
+
+  get visibleReturnBundles(): Bundle[] {
+    const list = this.currentReturnBundleList;
+    return this.showAllReturnBundles ? list : list.slice(0, 3);
+  }
+
+  toggleShowAllOutbound() {
+    this.showAllOutboundBundles = !this.showAllOutboundBundles;
+  }
+
+  toggleShowAllReturn() {
+    this.showAllReturnBundles = !this.showAllReturnBundles;
+  }
+
+  get canShowBundles(): boolean {
+    return this.getPassengerPaxType(this.selectedPassenger) !== null;
+  }
+
+  private getPassengerAge(passengerNumber: number): number | null {
+    const form = this.passengerForms[passengerNumber];
+    const value = form?.get('birthDate')?.value;
+    if (!value) return null;
+    const birth = new Date(value);
+    if (isNaN(birth.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  private getPassengerPaxType(passengerNumber: number): 'Adult' | 'Child' | null {
+    const age = this.getPassengerAge(passengerNumber);
+    if (age === null) return null;
+    return age > 12 ? 'Adult' : 'Child';
+  }
+
+  // จัดประเภท pax จากอายุ (เพิ่ม Infant)
+  private getPaxTypeByAge(age: number | null): 'Adult' | 'Child' | 'Infant' | null {
+    if (age === null) return null;
+    if (age < 2) return 'Infant';
+    if (age <= 12) return 'Child';
+    return 'Adult';
+  }
+
+  // นับจำนวน Adult/Child/Infant จากฟอร์มปัจจุบัน
+  private countPaxFromForms(): { adults: number; children: number; infants: number } {
+    let adults = 0;
+    let children = 0;
+    let infants = 0;
+    for (const passengerNumber of this.numberPassengerArray) {
+      const age = this.getPassengerAge(passengerNumber);
+      const paxType = this.getPaxTypeByAge(age);
+      if (paxType === 'Adult') adults++;
+      else if (paxType === 'Child') children++;
+      else if (paxType === 'Infant') infants++;
+    }
+    return { adults, children, infants };
+  }
+
+  // ตรวจสอบจำนวนตาม expected
+  private isPaxCountsMatchingExpected(): boolean {
+    const { adults, children, infants } = this.countPaxFromForms();
+    return adults === this.expectedAdults && children === this.expectedChildren && infants === this.expectedInfants;
+  }
+
+  private mapToBundle(item: ServiceBundle): Bundle {
+    return {
+      icon: 'seat',
+      title: item.serviceName,
+      price: item.amount,
+      original: item.originalAmount,
+      discount: item.discountPercentage,
+      serviceCode: item.serviceCode,
+      serviceCodeDetail: item.serviceCode,
+      paxTypeCode: item.paxTypeCode,
+      flightNumber: item.flightNumber,
+      details: (item.bundledServices || []).map((service) => ({
+        serviceCode: service.serviceCode,
+        serviceName: service.serviceName,
+        description: service.description
+      }))
+    };
+  }
+
+  private getBundlesForPassenger(passengerNumber: number, direction: 'outbound' | 'inbound'): Bundle[] {
+    if (!this.serviceBundleRaw) return [];
+    const paxType = this.getPassengerPaxType(passengerNumber);
+    if (!paxType) return [];
+    const source = direction === 'outbound' ? this.serviceBundleRaw.outbound : this.serviceBundleRaw.inbound;
+    return (source || [])
+      .filter(item => (item.paxTypeCode || '').toLowerCase() === paxType.toLowerCase())
+      .map(item => this.mapToBundle(item));
+  }
+
+
+  // สถานะการเลือก bundle ต่อผู้โดยสาร
+  // เปิด/ปิดรายละเอียด (accordion) ต่อผู้โดยสาร
+  selectedOutboundBundleIndexByPassenger: { [passenger: number]: number | null } = {};
+  selectedReturnBundleIndexByPassenger: { [passenger: number]: number | null } = {};
+
+  // เก็บค่าที่เลือกจริงของ bundle ต่อผู้โดยสาร (อาจซ้ำกับที่เปิดดู)
+  selectedOutboundBundleByPassenger: { [passenger: number]: number | null } = {};
+  selectedReturnBundleByPassenger: { [passenger: number]: number | null } = {};
+
+  selectOutboundBundle(index: number) {
+    const p = this.selectedPassenger;
+    const currentSelected = this.selectedOutboundBundleByPassenger[p] ?? null;
+    if (currentSelected === index) {
+      // คลิกซ้ำ -> ยกเลิกการเลือก และปิดรายละเอียด
+      this.selectedOutboundBundleByPassenger[p] = null;
+      this.selectedOutboundBundleIndexByPassenger[p] = null;
+      this.ensurePassengerDataExists(p);
+      (this.passengersData[p] as any).outboundBundleIndex = null;
+      (this.passengersData[p] as any).outboundBundle = null;
+    } else {
+      // เลือกรายการใหม่ -> เปิดรายละเอียดของรายการนั้น
+      this.selectedOutboundBundleByPassenger[p] = index;
+      this.selectedOutboundBundleIndexByPassenger[p] = index;
+      this.ensurePassengerDataExists(p);
+      (this.passengersData[p] as any).outboundBundleIndex = index;
+      const list = this.getBundlesForPassenger(p, 'outbound');
+      (this.passengersData[p] as any).outboundBundle = list[index] ?? null;
+    }
+  }
+
+  selectReturnBundle(index: number) {
+    const p = this.selectedPassenger;
+    const currentSelected = this.selectedReturnBundleByPassenger[p] ?? null;
+    if (currentSelected === index) {
+      // คลิกซ้ำ -> ยกเลิกการเลือก และปิดรายละเอียด
+      this.selectedReturnBundleByPassenger[p] = null;
+      this.selectedReturnBundleIndexByPassenger[p] = null;
+      this.ensurePassengerDataExists(p);
+      (this.passengersData[p] as any).returnBundleIndex = null;
+      (this.passengersData[p] as any).returnBundle = null;
+    } else {
+      // เลือกรายการใหม่ -> เปิดรายละเอียดของรายการนั้น
+      this.selectedReturnBundleByPassenger[p] = index;
+      this.selectedReturnBundleIndexByPassenger[p] = index;
+      this.ensurePassengerDataExists(p);
+      (this.passengersData[p] as any).returnBundleIndex = index;
+      const list = this.getBundlesForPassenger(p, 'inbound');
+      (this.passengersData[p] as any).returnBundle = list[index] ?? null;
+    }
+  }
+
+  // proxy ตัวแปรให้ HTML ใช้งานต่อผู้โดยสารที่เลือกอยู่
+  get selectedOutboundBundleIndex(): number | null {
+    return this.selectedOutboundBundleIndexByPassenger[this.selectedPassenger] ?? null;
+  }
+  set selectedOutboundBundleIndex(val: number | null) {
+    this.selectedOutboundBundleIndexByPassenger[this.selectedPassenger] = val;
+  }
+  get selectedReturnBundleIndex(): number | null {
+    return this.selectedReturnBundleIndexByPassenger[this.selectedPassenger] ?? null;
+  }
+  set selectedReturnBundleIndex(val: number | null) {
+    this.selectedReturnBundleIndexByPassenger[this.selectedPassenger] = val;
+  }
+
+  private ensurePassengerDataExists(p: number) {
+    if (!this.passengersData[p]) {
+      this.passengersData[p] = this.passengerForms[p]?.value ?? {} as any;
+    }
+  }
 
   constructor(private router: Router, 
     private dialog: MatDialog, 
     private route: ActivatedRoute,
     private apiService: ApiService, 
-    private passDataService: PassDataService, 
-    private translate: TranslateService) {
+    private passDataService: PassDataService) {
       // this.translate.setDefaultLang('th');
       // this.translate.use('th');
       this.route.queryParams.subscribe((params: any) => {
@@ -104,10 +404,25 @@ export class PassengerFormComponent {
     
     // ตั้งค่าเริ่มต้นก่อน
     this.passDataService.getPassengerInfo().subscribe((data: any) => {
+      // คำนวณสถานะไฟลท์ในประเทศ/ต่างประเทศ จากข้อมูลเที่ยวบินที่เลือก
+      try {
+        const outboundIntl = data?.outbound_flight_select?.flight_detail?.some((f: any) => f?.isInternational === true) === true;
+        const inboundIntl = data?.inbound_flight_select?.flight_detail?.some((f: any) => f?.isInternational === true) === true;
+        this.isInternationalTrip = outboundIntl || inboundIntl;
+      } catch (_) {
+        this.isInternationalTrip = false;
+      }
       const adults = data?.flight_search?.adults ?? 0;
       const children = data?.flight_search?.children ?? 0;
       const infants = data?.flight_search?.infants ?? 0;
+      // เก็บ expected count
+      this.expectedAdults = Number(adults);
+      this.expectedChildren = Number(children);
+      this.expectedInfants = Number(infants);
       this.numberPassenger = Number(adults) + Number(children) + Number(infants);
+      if (this.numberPassenger <= 0) {
+        this.numberPassenger = 1;
+      }
       console.log("getPassengerInfo passenger-form", this.numberPassenger);
       this.numberPassengerArray = Array.from({length: this.numberPassenger}, (_, i) => i + 1);
       this.initializePassengerForms();
@@ -121,6 +436,36 @@ export class PassengerFormComponent {
         this.currentForm = this.passengerForms[this.selectedPassenger];
         this.setupAutocompleteFilters();
       }
+    });
+
+    this.passDataService.getUserId().pipe(take(1)).subscribe((userId: string) => {
+      this.isLoading = true;
+      if (!userId) {
+        console.warn('getServiceBundle skipped: empty userId');
+        return;
+      }
+
+      const language$ = this.passDataService.getLanguage().pipe(take(1));
+      const passengerInfo$ = this.passDataService
+        .getPassengerInfo()
+        .pipe(
+          filter((info: any) => !!info && !!info.flight_search),
+          take(1)
+        );
+
+      combineLatest([language$, passengerInfo$]).subscribe(([language, passengerInfo]: [string, any]) => {
+        const currency = passengerInfo?.flight_search?.currency;
+        if (!currency) {
+          console.warn('getServiceBundle skipped: empty currency');
+          return;
+        }
+        console.log('getServiceBundle passenger-form currency', currency);
+        this.apiService.getServiceBundle(userId, language, currency).subscribe((data: any) => {
+          console.log('getServiceBundle passenger-form', data);
+          this.convertServiceBundle(data);
+          this.isLoading = false;
+        });
+      });
     });
 
     // โหลดข้อมูลจาก service และโหลดข้อมูลเพียงครั้งเดียว
@@ -144,10 +489,7 @@ export class PassengerFormComponent {
       this.convertRestcountries(res);
     });
 
-    // ตั้งค่า autocomplete filters หลังจากโหลดข้อมูลเสร็จ
-    setTimeout(() => {
-      this.setupAutocompleteFilters();
-    }, 1000);
+    // ตั้งค่า autocomplete filters ถูกเรียกในจุดที่เหมาะสมแล้ว (หลังสร้างฟอร์ม/โหลดข้อมูล) จึงไม่ต้องหน่วงเวลา
 
     // ตั้งค่าภาษา
     // this.passDataService.getLanguage().subscribe(language => {
@@ -250,36 +592,40 @@ export class PassengerFormComponent {
   // สร้าง FormGroup สำหรับผู้โดยสารแต่ละคน
   private initializePassengerForms() {
     if (!this.numberPassengerArray || this.numberPassengerArray.length === 0) {
-      console.error('numberPassengerArray is empty or undefined');
-      return;
+      this.numberPassenger = Math.max(1, Number(this.numberPassenger) || 0);
+      this.numberPassengerArray = Array.from({ length: this.numberPassenger }, (_, i) => i + 1);
     }
     
     for (const passengerNumber of this.numberPassengerArray) {
       if (passengerNumber === 1) {
+        // ฟิลด์พาสปอร์ตบังคับเฉพาะทริปต่างประเทศ
+        const passportValidators = this.isInternationalTrip ? [Validators.required] : [];
+        const passportDateValidators = this.isInternationalTrip ? [Validators.required, this.notPastDateValidator()] : [];
+
+        // สร้าง validators แบบมีเงื่อนไขสำหรับสัญชาติและประเทศ
+        const nationalityValidators = this.isInternationalTrip
+          ? [Validators.required, this.optionExistsValidator(() => this.nationalityOptions)]
+          : [this.optionExistsValidator(() => this.nationalityOptions)];
+        const countryValidators = this.isInternationalTrip
+          ? [Validators.required, this.optionExistsValidator(() => this.countryOptions)]
+          : [this.optionExistsValidator(() => this.countryOptions)];
+
         this.passengerForms[passengerNumber] = new FormGroup({
           selectedPrefix: new FormControl('', [Validators.required]),
           firstName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required, this.minAgeValidator(18)]),
-          nationality: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
-            this.optionExistsValidator(() => this.nationalityOptions)
-          ]),
-          country: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
-            this.optionExistsValidator(() => this.countryOptions)
-          ]),
-          passportNumber: new FormControl('', [Validators.required]),
+          nationality: new FormControl('', nationalityValidators),
+          country: new FormControl('', countryValidators),
+          passportNumber: new FormControl('', passportValidators),
           issuedBy: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
+            ...passportValidators,
+            // Validators.pattern(/^[a-zA-Z\s]+$/),
             this.optionExistsValidator(() => this.issuedByOptions)
           ]),
-          expireDate: new FormControl(null, [Validators.required, this.notPastDateValidator()]),
-          dialCode: new FormControl(''),
+          expireDate: new FormControl(null, passportDateValidators),
+          dialCode: new FormControl('', [this.dialCodeExistsValidator()]),
           phoneNumber: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
           needsSpecialAssistance: new FormControl(false),
@@ -297,32 +643,34 @@ export class PassengerFormComponent {
         const prefill = (this.passengersData && this.passengersData[passengerNumber]) ? this.passengersData[passengerNumber] : null;
         if (prefill) {
           this.passengerForms[passengerNumber].patchValue(prefill);
+          this.normalizeDialCodeValue(this.passengerForms[passengerNumber]);
         }
       } else {
         // ผู้โดยสารคนที่ 2+ - ไม่ต้องกรอก contact (ไม่มี FormControl สำหรับ contact)
+        const passportValidators = this.isInternationalTrip ? [Validators.required] : [];
+        const passportDateValidators = this.isInternationalTrip ? [Validators.required, this.notPastDateValidator()] : [];
+        const nationalityValidators = this.isInternationalTrip
+          ? [Validators.required, this.optionExistsValidator(() => this.nationalityOptions)]
+          : [this.optionExistsValidator(() => this.nationalityOptions)];
+        const countryValidators = this.isInternationalTrip
+          ? [Validators.required, this.optionExistsValidator(() => this.countryOptions)]
+          : [this.optionExistsValidator(() => this.countryOptions)];
+
         this.passengerForms[passengerNumber] = new FormGroup({
           selectedPrefix: new FormControl('', [Validators.required]),
           firstName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           birthDate: new FormControl(null, [Validators.required]),
-          nationality: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
-            this.optionExistsValidator(() => this.nationalityOptions)
-          ]),
-          country: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
-            this.optionExistsValidator(() => this.countryOptions)
-          ]),
-          passportNumber: new FormControl('', [Validators.required]),
+          nationality: new FormControl('', nationalityValidators),
+          country: new FormControl('', countryValidators),
+          passportNumber: new FormControl('', passportValidators),
           issuedBy: new FormControl('', [
-            Validators.required,
-            Validators.pattern(/^[a-zA-Z\s]+$/),
+            ...passportValidators,
+            // Validators.pattern(/^[a-zA-Z\s]+$/),
             this.optionExistsValidator(() => this.issuedByOptions)
           ]),
-          expireDate: new FormControl(null, [Validators.required, this.notPastDateValidator()]),
+          expireDate: new FormControl(null, passportDateValidators),
           needsSpecialAssistance: new FormControl(false),
           disabledVision: new FormControl(false),
           disabledHearing: new FormControl(false),
@@ -339,6 +687,7 @@ export class PassengerFormComponent {
         const prefill = (this.passengersData && this.passengersData[passengerNumber]) ? this.passengersData[passengerNumber] : null;
         if (prefill) {
           this.passengerForms[passengerNumber].patchValue(prefill);
+          this.normalizeDialCodeValue(this.passengerForms[passengerNumber]);
         }
       }
     }
@@ -444,17 +793,30 @@ export class PassengerFormComponent {
     };
   }
 
-  // private dialCodeExistsValidator(): ValidatorFn {
-  //   return (control: AbstractControl): ValidationErrors | null => {
-  //     const value = (control.value ?? '').toString().trim();
-  //     if (value === '') return null;
-  //     const exists = (this.dialCodeOptions || []).some(opt => {
-  //       if (typeof opt === 'string') return opt === value;
-  //       return this.extractDialCode(opt) === value;
-  //     });
-  //     return exists ? null : { notFound: true };
-  //   };
-  // }
+  private dialCodeExistsValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const raw = control.value;
+      const value = typeof raw === 'string' ? raw.trim() : this.extractDialCode(raw);
+      if (!value) return null;
+      const options = this.dialCodeOptions || [];
+      if (options.length === 0) return null; // ปล่อยผ่านก่อนถ้ายังไม่โหลดตัวเลือก
+      const exists = options.some(opt => {
+        if (typeof opt === 'string') return opt === value;
+        return this.extractDialCode(opt) === value;
+      });
+      return exists ? null : { notFound: true };
+    };
+  }
+
+  private normalizeDialCodeValue(form: FormGroup) {
+    const c = form.get('dialCode');
+    if (!c) return;
+    const raw = c.value;
+    if (raw && typeof raw !== 'string') {
+      const normalized = this.extractDialCode(raw);
+      c.setValue(normalized, { emitEvent: false });
+    }
+  }
 
   private revalidateOptionControls() {
     Object.values(this.passengerForms).forEach(form => {
@@ -469,9 +831,25 @@ export class PassengerFormComponent {
   // บันทึกข้อมูลผู้โดยสารปัจจุบัน
   private saveCurrentPassengerData() {
     console.log("saveCurrentPassengerData",this.currentForm);
-    if (this.currentForm && this.currentForm.valid) {
-      this.passengersData[this.selectedPassenger] = this.currentForm.value;
+    console.log("selectedOutboundBundleByPassenger",this.selectedOutboundBundleByPassenger);
+    
+    if (!this.currentForm) return;
+    const p = this.selectedPassenger;
+    const existing: any = this.passengersData[p] || {};
+    const merged: any = { ...existing, ...this.currentForm.value };
+    const outboundIndex = this.selectedOutboundBundleByPassenger[p];
+    if (outboundIndex !== undefined) {
+      merged.outboundBundleIndex = outboundIndex ?? null;
+      const list = this.getBundlesForPassenger(p, 'outbound');
+      merged.outboundBundle = typeof outboundIndex === 'number' ? (list[outboundIndex] ?? null) : null;
     }
+    const returnIndex = this.selectedReturnBundleByPassenger[p];
+    if (returnIndex !== undefined) {
+      merged.returnBundleIndex = returnIndex ?? null;
+      const listRet = this.getBundlesForPassenger(p, 'inbound');
+      merged.returnBundle = typeof returnIndex === 'number' ? (listRet[returnIndex] ?? null) : null;
+    }
+    this.passengersData[p] = merged;
   }
 
   // โหลดข้อมูลผู้โดยสาร
@@ -487,6 +865,7 @@ export class PassengerFormComponent {
     const data = this.passengersData[passengerNumber];
     if (data) {
       this.currentForm.patchValue(data);
+      this.normalizeDialCodeValue(this.currentForm);
     }
 
     // อัปเดต autocomplete filters สำหรับ FormGroup ใหม่
@@ -495,11 +874,32 @@ export class PassengerFormComponent {
 
   // เพิ่มฟังก์ชันใหม่สำหรับโหลดข้อมูลผู้โดยสารทุกคน
   private loadAllPassengerData(data: any) {
+    console.log("loadAllPassengerData",data);
     // โหลดข้อมูลผู้โดยสารทุกคน
     for (const passengerNumber of this.numberPassengerArray) {
       const _data = data[passengerNumber];
       if (_data && this.passengerForms[passengerNumber]) {
         this.passengerForms[passengerNumber].patchValue(_data);
+      }
+      // กู้คืนตัวเลือก bundle ถ้ามี
+      if (_data && typeof _data.outboundBundleIndex !== 'undefined') {
+        this.selectedOutboundBundleByPassenger[passengerNumber] = _data.outboundBundleIndex;
+        this.selectedOutboundBundleIndexByPassenger[passengerNumber] = _data.outboundBundleIndex ?? null;
+        // ทำให้แน่ใจว่า passengersData มี object ของ bundle ด้วย
+        if (!this.passengersData[passengerNumber]) {
+          this.passengersData[passengerNumber] = {} as any;
+        }
+        const list = this.getBundlesForPassenger(passengerNumber, 'outbound');
+        (this.passengersData[passengerNumber] as any).outboundBundle = _data.outboundBundleIndex != null ? (list[_data.outboundBundleIndex] ?? null) : null;
+      }
+      if (_data && typeof _data.returnBundleIndex !== 'undefined') {
+        this.selectedReturnBundleByPassenger[passengerNumber] = _data.returnBundleIndex;
+        this.selectedReturnBundleIndexByPassenger[passengerNumber] = _data.returnBundleIndex ?? null;
+        if (!this.passengersData[passengerNumber]) {
+          this.passengersData[passengerNumber] = {} as any;
+        }
+        const listRet = this.getBundlesForPassenger(passengerNumber, 'inbound');
+        (this.passengersData[passengerNumber] as any).returnBundle = _data.returnBundleIndex != null ? (listRet[_data.returnBundleIndex] ?? null) : null;
       }
     }
     
@@ -567,6 +967,9 @@ export class PassengerFormComponent {
     
     // โหลดข้อมูลผู้โดยสารที่เลือก
     this.loadPassengerData(passenger);
+
+    // เลื่อนไปยังกล่องผู้โดยสารที่เลือก
+    this.scrollSelectedPassengerIntoView();
   }
 
   nextPassenger() {
@@ -576,6 +979,7 @@ export class PassengerFormComponent {
       this.loadPassengerData(this.selectedPassenger);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.scrollSelectedPassengerIntoView();
   }
 
   // scroll to first error
@@ -603,6 +1007,29 @@ export class PassengerFormComponent {
       attemptScroll();
       // เผื่อกรณี DOM ยังอัปเดตไม่สมบูรณ์ ลองอีกครั้งสั้นๆ
       setTimeout(() => attemptScroll(), 120);
+    }, 0);
+  }
+
+  // scroll selected passenger chip into view
+  private scrollSelectedPassengerIntoView() {
+    // หน่วงให้ Angular อัปเดต DOM เสร็จก่อน
+    setTimeout(() => {
+      const targetIndex = this.selectedPassenger - 1;
+      const container = this.passengerScrollContainer?.nativeElement;
+      const boxes = this.passengerBoxes?.toArray().map(r => r.nativeElement) ?? [];
+      if (!container || !boxes[targetIndex]) return;
+
+      const targetEl = boxes[targetIndex];
+      // ใช้ scrollIntoView ถ้ามี และ container เป็นแนวนอน
+      try {
+        targetEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch {
+        // fallback คำนวณ scrollLeft เอง
+        const containerRect = container.getBoundingClientRect();
+        const targetRect = targetEl.getBoundingClientRect();
+        const offsetLeft = targetEl.offsetLeft - (container.clientWidth / 2) + (targetEl.clientWidth / 2);
+        container.scrollTo({ left: Math.max(0, offsetLeft), behavior: 'smooth' });
+      }
     }, 0);
   }
 
@@ -641,24 +1068,55 @@ export class PassengerFormComponent {
       }
       return;
     }
+
+    console.log("this.isPaxCountsMatchingExpected()", this.isPaxCountsMatchingExpected());
     
-    const dialogRef = this.dialog.open(DialogComponent, {
-      width: '350px',
-      disableClose: true,
-      data: {
-        isDialog: 'alert_checkdata'
-      }
-    });
-    dialogRef.afterClosed().subscribe((result: any) => {
-      if (result.result === 'confirm') {
-        this.setPassengerData();
-        this.router.navigate(['/select-seat']);
-      }
-    });
+    
+    // แสดง dialog เมื่อจำนวน Adult/Child/Infant ไม่ตรงตาม expected
+    if (this.isPaxCountsMatchingExpected()) {
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '350px',
+        disableClose: true,
+        data: {
+          isDialog: 'alert_checkdata'
+        }
+      });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result.result === 'confirm') {
+          this.setPassengerData();
+          this.router.navigate(['/select-seat']);
+        }
+      });
+    } else {
+      const { adults, children, infants } = this.countPaxFromForms();
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '350px',
+        disableClose: true,
+        data: {
+          isDialog: 'alert_passenger_not_match',
+          apiAdults: this.expectedAdults,
+          apiChildren: this.expectedChildren,
+          apiInfants: this.expectedInfants,
+          currentAdults: adults,
+          currentChildren: children,
+          currentInfants: infants
+        }
+      });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result.result === 'confirm') {
+          this.setPassengerData();
+          // this.router.navigate(['/select-seat']);
+        }
+      });
+      // ตรงตาม expected ไปต่อได้เลย
+      // this.setPassengerData();
+      // this.router.navigate(['/select-seat']);
+    }
   }
 
   setPassengerData() {
-    if (this.passengersData[1].dialCode === '') {
+    if (!this.passengersData[1]) this.passengersData[1] = {} as any;
+    if (!this.passengersData[1].dialCode) {
       this.passengersData[1].dialCode = '+66';
     }
     this.passDataService.setFormData(this.passengersData);
@@ -682,10 +1140,17 @@ export class PassengerFormComponent {
 
   minAgeValidator(minAge: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const birthDate = new Date(control.value);
+      const value = control.value;
+      if (!value) return null;
+      const birth = new Date(value);
+      if (isNaN(birth.getTime())) return null;
       const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      return age >= minAge ? null : { minAge: true };
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age >= minAge ? null : { minAge: { required: minAge, actual: age } };
     };
   }
 
@@ -723,9 +1188,23 @@ export class PassengerFormComponent {
     const form = this.passengerForms[passenger];
     if (!form) return false;
     
+    const baseFieldsP1 = ['selectedPrefix', 'firstName', 'lastName', 'birthDate'];
+    const passportFields = ['passportNumber', 'issuedBy', 'expireDate'];
+    const intlDemographicFields = ['nationality', 'country'];
+    const contactFields = ['phoneNumber', 'email'];
+
     const requiredFields = passenger === 1 
-      ? ['selectedPrefix', 'firstName', 'lastName', 'birthDate', 'nationality', 'country', 'passportNumber', 'issuedBy', 'expireDate', 'phoneNumber', 'email']
-      : ['selectedPrefix', 'firstName', 'lastName', 'birthDate', 'nationality', 'country', 'passportNumber', 'issuedBy', 'expireDate'];
+      ? [
+          ...baseFieldsP1,
+          ...(this.isInternationalTrip ? intlDemographicFields : []),
+          ...(this.isInternationalTrip ? passportFields : []),
+          ...contactFields
+        ]
+      : [
+          ...baseFieldsP1,
+          ...(this.isInternationalTrip ? intlDemographicFields : []),
+          ...(this.isInternationalTrip ? passportFields : [])
+        ];
     
     return requiredFields.some(fieldName => {
       const control = form.get(fieldName);
@@ -746,11 +1225,9 @@ export class PassengerFormComponent {
     if (!this.currentForm) return;
     
     const currentValue = this.currentForm.get('needsSpecialAssistance')?.value;
-    this.currentForm.patchValue({
-      needsSpecialAssistance: !currentValue
-    });
-
-    if (currentValue === false) {
+    const nextValue = !currentValue;
+    this.currentForm.patchValue({ needsSpecialAssistance: nextValue });
+    if (!nextValue) {
       this.ClearAllSpecialAssistance();
     }
   }
@@ -844,5 +1321,11 @@ export class PassengerFormComponent {
         control.setValue(selected, { emitEvent: false });
       }
     }
+  }
+
+  convertServiceBundle(data: ServiceBundleResponse) {
+    console.log("convertServiceBundle passenger-form", data);
+    this.serviceBundleRaw = data;
+    return data;
   }
 }

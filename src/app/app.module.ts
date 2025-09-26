@@ -10,7 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from './date-adapter-th';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -76,7 +77,9 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   providers: [
     { provide: APP_BASE_HREF, useValue: '/botnoi-liff/' },
-    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptorInterceptor, multi: true },
+    { provide: DateAdapter, useClass: ThaiNativeDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: TH_DATE_FORMATS }
   ],
   bootstrap: [AppComponent]
 })

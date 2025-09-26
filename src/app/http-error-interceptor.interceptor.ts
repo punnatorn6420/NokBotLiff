@@ -19,7 +19,7 @@ export class HttpErrorInterceptorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('HTTP Error:', error);
-        if (error.status === 500) {
+        if (error.status === 500 || error.status === 422) {
           console.error('Server Error 500:', error);
           this.handleServerError(error);
           return throwError(() => new Error('error 500'));

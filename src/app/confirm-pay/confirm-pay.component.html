@@ -1,56 +1,45 @@
+<app-loading *ngIf="isLoading"></app-loading>
 <div class="container-confirm-pay">
     <app-header [currentStep]="4"></app-header>
     <div class="container-confirm-pay-content">
         <div class="summary-section">
             <div class="section-title">{{ 'CONFRIM_PAGE_FARE_TITLE' | translate }}</div>
-            <div class="fare-group">
+            <div class="fare-group" *ngFor="let j of ui.journeys">
                 <div class="fare-header">
-                    <span>ค่าโดยสาร (Nok Lite)</span>
+                    <span>ค่าโดยสาร ({{ j.fareFamilyName }})</span>
                     <span class="flight-type">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 21H10L15 13H20.5C21.33 13 22 12.33 22 11.5C22 10.67 21.33 10 20.5 10H15L10 2H8L10.5 10H5L3.5 8H2L3 11.5L2 15H3.5L5 13H10.5L8 21Z" fill="#E5BB01"/>
+                        <path *ngIf="j.directionLabel==='ไป'" d="M8 21H10L15 13H20.5C21.33 13 22 12.33 22 11.5C22 10.67 21.33 10 20.5 10H15L10 2H8L10.5 10H5L3.5 8H2L3 11.5L2 15H3.5L5 13H10.5L8 21Z" fill="#E5BB01"/>
+                        <path *ngIf="j.directionLabel==='กลับ'" d="M16 3H14L9 11H3.5C2.67 11 2 11.67 2 12.5C2 13.33 2.67 14 3.5 14H9L14 22H16L13.5 14H19L20.5 16H22L21 12.5L22 9H20.5L19 11H13.5L16 3Z" fill="#E5BB01"/>
                         </svg>
-                         ไป
+                         {{ j.directionLabel }}
                     </span>
                 </div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>1,475.70 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>1,475.70 THB</span></div>
-                <div class="fare-detail">x1 ทารก <span>467.29 THB</span></div>
-                <div class="fare-detail special-bundle">Special Bundle</div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>467.50 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>467.50 THB</span></div>
-                <div class="fare-total">{{ 'CONFRIM_PAGE_Subtotal_Outbound' | translate }} <span>4,353.69 THB</span></div>
-            </div>
-            <div class="fare-group">
-                <div class="fare-header">
-                    <span>ค่าโดยสาร (Nok Lite)</span>
-                    <span class="flight-type"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16 3H14L9 11H3.5C2.67 11 2 11.67 2 12.5C2 13.33 2.67 14 3.5 14H9L14 22H16L13.5 14H19L20.5 16H22L21 12.5L22 9H20.5L19 11H13.5L16 3Z" fill="#E5BB01"/>
-                        </svg>
-                         กลับ</span>
+                <div class="fare-detail" *ngFor="let f of j.fareItems">x{{ f.count }} {{ f.label }} <span>{{ formatAmount(f.amount) }}</span></div>
+                <div class="fare-detail special-bundle" *ngIf="j.bundleItems?.length">Service Bundle</div>
+                <div class="fare-detail" *ngFor="let b of j.bundleItems">x{{ b.count }} {{ b.label }} <span>{{ formatAmount(b.amount) }}</span></div>
+                <div class="fare-total">
+                    รวมค่าใช้จ่าย ({{ j.directionLabel==='ไป' ? 'ขาไป' : 'ขากลับ' }})
+                    <span>{{ formatAmount(j.subtotal) }}</span>
                 </div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>1,475.70 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>1,475.70 THB</span></div>
-                <div class="fare-detail">x1 ทารก <span>467.29 THB</span></div>
-                <div class="fare-total">{{ 'CONFRIM_PAGE_Subtotal_Inbound' | translate }} <span>3,418.69 THB</span></div>
             </div>
-            <div class="addon-section">
-                <div class="section-title">{{ 'CONFIRM_PAGE_Additional_Services' | translate }}</div>
-                <div class="section-title">{{ 'CONFIRM_PAGE_Seat_Selection' | translate }}</div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>150.00 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>150.00 THB</span></div>
-                <div class="fare-total">{{ 'CONFIRM_PAGE_Total_Add-on_Package_Fee' | translate }} <span>300.00 THB</span></div>
+            <div class="addon-section" *ngIf="ui.addOns?.total">
+                <div class="section-title">บริการเสริมที่นั่ง</div>
+                <div class="fare-detail" *ngFor="let s of ui.addOns?.seatItems">x{{ s.count }} {{ s.label }} <span>{{ formatAmount(s.amount) }}</span></div>
+                <div class="fare-total">ค่าบริการเสริมที่นั่งทั้งหมด <span>{{ formatAmount(ui.addOns.total) }}</span></div>
             </div>
             <div class="tax-section">
-                <div class="section-title">{{ 'CONFIRM_PAGE_Taxes' | translate }}</div>
+                <div class="section-title">ภาษี</div>
                 <div class="section-title">Airport Tax</div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>130.00 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>130.00 THB</span></div>
+                <div class="fare-detail" *ngFor="let t of ui.taxes.airportTaxItems">x{{ t.count }} {{ t.label }} <span>{{ formatAmount(t.amount) }}</span></div>
                 <div class="section-title">VAT</div>
-                <div class="fare-detail">x1 ผู้ใหญ่ <span>103.30 THB</span></div>
-                <div class="fare-detail">x1 เด็ก <span>103.30 THB</span></div>
-                <div class="fare-detail">x1 ทารก <span>32.71 THB</span></div>
-                <div class="fare-total">{{ 'CONFIRM_PAGE_Total_Tax' | translate }} <span>519.31 THB</span></div>
+                <div class="fare-detail" *ngFor="let v of ui.taxes.vatItems">x{{ v.count }} {{ v.label }} <span>{{ formatAmount(v.amount) }}</span></div>
+                <div class="fare-total">ภาษีทั้งหมด <span>{{ formatAmount(ui.taxes.total) }}</span></div>
+            </div>
+            <div class="fee-section" *ngIf="ui.fees?.total">
+                <div class="section-title">ค่าธรรมเนียมเที่ยวบินต่อเครื่อง (Flight Connecting Fee)</div>
+                <div class="fare-detail" *ngFor="let c of ui.fees.connectingItems">x{{ c.count }} {{ c.label }} <span>{{ formatAmount(c.amount) }}</span></div>
+                <div class="fare-total">ค่าธรรมเนียมต่อเครื่องทั้งหมด <span>{{ formatAmount(ui.fees.total) }}</span></div>
             </div>
         </div>
         <div class="promo-section">
@@ -60,21 +49,20 @@
         <div class="payment-section">
             <div class="section-title">{{ 'CONFIRM_PAGE_Payment_Method' | translate }}</div>
             <div class="payment-method">
-                <label><input type="radio" name="payment" [(ngModel)]="selectedPayment" value="credit" /> Credit/Debit card <span class="fee">(128.40
-                        THB/Passenger)</span></label>
+                <label><input type="radio" name="payment" (click)="onPaymentMethodClick('credit')" [(ngModel)]="selectedPayment" value="credit" /> Credit/Debit card <span class="fee">({{ formatAmount(ui.paymentFeePerPassenger) }}/Passenger)</span></label>
             </div>
             <div class="payment-method">
-                <label><input type="radio" name="payment" [(ngModel)]="selectedPayment" value="counterservice" /> Counter Service</label>
+                <label><input type="radio" name="payment" (click)="onPaymentMethodClick('counterservice')" [(ngModel)]="selectedPayment" value="counterservice" /> Counter Service</label>
             </div>
             <div class="payment-fee">{{ 'CONFIRM_PAGE_Payment_Service_Fee' | translate }}</div>
-            <div class="payment-fee-amount"><span>{{ 'CONFIRM_PAFE_per_transaction' | translate }}</span><span>385.20 THB</span></div>
+            <div class="payment-fee-amount"><span>{{ 'CONFIRM_PAFE_per_transaction' | translate }}</span><span>{{ formatAmount(ui.paymentFeePerTransaction) }}</span></div>
         </div>
         <div class="total-section">
             <div class="total-label">
                 <div class="total-label-text">{{ 'CONFIRM_PAGE_Grand_Total' | translate }}</div>
                 <div class="total-note">{{ 'CONFIRM_PAGE_Including_service_fees' | translate }}</div>
             </div>
-            <div class="total-amount">8,557.69 THB</div>
+            <div class="total-amount">{{ formatAmount(ui.grandTotal) }}</div>
         </div>
         <div class="confirm-pay-button-group">
             <button class="btn-back" (click)="goBack()">{{ 'CONFIRM_PAGE_Back_to_Previous_Step' | translate }}</button>

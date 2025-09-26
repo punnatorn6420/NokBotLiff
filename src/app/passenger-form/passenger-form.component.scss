@@ -255,6 +255,11 @@ mat-error {
     margin: 0 auto;
     margin-top: 20px;
 }
+@media (min-width: 1050px) {
+  .form-passenger-container {
+    max-width: 60%;
+  }
+}
 
 .form-passenger-info {
     display: flex;
@@ -272,6 +277,7 @@ mat-error {
     flex-direction: column;
     .form-passenger-passport-content {
         margin-bottom: -12px;
+        width: 100%;
         // background-color: #4CAF50;
     }
 }
@@ -303,13 +309,25 @@ mat-error {
   min-width: 350px !important;
 }
 
+.footer-container-background {
+  background-color: #fff;
+  height: 160px;
+}
+
 .footer-container {
+  background-color: #fff;
+  border-top: 1px solid #e1e1e1;
+  padding-top: 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-top: 20px;
-    width: 90vw;
+    width: 100%;
 }
 .footer-container-text {
     display: flex;
@@ -321,7 +339,7 @@ mat-error {
     color: #222;
 }
 .footer-container button {
-    width: 100%;
+    width: 90%;
     height: 60px;
     border-radius: 8px;
     margin-top: 20px;
@@ -469,10 +487,17 @@ button[disabled] {
   color: #999;
   font-size: 18px;
 }
+
+.next-passenger-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
     
 .next-passenger-button {
+  max-width: 500px;
   background-color: #D2D2D2;
-  color: #676767; 
+  color: #000000; 
   border: none;
 }
 
@@ -486,4 +511,205 @@ button[disabled] {
   cursor: not-allowed;
   opacity: 0.5;
   pointer-events: none;
+}
+
+// Bundle UI styles
+.service-bundle-container {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// .service-bundle-section {
+//   background: #fe4646;
+//   // border: 1px solid #E6E6E6;
+//   border-radius: 12px;
+//   padding: 12px;
+// }
+
+.service-bundle-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.service-bundle-header .muted {
+  font-weight: 400;
+  color: #8B8B8B;
+}
+
+.service-bundle-header .route-text {
+  color: #FCCD01;
+}
+
+.bundle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bundle-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid #E6E6E6;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.bundle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.bundle-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  // ป้องกันข้อความดันไอคอนจนบีบ
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bundle-icon {
+  // ขนาดไอคอนคงที่ และไม่ให้โดนบีบหรือยืดผิดสัดส่วน
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #FEE88A;
+  flex: 0 0 56px; // ไม่ให้ย่อ
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain; // รักษาสัดส่วนรูป
+}
+
+.bundle-title {
+  font-size: 20px;
+  color: #222;
+  line-height: 1.2;
+  // รองรับชื่อยาว ๆ ไม่ให้ชนราคา
+  white-space: normal;
+}
+
+.bundle-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.bundle-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  white-space: nowrap; // ราคาไม่ตกรายบรรทัด
+}
+
+.bundle-original {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; // ราคาเดิมและป้ายส่วนลดไม่ตกรายบรรทัด
+}
+
+.bundle-original .strike {
+  color: #8B8B8B;
+  text-decoration: line-through;
+  font-size: 18px;
+  // ทำให้เส้นขีดทับเห็นชัด ไม่บังตัวอักษร
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: #AFAFAF;
+}
+
+.bundle-original .discount {
+  padding: 2px 8px;
+  background: #FEE88A;
+  // border: 1px solid #FFD55A;
+  border-radius: 8px;
+  color: #6C5D00;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+// Active state และรายละเอียด
+.bundle-card.active {
+  border-color: #FCCD01;
+  background: #FFFAE6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  border-width: 2px;
+}
+
+.bundle-divider {
+  height: 1px;
+  background: #EDEDED;
+  margin: 0 16px;
+}
+
+.bundle-detail-inline {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Collapse animation container
+.bundle-detail-collapse {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 220ms ease, opacity 220ms ease;
+}
+
+.bundle-detail-collapse.open {
+  max-height: 200px; // เพียงพอสำหรับ 2-3 แถว ถ้ามีมากกว่านี้จะขยายต่อด้วย CSS
+  opacity: 1;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 12px;
+  font-size: 20px;
+  color: #4A4A4A;
+
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+// .detail-row .bullet {
+//   width: 26px;
+//   height: 26px;
+//   border-radius: 50%;
+//   background: transparent;
+//   border: 2px solid #6A6A6A;
+//   display: inline-flex;
+//   // align-items: center;
+//   // justify-content: center;
+//   color: #6A6A6A;
+//   font-weight: 700;
+// }
+
+// Open Close Bundle Button
+.open-close-bundle-button {
+  background-color: #fff2b0;
+  color: #000000;
+  border-radius: 8px;
+  padding: 4px 6px;
+  border: none;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 12px;
 }

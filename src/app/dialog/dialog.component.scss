@@ -55,7 +55,7 @@
 }
 
 .dialog-message-custom {
-    font-size: 18px;
+    font-size: 20px;
     color: #222;
     line-height: 1.5;
 }
@@ -86,7 +86,9 @@
     background: #FFD600 !important;
     color: #222 !important;
     border-radius: 8px !important;
+    width: 100%;
     min-width: 140px;
+    height: 60px;
     font-size: 22px;
     font-weight: 700;
     border: none;
@@ -94,9 +96,9 @@
     box-shadow: none !important;
 }
 
-.btn-confirm:hover {
-    background: #FFC107 !important;
-}
+// .btn-confirm:hover {
+//     background: #FFC107 !important;
+// }
 
 
 .dialog-alert-seat{
@@ -123,6 +125,7 @@
 
 .btn-confirm-alert-seat{
     min-width: 270px;
+    width: 100%;
     min-height: 60px;
     border-radius: 8px !important;
     font-size: 22px;

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { PassDataService } from './pass-data.service';
 import { LiffService } from './liff.service';
 import { ApiService } from './api.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,34 +17,44 @@ export class AppComponent {
     private passDataService: PassDataService,
     private liffService: LiffService,
     private apiService: ApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     // this.passDataService.setLanguage('th');
   }
 
   ngOnInit() {
-    const userId = 'U197dceb79bc625b5811cfa6174397c86';
-    this.passDataService.setUserId(userId);
-    this.fetchInitialData(userId);
+    const searchParams = new URLSearchParams(window.location.search);
+    const uidFromQuery = searchParams.get('uid') || searchParams.get('UID');
+    const uidFromHrefMatch = window.location.href.match(/[?&]uid=([^&#]+)/i);
+    const uidFromHref = uidFromHrefMatch ? decodeURIComponent(uidFromHrefMatch[1]) : null;
+    const resolvedUid = (uidFromQuery || uidFromHref || '').trim();
 
-  //   this.liffService.initializeLiff().then(async (initialized) => {
-  //     if (!initialized) {
-  //       const userId = fallbackUserId;
-  //       this.passDataService.setUserId(userId);
-  //       this.fetchInitialData(userId);
-  //       return;
-  //     }
+    if (resolvedUid.length > 0) {
+      const userId = resolvedUid;
+      this.passDataService.setUserId(userId);
+      this.fetchInitialData(userId);
+      return;
+    }
 
-  //     if (!this.liffService.isLoggedIn()) {
-  //       await this.liffService.login();
-  //       return;
-  //     }
+    this.liffService.initializeLiff().then(async (initialized) => {
+      // if (!initialized) {
+      //   const userId = 'U197dceb79bc625b5811cfa6174397c88';
+      //   this.passDataService.setUserId(userId);
+      //   this.fetchInitialData(userId);
+      //   return;
+      // }
 
-  //     const profile = await this.liffService.getProfile();
-  //     const userId = profile?.userId || fallbackUserId;
-  //     this.passDataService.setUserId(userId);
-  //     this.fetchInitialData(userId);
-  //   });
+      if (!this.liffService.isLoggedIn()) {
+        await this.liffService.login();
+        return;
+      }
+
+      const profile = await this.liffService.getProfile();
+      const userId = profile?.userId || 'U197dceb79bc625b5811cfa6174397c88';
+      this.passDataService.setUserId(userId);
+      this.fetchInitialData(userId);
+    });
   }
 
    fetchInitialData(userId: string) {

@@ -22,6 +22,12 @@ export class DialogComponent {
 
   isDialog: string = this.data.isDialog;
   message: string = this.data.message || '';
+  apiAdults: number = Number(this.data.apiAdults ?? 0);
+  apiChildren: number = Number(this.data.apiChildren ?? 0);
+  apiInfants: number = Number(this.data.apiInfants ?? 0);
+  currentAdults: number = Number(this.data.currentAdults ?? 0);
+  currentChildren: number = Number(this.data.currentChildren ?? 0);
+  currentInfants: number = Number(this.data.currentInfants ?? 0);
 
   onClose(): void {
     this.dialogRef.close({

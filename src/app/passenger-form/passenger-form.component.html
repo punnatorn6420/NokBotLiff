@@ -1,7 +1,8 @@
+<app-loading *ngIf="isLoading"></app-loading>
 <div class="container">
     <app-header></app-header>
     <div class="container-passenger-form">
-        <div class="number-passenger-scroll">
+        <div class="number-passenger-scroll" #passengerScroll>
             <!-- <div *ngFor="let passenger of numberPassengerArray">
                 <div class="number-passenger-box" [class.active]="selectedPassenger === passenger"
                     [class.valid]="passengerForms[passenger].valid"
@@ -11,7 +12,7 @@
                 </div>
             </div> -->
             <div *ngFor="let passenger of numberPassengerArray">
-                <div class="number-passenger-box" [class.active]="selectedPassenger === passenger"
+                <div class="number-passenger-box" #passengerBox [class.active]="selectedPassenger === passenger"
                     [class.valid]="passengerForms[passenger].valid"
                     [class.invalid]="hasInvalidTouchedFields(passenger)"
                     [class.disabled]="!canSelectPassenger(passenger)"
@@ -21,10 +22,9 @@
             </div>
         </div>
         <div class="form-passenger-container">
-            <div *ngIf="!currentForm" class="loading-container">
-                <!-- <p>{{ 'LOADING' | translate }}</p> -->
+            <!-- <div *ngIf="!currentForm" class="loading-container">
                  <app-loading></app-loading>
-            </div>
+            </div> -->
             <form *ngIf="currentForm" [formGroup]="currentForm" (ngSubmit)="validateAndScrollToError()">
                 <p style="margin-bottom: 15px; font-weight: 700; font-size: 23px;">{{ 'PASSENGER_INFO' | translate }} <span *ngIf="selectedPassenger !== 1"> {{ selectedPassenger }}</span>
                     <span *ngIf="selectedPassenger === 1"> ({{ 'PASSENGER_INFO_1' | translate }})</span></p>
@@ -85,10 +85,11 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;">
+                <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;" *ngIf="isInternationalTrip">
                     {{ 'PASSPORT_INFO' | translate }}
                 </p>
-                <div class="form-passenger-passport">
+                
+                <div class="form-passenger-passport" *ngIf="isInternationalTrip">
                     <div class="form-passenger-passport-country">
                         <mat-form-field class="form-passenger-passport-content" appearance="outline">
                             <mat-label>{{ 'NATIONALITY' | translate }}</mat-label>
@@ -101,9 +102,9 @@
                             <mat-error *ngIf="currentForm.get('nationality')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_NATIONALITY' | translate }}
                             </mat-error>
-                            <mat-error *ngIf="currentForm.get('nationality')?.hasError('pattern')">
+                            <!-- <mat-error *ngIf="currentForm.get('nationality')?.hasError('pattern')">
                                 กรุณาเลือกกรอกภาษาอังกฤษ
-                            </mat-error>
+                            </mat-error> -->
                             <mat-error *ngIf="currentForm.get('nationality')?.hasError('notFound')">
                                 ไม่พบข้อมูล
                             </mat-error>
@@ -120,9 +121,9 @@
                             <mat-error *ngIf="currentForm.get('country')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_COUNTRY' | translate }}
                             </mat-error>
-                            <mat-error *ngIf="currentForm.get('country')?.hasError('pattern')">
+                            <!-- <mat-error *ngIf="currentForm.get('country')?.hasError('pattern')">
                                 กรุณาเลือกกรอกภาษาอังกฤษ
-                            </mat-error>
+                            </mat-error> -->
                             <mat-error *ngIf="currentForm.get('country')?.hasError('notFound')">
                                 ไม่พบข้อมูล
                             </mat-error>
@@ -132,7 +133,7 @@
                     <br>
                     <mat-form-field class="form-passenger-passport-content" appearance="outline">
                         <mat-label>{{ 'PASSPORT_NUMBER' | translate }}</mat-label>
-                        <input matInput required formControlName="passportNumber">
+                        <input matInput formControlName="passportNumber">
                         <mat-error *ngIf="currentForm.get('passportNumber')?.hasError('required')">
                             {{ 'ERROR_REQUIRED_PASSPORT' | translate }}
                         </mat-error>
@@ -150,9 +151,9 @@
                         <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('required')">
                             {{ 'ERROR_REQUIRED_ISSUED_BY' | translate }}
                         </mat-error>
-                        <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('pattern')">
+                        <!-- <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('pattern')">
                             กรุณาเลือกกรอกภาษาอังกฤษ
-                        </mat-error>
+                        </mat-error> -->
                         <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('notFound')">
                             ไม่พบข้อมูล
                         </mat-error>
@@ -160,7 +161,7 @@
                     <br>
                     <mat-form-field class="form-passenger-passport-content" appearance="outline">
                         <mat-label>{{ 'EXPIRE_DATE' | translate }}</mat-label>
-                        <input matInput [matDatepicker]="expirePicker" required formControlName="expireDate">
+                        <input matInput [matDatepicker]="expirePicker" formControlName="expireDate">
                         <mat-datepicker-toggle matIconSuffix [for]="expirePicker"></mat-datepicker-toggle>
                         <mat-datepicker #expirePicker></mat-datepicker>
                         <mat-error *ngIf="currentForm.get('expireDate')?.hasError('required')">
@@ -171,6 +172,7 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
+
                 <p style="margin-top: 25px; margin-bottom: 25px; font-weight: 400; font-size: 22px;"
                     *ngIf="selectedPassenger === 1">{{ 'CONTACT_INFO' | translate }}</p>
                 <div class="form-passenger-contact" *ngIf="selectedPassenger === 1">
@@ -191,7 +193,7 @@
                                 </mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
-                        <mat-form-field class="form-passenger-contact-phone-content" style="width: 80%;"
+                        <mat-form-field class="form-passenger-contact-phone-content" style="width: 100%;"
                             appearance="outline">
                             <mat-label>{{ 'PHONE' | translate }}</mat-label>
                             <input matInput required formControlName="phoneNumber" inputmode="numeric" pattern="[0-9]*" (input)="onPhoneNumberInput($event)">
@@ -216,6 +218,96 @@
                     </mat-form-field>
                 </div>
 
+                <div class="service-bundle-container" *ngIf="canShowBundles">
+                    <div class="service-bundle-outbound" *ngIf="visibleOutboundBundles.length > 0">
+                        <div class="service-bundle-header">
+                            <span>เลือก Bundle <span class="route-text">- ขาไป</span></span>
+                            <span class="muted">| Optional service</span>
+                        </div>
+                        <div class="bundle-list">
+                            <div class="bundle-card"
+                                *ngFor="let item of visibleOutboundBundles; let i = index"
+                                [class.active]="selectedOutboundBundleByPassenger[selectedPassenger] === i"
+                                (click)="selectOutboundBundle(i)">
+                                <div class="bundle-row">
+                                    <div class="bundle-left">
+                                        <div class="bundle-icon" [ngClass]="item.icon"></div>
+                                        <div class="bundle-title">{{ item.title }}</div>
+                                    </div>
+                                    <div class="bundle-right">
+                                        <div class="bundle-price">{{ item.price | number:'1.2-2' }} THB</div>
+                                        <div class="bundle-original">
+                                            <span class="strike">{{ item.original | number:'1.2-2' }} THB</span>
+                                            <span class="discount">-{{ item.discount }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bundle-detail-collapse" [class.open]="selectedOutboundBundleIndex === i">
+                                    <div class="bundle-divider"></div>
+                                    <div class="bundle-detail-inline">
+                                        <div class="detail-row" *ngFor="let d of item.details">
+                                            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M4.125 6.875L5.25 8L7.875 5.375" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M6 11C8.48528 11 10.5 8.98528 10.5 6.5C10.5 4.01472 8.48528 2 6 2C3.51472 2 1.5 4.01472 1.5 6.5C1.5 8.98528 3.51472 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>                                                
+                                            <span class="text">{{ d.description }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="currentOutboundBundleList.length > 4" style="margin-top: 12px; display: flex; justify-content: center;">
+                            <button type="button" class="open-close-bundle-button" (click)="toggleShowAllOutbound()">
+                                {{ showAllOutboundBundles ? 'ย่อข้อมูล bundle' : 'ดูข้อมูล bundle เพิ่มเติม' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="service-bundle-inbound" *ngIf="visibleReturnBundles.length > 0">
+                        <div class="service-bundle-header">
+                            <span>เลือก Bundle <span class="route-text">- ขากลับ</span></span>
+                            <span class="muted">| Optional service</span>
+                        </div>
+                        <div class="bundle-list">
+                            <div class="bundle-card"
+                                *ngFor="let item of visibleReturnBundles; let i = index"
+                                [class.active]="selectedReturnBundleByPassenger[selectedPassenger] === i"
+                                (click)="selectReturnBundle(i)">
+                                <div class="bundle-row">
+                                    <div class="bundle-left">
+                                        <div class="bundle-icon" [ngClass]="item.icon"></div>
+                                        <div class="bundle-title">{{ item.title }}</div>
+                                    </div>
+                                    <div class="bundle-right">
+                                        <div class="bundle-price">{{ item.price | number:'1.2-2' }} THB</div>
+                                        <div class="bundle-original">
+                                            <span class="strike">{{ item.original | number:'1.2-2' }} THB</span>
+                                            <span class="discount">-{{ item.discount }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bundle-detail-collapse" [class.open]="selectedReturnBundleIndex === i">
+                                    <div class="bundle-divider"></div>
+                                    <div class="bundle-detail-inline">
+                                        <div class="detail-row" *ngFor="let d of item.details">
+                                            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M4.125 6.875L5.25 8L7.875 5.375" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M6 11C8.48528 11 10.5 8.98528 10.5 6.5C10.5 4.01472 8.48528 2 6 2C3.51472 2 1.5 4.01472 1.5 6.5C1.5 8.98528 3.51472 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>                                                
+                                            <span class="text">{{ d.description }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="currentReturnBundleList.length > 4" style="margin-top: 12px; display: flex; justify-content: center;">
+                            <button type="button" class="open-close-bundle-button" (click)="toggleShowAllReturn()">
+                                {{ showAllReturnBundles ? 'ย่อข้อมูล bundle' : 'ดูข้อมูล bundle เพิ่มเติม' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="special-assistance-container" style="margin-top: 20px;">
                     <div class="main-assistance-header">
                         <div class="yellow-checkbox" [class.checked]="currentForm.get('needsSpecialAssistance')?.value === true" (click)="toggleMainAssistance()">
@@ -288,6 +380,7 @@
                 </div>
             </form>
 
+            <div class="footer-container-background"></div>
             <div class="footer-container">
                 <div class="footer-container-text">
                     <!-- <u *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)">{{
@@ -303,10 +396,13 @@
                         </svg>
                     </div> -->
                 </div>
-                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger" (click)="checkPassengerValid(selectedPassenger)" [ngClass]="{'yellow-button': passengerForms[selectedPassenger].valid}">
+                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger && !isAllPassengersValid()" (click)="checkPassengerValid(selectedPassenger)" [ngClass]="{'yellow-button': passengerForms[selectedPassenger].valid}">
                     กรอกข้อมูลผู้โดยสารคนต่อไป
                 </button>
                 <button class="next-passenger-button" *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">
+                    ยืนยัน
+                </button>
+                <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger && isAllPassengersValid()" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">
                     ยืนยัน
                 </button>
                 <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
