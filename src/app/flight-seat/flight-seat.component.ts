@@ -786,6 +786,10 @@ export class FlightSeatComponent {
     if (passengerIndex !== undefined) {
       const passenger = this.passengers[parseInt(passengerIndex)];
       if (passenger) {
+        // หากเป็นผู้โดยสาร Infant ให้ไม่แสดงชื่อ
+        if (this.isInfant(parseInt(passengerIndex))) {
+          return seat.label;
+        }
         return `${passenger.firstName.charAt(0)} ${passenger.lastName.charAt(0)}`;
       }
     }
@@ -1210,11 +1214,11 @@ export class FlightSeatComponent {
   
     // หา index ผู้โดยสารถัดไปที่ยังไม่ได้เลือกที่นั่งใน segment ปัจจุบัน
     private getNextUnassignedPassengerIndex(): number {
-      // เลือกผู้โดยสารที่ยังไม่ได้เลือกที่นั่งและมี Bundle ตามทิศทางปัจจุบันก่อน
-      const prioritized = this.passengers.findIndex((_, index) => !this.passengerSeatMap[index] && this.hasServiceBundle(index));
+      // เลือกผู้โดยสารที่ยังไม่ได้เลือกที่นั่งและมี Bundle ตามทิศทางปัจจุบันก่อน (ข้าม Infant)
+      const prioritized = this.passengers.findIndex((_, index) => !this.passengerSeatMap[index] && !this.isInfant(index) && this.hasServiceBundle(index));
       if (prioritized !== -1) return prioritized;
-      // หากไม่มี ให้คืนค่าแรกที่ยังไม่ได้เลือกตามลำดับเดิม
-      return this.passengers.findIndex((_, index) => !this.passengerSeatMap[index]);
+      // หากไม่มี ให้คืนค่าแรกที่ยังไม่ได้เลือกตามลำดับเดิม (ข้าม Infant)
+      return this.passengers.findIndex((_, index) => !this.passengerSeatMap[index] && !this.isInfant(index));
     }
 
   // --- ฟังก์ชันเลือกที่นั่ง (selectSeat) ใช้ logic เดิม ---
@@ -1242,7 +1246,7 @@ export class FlightSeatComponent {
       return;
     }
     
-    if (this.selectedSeat.length >= this.passengers.length) {
+    if (this.selectedSeat.length >= this.getSeatEligibleCount()) {
       return;
     }
 
@@ -1351,7 +1355,9 @@ export class FlightSeatComponent {
     // อนุญาตให้สลับที่นั่งสำหรับผู้โดยสารที่ถูกเลือก แม้จะเลือกครบทุกคนแล้ว
     if (seat.status !== 'available') return;
     const passengerIndex = this.getTargetPassengerIndexForSelection();
-    if (passengerIndex === -1 && this.selectedSeat.length >= this.passengers.length) return;
+    if (passengerIndex === -1 && this.selectedSeat.length >= this.getSeatEligibleCount()) return;
+    // ป้องกันไม่ให้กำหนดที่นั่งให้ผู้โดยสารที่เป็น Infant
+    if (passengerIndex !== -1 && this.isInfant(passengerIndex)) return;
     if (passengerIndex !== -1) {
       seat.status = 'selected';
 
@@ -1421,7 +1427,7 @@ export class FlightSeatComponent {
     const currentSegs = this.getCurrentDirectionSegments();
     const nonBundleIdxs = this.passengers
       .map((_, idx) => idx)
-      .filter(idx => !this.passengerHasS150Bundle(idx, direction));
+      .filter(idx => !this.isInfant(idx) && !this.passengerHasS150Bundle(idx, direction));
     const unseatedNonBundleIdxs = nonBundleIdxs.filter(idx => {
       // ต้องมีที่นั่งครบทุก segment ของทิศทางปัจจุบัน จึงถือว่าเลือกครบ
       const isFullySeatedInDirection = currentSegs.every(seg => {
@@ -1455,7 +1461,7 @@ export class FlightSeatComponent {
           }
         } else {
           // ไม่สนใจ: ไปหน้าถัดไป (context สุดท้ายแล้ว)
-          if (this.isInboundDirection()) {
+          if (this.isInboundDirection() || !this.hasInbound) {
             this.router.navigate(['/review']);
           } else {
             this.switchDirection('inbound');
@@ -1465,10 +1471,35 @@ export class FlightSeatComponent {
       return;
     }
 
-    // หากมีการซื้อที่นั่งเพิ่มทั้ง Outbound และ Inbound ให้แสดงแจ้งเตือนก่อนไปหน้าถัดไป
+    // แจ้งเตือนกรณีผู้มีสิทธิ์ bundle เลือกที่นั่งที่ไม่รวมในแพ็กเกจ (เช่น S300/S500)
+    const directionForWarn = this.isInboundDirection() ? 'inbound' : 'outbound';
+    const nonIncludedIdxs = this.getEntitledNonIncludedPassengerIndexesByDirection(directionForWarn);
+    if (nonIncludedIdxs.length > 0) {
+      const names = nonIncludedIdxs.map(i => this.getPassengerFullName(i)).join(', ');
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '350px',
+        disableClose: true,
+        data: { isDialog: 'alert_select_not_include_package', message: names }
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        // ดำเนินการต่อไปตาม flow ปกติหลังยืนยันการรับทราบ
+        const nextSegTmp = this.getNextSegmentInCurrentDirection();
+        if (nextSegTmp) {
+          this.switchSegment(nextSegTmp);
+        } else if (this.isInboundDirection() || !this.hasInbound) {
+          this.router.navigate(['/review']);
+        } else {
+          this.switchDirection('inbound');
+        }
+      });
+      return;
+    }
+
+    // หากมีการซื้อที่นั่งเพิ่มใน Outbound หรือ Inbound ใดๆ ให้แสดงแจ้งเตือนก่อน
     const paidOutboundIdxs = this.getPaidPassengerIndexesByDirection('outbound');
     const paidInboundIdxs = this.getPaidPassengerIndexesByDirection('inbound');
     if (paidOutboundIdxs.length > 0 && paidInboundIdxs.length > 0) {
+      // ทั้งสองขามีค่าใช้จ่าย -> แสดงและไปหน้ารีวิว (พฤติกรรมเดิม)
       const paidOutboundNames = paidOutboundIdxs.map(i => this.getPassengerFullName(i));
       const paidInboundNames = paidInboundIdxs.map(i => this.getPassengerFullName(i));
       const message = this.buildChargeMessage(paidOutboundNames, paidInboundNames);
@@ -1483,6 +1514,29 @@ export class FlightSeatComponent {
         }
       });
       return;
+    } else if (paidOutboundIdxs.length > 0 || paidInboundIdxs.length > 0) {
+      // อย่างน้อยหนึ่งขามีค่าใช้จ่าย -> เตือนให้รับทราบ แล้วดำเนิน flow ปกติ
+      const paidOutboundNames = paidOutboundIdxs.map(i => this.getPassengerFullName(i));
+      const paidInboundNames = paidInboundIdxs.map(i => this.getPassengerFullName(i));
+      const message = this.buildChargeMessage(paidOutboundNames, paidInboundNames);
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '350px',
+        disableClose: true,
+        data: { isDialog: 'alert_charge_additional_seat', message }
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        const nextSegTmp = this.getNextSegmentInCurrentDirection();
+        if (nextSegTmp) {
+          this.switchSegment(nextSegTmp);
+          return;
+        }
+        if (this.isInboundDirection() || !this.hasInbound) {
+          this.router.navigate(['/review']);
+        } else {
+          this.switchDirection('inbound');
+        }
+      });
+      return;
     }
 
     // ไม่มี dialog ใดๆ ให้สลับไป segment ถัดไปในทิศทางเดียวกันก่อน หากหมดแล้วค่อยไปทิศทางถัดไป
@@ -1491,7 +1545,7 @@ export class FlightSeatComponent {
       this.switchSegment(nextSeg);
       return;
     }
-    if (this.isInboundDirection()) {
+    if (this.isInboundDirection() || !this.hasInbound) {
       this.router.navigate(['/review']);
     } else {
       this.switchDirection('inbound');
@@ -1528,7 +1582,7 @@ export class FlightSeatComponent {
     const currentSegs = this.getCurrentDirectionSegments();
     const nonBundleIdxs = this.passengers
       .map((_, idx) => idx)
-      .filter(idx => !this.passengerHasS150Bundle(idx, direction));
+      .filter(idx => !this.isInfant(idx) && !this.passengerHasS150Bundle(idx, direction));
     const unseatedNonBundleIdxs = nonBundleIdxs.filter(idx => {
       // ต้องมีที่นั่งครบทุก segment ของทิศทางปัจจุบัน จึงถือว่าเลือกครบ
       const isFullySeatedInDirection = currentSegs.every(seg => {
@@ -1562,7 +1616,7 @@ export class FlightSeatComponent {
           }
         } else {
           // ไม่สนใจ: ไปหน้าถัดไป (context สุดท้ายแล้ว)
-          if (this.isInboundDirection()) {
+          if (this.isInboundDirection() || !this.hasInbound) {
             this.router.navigate(['/review']);
           } else {
             this.switchDirection('inbound');
@@ -1578,7 +1632,7 @@ export class FlightSeatComponent {
       this.switchSegment(nextSeg);
       return;
     }
-    if (this.isInboundDirection()) {
+    if (this.isInboundDirection() || !this.hasInbound) {
       this.router.navigate(['/review']);
     } else {
       this.switchDirection('inbound');
@@ -1699,6 +1753,31 @@ export class FlightSeatComponent {
     return parts.join('\n');
   }
 
+  // ตรวจผู้โดยสารที่มีสิทธิ์ที่นั่งฟรี (S150) แต่เลือกที่นั่งที่ไม่รวมในแพ็กเกจในทิศทางที่ระบุ
+  private getEntitledNonIncludedPassengerIndexesByDirection(direction: 'outbound' | 'inbound'): number[] {
+    const affectedPassengerIndexSet = new Set<number>();
+    this.segmentList
+      .filter(segment => this.getDirectionFromSegmentKey(segment.key) === direction)
+      .forEach(segment => {
+        const segmentSeats = (this.segmentSelectedSeat[segment.key] || []) as any[];
+        const seatMap = this.segmentSeatMap[segment.key] || {};
+        const labelToPassengerIndex: { [label: string]: number } = {};
+        Object.keys(seatMap).forEach((pIdxStr: string) => {
+          const label = seatMap[parseInt(pIdxStr, 10)];
+          if (label) labelToPassengerIndex[label] = parseInt(pIdxStr, 10);
+        });
+        segmentSeats.forEach((seat: any) => {
+          const passengerIndex = labelToPassengerIndex[seat.label];
+          const entitled = typeof passengerIndex === 'number' && this.passengerHasS150Bundle(passengerIndex, direction);
+          const notIncluded = seat && seat.serviceCode !== 'S150';
+          if (entitled && notIncluded && typeof passengerIndex === 'number') {
+            affectedPassengerIndexSet.add(passengerIndex);
+          }
+        });
+      });
+    return Array.from(affectedPassengerIndexSet.values());
+  }
+
   // ฟังก์ชันคำนวณราคาสำหรับ segment ปัจจุบัน
   calculateCurrentSegmentPrice(): number {
     const direction = this.isInboundDirection() ? 'inbound' : 'outbound';
@@ -1725,6 +1804,35 @@ export class FlightSeatComponent {
   }
 
   // --- ฟังก์ชันสำหรับ UI ใหม่ ---
+  // --- Helpers สำหรับกำหนดสิทธิ์เลือกที่นั่ง (ตัด Infant ออก) ---
+  private getPassengerAgeYearsFromBirthDate(birthDate: any): number | null {
+    if (!birthDate) return null;
+    const bd = new Date(birthDate);
+    if (isNaN(bd.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - bd.getFullYear();
+    const m = today.getMonth() - bd.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+    return age;
+  }
+
+  isInfant(index: number): boolean {
+    const p: any = this.passengers[index];
+    if (!p) return false;
+    const age = this.getPassengerAgeYearsFromBirthDate(p.birthDate);
+    if (age === null) return false;
+    return age < 2;
+  }
+
+  private getSeatEligiblePassengerIndexes(): number[] {
+    return this.passengers
+      .map((_, idx) => idx)
+      .filter(idx => !this.isInfant(idx));
+  }
+
+  private getSeatEligibleCount(): number {
+    return this.getSeatEligiblePassengerIndexes().length;
+  }
   
   // ตรวจสอบว่าเป็น inbound direction (ขากลับ) หรือไม่
   isInboundDirection(): boolean {
@@ -1967,10 +2075,14 @@ export class FlightSeatComponent {
       // ถ้ามี service bundle ให้เช็คว่าเลือกที่นั่งครบแล้วหรือยัง
       if (segmentHasService) {
         const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
-        const selectedSeatsCount = Object.keys(segmentSeatMap).length;
-        
-        // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสาร)
-        if (selectedSeatsCount < this.passengers.length) {
+        const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
+        let selectedSeatsCount = 0;
+        Object.keys(segmentSeatMap).forEach((pIdxStr: string) => {
+          const pIdx = parseInt(pIdxStr, 10);
+          if (eligibleIndexes.has(pIdx) && segmentSeatMap[pIdx]) selectedSeatsCount++;
+        });
+        // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสารที่มีสิทธิ์)
+        if (selectedSeatsCount < eligibleIndexes.size) {
           hasUnselectedService = true;
           unselectedSegments.push(segment.key);
         }
@@ -1984,8 +2096,13 @@ export class FlightSeatComponent {
   // ฟังก์ชันเช็คว่า segment ปัจจุบันเลือกที่นั่งครบแล้วหรือยัง
   isCurrentSegmentComplete(): boolean {
     const currentSegmentSeatMap = this.segmentSeatMap[this.currentSegmentKey] || {};
-    const selectedSeatsCount = Object.keys(currentSegmentSeatMap).length;
-    return selectedSeatsCount >= this.passengers.length;
+    const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
+    let selectedSeatsCount = 0;
+    Object.keys(currentSegmentSeatMap).forEach((pIdxStr: string) => {
+      const pIdx = parseInt(pIdxStr, 10);
+      if (eligibleIndexes.has(pIdx) && currentSegmentSeatMap[pIdx]) selectedSeatsCount++;
+    });
+    return selectedSeatsCount >= eligibleIndexes.size;
   }
 
   // ฟังก์ชันเช็คว่า segment ปัจจุบันมี service bundle และยังไม่ได้เลือกที่นั่งครบ
@@ -2232,6 +2349,8 @@ export class FlightSeatComponent {
   // --- ฟังก์ชันใหม่: เมื่อคลิกผู้โดยสารให้ตั้งค่าผู้โดยสารเป้าหมาย ---
   onPassengerClick(index: number) {
     if (index < 0 || index >= this.passengers.length) return;
+    // ไม่อนุญาตเลือกผู้โดยสารที่เป็น Infant
+    if (this.isInfant(index)) return;
     // ถ้าคลิกซ้ำที่ผู้โดยสารคนเดิม ให้ยกเลิกและกลับไปโหมดอัตโนมัติ
     if (this.selectedPassengerIndex === index) {
       this.selectedPassengerIndex = null;
@@ -2244,7 +2363,8 @@ export class FlightSeatComponent {
   // --- ฟังก์ชันใหม่: คืนค่า index ผู้โดยสารที่ควรถูกกำหนดที่นั่ง ---
   private getTargetPassengerIndexForSelection(): number {
     if (this.selectedPassengerIndex !== null && this.selectedPassengerIndex >= 0 && this.selectedPassengerIndex < this.passengers.length) {
-      return this.selectedPassengerIndex;
+      // หากผู้ที่ถูกเลือกเป็น Infant ให้ข้ามไปหา index ถัดไปที่ยังไม่ได้กำหนดและไม่ใช่ Infant
+      if (!this.isInfant(this.selectedPassengerIndex)) return this.selectedPassengerIndex;
     }
     return this.getNextUnassignedPassengerIndex();
   }

@@ -218,7 +218,7 @@
                     </mat-form-field>
                 </div>
 
-                <div class="service-bundle-container" *ngIf="canShowBundles">
+                <div class="service-bundle-container" *ngIf="canShowBundles && ((visibleOutboundBundles?.length || 0) > 0 || (visibleReturnBundles?.length || 0) > 0)">
                     <div class="service-bundle-outbound" *ngIf="visibleOutboundBundles.length > 0">
                         <div class="service-bundle-header">
                             <span>เลือก Bundle <span class="route-text">- ขาไป</span></span>

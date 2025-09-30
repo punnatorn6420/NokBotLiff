@@ -748,6 +748,13 @@ export class ReviewPageComponent {
     }
   }
 
+  // ตรวจสอบว่าเป็นทริปต่างประเทศหรือไม่ (มีอย่างน้อยหนึ่งขาเป็น International)
+  isInternationalTrip(): boolean {
+    const outboundIntl = Array.isArray(this.outboundFlightData) && this.outboundFlightData.some(f => f.isInternational === true);
+    const inboundIntl = Array.isArray(this.inboundFlightData) && this.inboundFlightData.some(f => f.isInternational === true);
+    return Boolean(outboundIntl || inboundIntl);
+  }
+
   // // ฟังก์ชันสำหรับแสดงข้อมูลที่นั่งพร้อมข้อมูลเครื่องบิน
   // getOutboundSeatInfoWithAircraft(passengerIndex: number): string {
   //   const segments = this.getFlightSegments('outbound');

@@ -645,6 +645,8 @@ export class PassengerFormComponent {
           this.passengerForms[passengerNumber].patchValue(prefill);
           this.normalizeDialCodeValue(this.passengerForms[passengerNumber]);
         }
+        // ผูกการสลับ validators ตามอายุ (Infant ไม่ตรวจพาสปอร์ต)
+        this.bindInfantPassportValidators(passengerNumber);
       } else {
         // ผู้โดยสารคนที่ 2+ - ไม่ต้องกรอก contact (ไม่มี FormControl สำหรับ contact)
         const passportValidators = this.isInternationalTrip ? [Validators.required] : [];
@@ -689,10 +691,63 @@ export class PassengerFormComponent {
           this.passengerForms[passengerNumber].patchValue(prefill);
           this.normalizeDialCodeValue(this.passengerForms[passengerNumber]);
         }
+        // ผูกการสลับ validators ตามอายุ (Infant ไม่ตรวจพาสปอร์ต)
+        this.bindInfantPassportValidators(passengerNumber);
       }
     }
     
     console.log('Passenger forms initialized:', this.passengerForms);
+  }
+
+  // สลับ validators ของฟิลด์พาสปอร์ตตามอายุ: หากอายุน้อยกว่า 2 ปี (Infant) จะยกเลิกการตรวจพาสปอร์ต
+  private bindInfantPassportValidators(passengerNumber: number) {
+    const form = this.passengerForms[passengerNumber];
+    if (!form) return;
+
+    const apply = () => {
+      const age = this.getPassengerAge(passengerNumber);
+      const isInfant = age !== null && age < 2;
+
+      const passportNumber = form.get('passportNumber');
+      const issuedBy = form.get('issuedBy');
+      const expireDate = form.get('expireDate');
+      const nationality = form.get('nationality');
+      const country = form.get('country');
+
+      // เงื่อนไขบังคับเอกสารเฉพาะทริปต่างประเทศ และไม่ใช่ Infant
+      const requirePassport = this.isInternationalTrip && !isInfant;
+
+      if (passportNumber) {
+        passportNumber.setValidators(requirePassport ? [Validators.required] : []);
+        passportNumber.updateValueAndValidity({ emitEvent: false });
+      }
+      if (issuedBy) {
+        const baseIssuedBy = [this.optionExistsValidator(() => this.issuedByOptions)];
+        issuedBy.setValidators(requirePassport ? [Validators.required, ...baseIssuedBy] : baseIssuedBy);
+        issuedBy.updateValueAndValidity({ emitEvent: false });
+      }
+      if (expireDate) {
+        expireDate.setValidators(requirePassport ? [Validators.required, this.notPastDateValidator()] : []);
+        expireDate.updateValueAndValidity({ emitEvent: false });
+      }
+      // สัญชาติ/ประเทศ: ถ้าเป็น Infant ไม่ตรวจเลย
+      const requireDemographic = this.isInternationalTrip && !isInfant;
+      if (nationality) {
+        nationality.setValidators(requireDemographic ? [Validators.required, this.optionExistsValidator(() => this.nationalityOptions)] : []);
+        nationality.updateValueAndValidity({ emitEvent: false });
+      }
+      if (country) {
+        country.setValidators(requireDemographic ? [Validators.required, this.optionExistsValidator(() => this.countryOptions)] : []);
+        country.updateValueAndValidity({ emitEvent: false });
+      }
+    };
+
+    // apply ครั้งแรกหลังสร้างฟอร์ม/โหลดค่า
+    apply();
+
+    // ผูกกับการเปลี่ยนแปลงวันเกิดเพื่อสลับ validators อัตโนมัติ
+    const birth = form.get('birthDate');
+    birth?.valueChanges.subscribe(() => apply());
   }
 
   // ตั้งค่า autocomplete filters

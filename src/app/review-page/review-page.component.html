@@ -58,8 +58,8 @@
                             <div class="info-value">{{passenger.birthDate | date:'dd/MM/yyyy'}}</div>
                         </div>
                     </div>
-                    <div class="info-divider"></div>
-                    <div class="info-section">
+                    <div class="info-divider" *ngIf="isInternationalTrip()"></div>
+                    <div class="info-section" *ngIf="isInternationalTrip()">
                         <div class="info-title">{{ 'REVIEW_PAGE_PASSPORT_TITLE' | translate }}</div>
                         <div class="info-row">
                             <div class="info-label">{{ 'REVIEW_PAGE_NATIONALITY' | translate }}</div>

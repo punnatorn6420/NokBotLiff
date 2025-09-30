@@ -79,8 +79,9 @@
                 <div class="passenger-box" #passengerBox *ngFor="let passenger of passengers; let i = index" [ngClass]="{
                     'has-seat': hasSeatInServiceSegments(i),
                     'no-seat': !hasSeatInServiceSegments(i),
-                    'is-selecting': isSelectingPassenger(i)
-                }" (click)="!hasSeatInServiceSegments(i) && onPassengerClick(i)" [attr.aria-disabled]="hasSeatInServiceSegments(i)">
+                    'is-selecting': isSelectingPassenger(i) && !hasSeatInServiceSegments(i),
+                    'is-infant': isInfant(i)
+                }" (click)="!hasSeatInServiceSegments(i) && !isInfant(i) && onPassengerClick(i)" [attr.aria-disabled]="hasSeatInServiceSegments(i) || isInfant(i)" [style.display]="isInfant(i) ? 'none' : null">
                 <div class="has-service-container" *ngIf="hasServiceBundle(i)">
                     <p>Bundle</p>
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -118,8 +119,8 @@
                         </svg>
                     </ng-container>
                     <span class="passenger-name">
-                        <span class="selecting-dot" *ngIf="isSelectingPassenger(i)"></span>
-                        {{passenger.firstName}} {{passenger.lastName}}
+                        <span class="selecting-dot" *ngIf="isSelectingPassenger(i) && !hasSeatInServiceSegments(i)"></span>
+                        <ng-container *ngIf="!isInfant(i)">{{passenger.firstName}} {{passenger.lastName}}</ng-container>
                     </span>
                     <span class="passenger-seat" *ngIf="passengerSeatMap[i]"> : {{ passengerSeatMap[i] }}</span>
                     <button *ngIf="passengerSeatMap[i]" class="remove-seat-btn" (click)="onRemoveSeat(i, $event)" aria-label="remove seat">
