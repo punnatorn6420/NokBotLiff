@@ -5,7 +5,7 @@ import liff from '@line/liff';
   providedIn: 'root'
 })
 export class LiffService {
-  private liffId: string = '2007758051-L721887x'; 
+  private liffId: string = '2007963873-Nm3zln4x'; 
 
   constructor() { }
 
