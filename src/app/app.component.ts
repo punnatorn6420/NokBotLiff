@@ -22,12 +22,12 @@ export class AppComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    // this.passDataService.setLanguage('th');
+    // this.passDataService.setLanguage('en');
+    // this.translate.setDefaultLang('en');
+    // this.translate.use('en');
   }
 
   ngOnInit() {
-    this.translate.setDefaultLang('th');
-    this.translate.use('th');
     const searchParams = new URLSearchParams(window.location.search);
     const uidFromQuery = searchParams.get('uid') || searchParams.get('UID');
     const uidFromHrefMatch = window.location.href.match(/[?&]uid=([^&#]+)/i);
