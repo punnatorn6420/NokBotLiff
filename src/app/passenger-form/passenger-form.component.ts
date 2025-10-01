@@ -250,7 +250,10 @@ export class PassengerFormComponent {
   private getPassengerPaxType(passengerNumber: number): 'Adult' | 'Child' | null {
     const age = this.getPassengerAge(passengerNumber);
     if (age === null) return null;
-    return age > 12 ? 'Adult' : 'Child';
+    // ทารก (< 2 ปี) ไม่สามารถเลือก/แสดง bundle
+    if (age < 2) return null;
+    if (age <= 12) return 'Child';
+    return 'Adult';
   }
 
   // จัดประเภท pax จากอายุ (เพิ่ม Infant)

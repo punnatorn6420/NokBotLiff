@@ -223,8 +223,9 @@
 }
 
 .flight-card-tab {
-    min-width: 90vw;
-    max-width: 400px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: #FFD600;
     color: #222;
     border-radius: 22px 22px 0 0;
@@ -260,6 +261,13 @@
     }
   }
 
+  // คอนเทนเนอร์ของการ์ด เพื่อให้การ์ด absolute ผูกกับกรอบนี้และย่อตาม
+  .flight-card-stack {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+  }
+
   .flight-card {
     background: #fff;
     border-radius: 22px;
@@ -286,8 +294,8 @@
     //   background-color: #888;
       display: flex;
       justify-content: center;
-      // width: 400px;
-      // width: 100%;
+        // width: 400px;
+        width: 100%;
     }
   
   .flight-section .flight-card {
@@ -406,6 +414,18 @@
   // padding: 12px 14px;
   margin-bottom: 14px;
 }
+
+// ปรับขนาดบนจอเล็กให้พอดี
+@media screen and (max-width: 360px) {
+  .flight-time-depart,
+  .flight-time-arrive { font-size: 32px; }
+
+  .flight-card-tab { padding: 16px 20px 10px 20px; height: 52px; }
+  .flight-card { padding: 24px 20px 20px 20px; }
+  .flight-card-tab-title { font-size: 20px; }
+  .flight-dash span { min-width: 40px; }
+  .flight-place { font-size: 18px; }
+}
 .list-title {
   font-weight: 600;
   margin-bottom: 6px;
@@ -511,7 +531,7 @@
   gap: 12px;
   color: #b3b3b3;
   font-size: 22px;
-  margin: 14px 0 22px 0;
+  // margin: 14px 0 22px 0;
   &::before, &::after{
     content: '';
     height: 2px;
@@ -521,6 +541,133 @@
   }
 }
 
+/* ===== Service Bundle (ใหม่) ===== */
+// .service-bundle-section {
+//   border: 1px solid #e8e8e8;
+//   border-radius: 12px;
+//   padding: 12px;
+//   margin: 14px 0 18px 0;
+//   background: #fff;
+// }
+
+.bundle-passenger {
+  background: #F8F8F8;
+  border-radius: 12px 12px 0 0;
+  border: 1px solid #ABABAB;
+  padding: 12px;
+}
+
+.bundle-passenger-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 20px;
+  font-weight: 600;
+  color: #555;
+
+  u {
+    font-weight: 400;
+    color: #6b6b6b;
+    cursor: pointer;
+  }
+}
+
+.bundle-passenger-list {
+  margin: 8px 0 0 18px;
+  padding: 0;
+  color: #222;
+  font-size: 20px;
+}
+
+.bundle-card {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 12px;
+  margin-top: -10px;
+  align-items: center;
+  border: 2px solid #F0C400;
+  background: #FFFAE6;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.bundle-icon img {
+  width: 48px;
+  height: 48px;
+}
+
+.bundle-body {
+  min-width: 0;
+}
+
+.bundle-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #212121;
+}
+
+.bundle-features {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  color: #4a4a4a;
+  font-size: 20px;
+}
+.bundle-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+// .bundle-features li::before {
+//   content: '';
+//   width: 22px;
+//   height: 22px;
+//   border-radius: 50%;
+//   border: 2px solid #8B8B8B;
+//   display: inline-block;
+//   background: radial-gradient(circle at center, #FCCD01 0 0) no-repeat;
+//   mask: radial-gradient(circle 7px at center, transparent 6px, #000 7px);
+// }
+
+.bundle-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.price-discount {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 8px;
+}
+
+.bundle-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: #E9E2BE;
+  margin-top: 4px;
+}
+
+.discount-pill {
+  background: #FFE28C;
+  color: #8B7101;
+  font-size: 18px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.no-bundle-group .bundle-subtitle {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
 .no-seat-info-text{
   display: flex;
   align-items: center;
@@ -528,7 +675,7 @@
   gap: 12px;
   color: #b3b3b3;
   font-size: 22px;
-  margin: 14px 0 22px 0;
+  // margin: 14px 0 22px 0;
   &::before, &::after{
     content: '';
     height: 2px;

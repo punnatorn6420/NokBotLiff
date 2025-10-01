@@ -28,6 +28,9 @@ interface Passenger {
   other?: boolean;
   otherReason?: string;
   // seatID: string;
+  // bundle selections
+  outboundBundleIndex?: number;
+  outboundBundle?: PassengerBundle;
 }
 
 interface FlightDetail {
@@ -63,6 +66,26 @@ interface ServiceBundle {
   serviceId: number;
   serviceName: string;
   vatAmount: number;
+}
+
+// โครงสร้าง bundle ที่มากับข้อมูลผู้โดยสารใน formData
+interface PassengerBundleDetail {
+  serviceCode: string;
+  serviceName: string;
+  description: string;
+}
+
+interface PassengerBundle {
+  icon: string;
+  title: string;
+  price: number;
+  original?: number;
+  discount?: number;
+  serviceCode: string;
+  serviceCodeDetail?: string;
+  paxTypeCode?: string;
+  flightNumber?: string;
+  details?: PassengerBundleDetail[];
 }
 
 interface SeatData {
@@ -145,6 +168,19 @@ export class ReviewPageComponent {
   inboundFlightData: FlightDetail[] = [];
   outboundServiceBundle: ServiceBundle | null = null;
   inboundServiceBundle: ServiceBundle | null = null;
+  // toggle แสดง/ซ่อนรายชื่อผู้โดยสารที่ซื้อ bundle
+  outboundBundleShow: boolean = true;
+  inboundBundleShow: boolean = true;
+  // ข้อมูล bundle (หลังรวม/แปลง) ที่ใช้แสดงผลจริง
+  outboundBundleDisplay: ServiceBundle | null = null;
+  inboundBundleDisplay: ServiceBundle | null = null;
+  // รายชื่อ index ผู้โดยสารที่ซื้อ bundle
+  outboundBundlePassengerIndexes: number[] = [];
+  inboundBundlePassengerIndexes: number[] = [];
+
+  // กลุ่ม bundle ขาไปและขากลับ (จัดตาม title ไม่ซ้ำ)
+  outboundBundleGroups: { title: string; passengers: Passenger[]; sample: ServiceBundle | null }[] = [];
+  inboundBundleGroups: { title: string; passengers: Passenger[]; sample: ServiceBundle | null }[] = [];
 
   constructor(
     private router: Router,
@@ -169,10 +205,15 @@ export class ReviewPageComponent {
           }
           this.isPassengerInfoOpen = new Array(this.passengers.length).fill(true);
           console.log(this.passengers);
+          // อัปเดตข้อมูล bundle จากผู้โดยสาร (fallback)
+          this.updateBundleDisplays();
         } else {
           this.formData = [];
           this.passengers = [];
           this.isPassengerInfoOpen = [];
+          this.outboundBundlePassengerIndexes = [];
+          this.inboundBundlePassengerIndexes = [];
+          this.updateBundleDisplays();
         }
       });
 
@@ -191,9 +232,12 @@ export class ReviewPageComponent {
         if (data && Object.keys(data).length > 0) {
           console.log("getFlightData review-page", data);
           this.getFlightDetail(data);
+          // อัปเดตข้อมูล bundle หลังได้ flight detail
+          this.updateBundleDisplays();
         } else {
           this.outboundFlightData = [];
           this.inboundFlightData = [];
+          this.updateBundleDisplays();
         }
       });
     }
@@ -560,6 +604,151 @@ export class ReviewPageComponent {
     this.isPassengerInfoOpen[index] = !this.isPassengerInfoOpen[index];
   }
 
+  // toggle รายชื่อผู้โดยสารของ bundle
+  toggleOutboundBundlePassengers() {
+    this.outboundBundleShow = !this.outboundBundleShow;
+  }
+
+  toggleInboundBundlePassengers() {
+    this.inboundBundleShow = !this.inboundBundleShow;
+  }
+
+  // ===== Bundle (FormData) Helpers =====
+  private extractPassengerBundlePassengers(direction: 'outbound' | 'inbound'): number[] {
+    if (!this.passengers || this.passengers.length === 0) return [];
+    const key = direction === 'outbound' ? 'outboundBundle' : 'inboundBundle';
+    const indexes: number[] = [];
+    this.passengers.forEach((p: any, idx: number) => {
+      if (p && p[key]) indexes.push(idx);
+    });
+    return indexes;
+  }
+
+  // จัดกลุ่ม bundle ของผู้โดยสารตาม title (ใช้ข้อมูลจาก formData)
+  private groupPassengerBundlesByTitle(direction: 'outbound' | 'inbound') {
+    const indexes = direction === 'outbound' ? this.outboundBundlePassengerIndexes : this.inboundBundlePassengerIndexes;
+    const groups = new Map<string, { passengers: Passenger[]; sample: ServiceBundle | null }>();
+
+    indexes.forEach(idx => {
+      const p: any = this.passengers[idx];
+      const pb = direction === 'outbound' ? (p?.outboundBundle as PassengerBundle | null) : (p?.inboundBundle as PassengerBundle | null);
+      if (!pb || !pb.title) return;
+      const key = pb.title.trim();
+      if (!groups.has(key)) {
+        groups.set(key, {
+          passengers: [],
+          sample: this.convertPassengerBundleToServiceBundle(pb)
+        });
+      }
+      const g = groups.get(key)!;
+      g.passengers.push(p);
+    });
+
+    const result = Array.from(groups.entries()).map(([title, val]) => ({ title, passengers: val.passengers, sample: val.sample }));
+    if (direction === 'outbound') {
+      this.outboundBundleGroups = result;
+    } else {
+      this.inboundBundleGroups = result;
+    }
+  }
+
+  private convertPassengerBundleToServiceBundle(bundle: PassengerBundle | undefined | null): ServiceBundle | null {
+    if (!bundle) return null;
+    const firstDetail = bundle.details && bundle.details.length > 0 ? bundle.details[0] : undefined;
+    return {
+      originalAmount: bundle.original ?? 0,
+      discountPercentage: bundle.discount ?? 0,
+      includedServices: bundle.details || [],
+      promotionalText: '',
+      imageUrl: '',
+      amount: bundle.price,
+      amountIncludingVat: bundle.price,
+      categoryId: 0,
+      currency: 'THB',
+      departureDate: '',
+      description: firstDetail?.description || bundle.title,
+      flightNumber: bundle.flightNumber || '',
+      logicalFlightId: 0,
+      paxTypeCode: bundle.paxTypeCode || '',
+      physicalFlightId: 0,
+      serviceCode: bundle.serviceCode,
+      serviceId: 0,
+      serviceName: bundle.title,
+      vatAmount: 0
+    };
+  }
+
+  getOutboundBundleFeatures(): string[] {
+    const source = this.outboundBundleDisplay;
+    if (!source) return [];
+    const details = (source.includedServices || []) as PassengerBundleDetail[];
+    if (details && details.length > 0) return details.map(d => d.description || d.serviceName);
+    if (source.description) return [source.description];
+    return [];
+  }
+
+  getInboundBundleFeatures(): string[] {
+    const source = this.inboundBundleDisplay;
+    if (!source) return [];
+    const details = (source.includedServices || []) as PassengerBundleDetail[];
+    if (details && details.length > 0) return details.map(d => d.description || d.serviceName);
+    if (source.description) return [source.description];
+    return [];
+  }
+
+  getOutboundBundlePassengers(): Passenger[] {
+    return this.outboundBundlePassengerIndexes.map(i => this.passengers[i]).filter(Boolean);
+  }
+
+  getInboundBundlePassengers(): Passenger[] {
+    return this.inboundBundlePassengerIndexes.map(i => this.passengers[i]).filter(Boolean);
+  }
+
+  hasOutboundPassengerBundle(): boolean {
+    return this.outboundBundlePassengerIndexes.length > 0;
+  }
+
+  hasInboundPassengerBundle(): boolean {
+    return this.inboundBundlePassengerIndexes.length > 0;
+  }
+
+  private updateBundleDisplays() {
+    // ค้นหาจากข้อมูลผู้โดยสาร
+    this.outboundBundlePassengerIndexes = this.extractPassengerBundlePassengers('outbound');
+    this.inboundBundlePassengerIndexes = this.extractPassengerBundlePassengers('inbound');
+
+    const firstOutbound = this.outboundBundlePassengerIndexes.length > 0
+      ? (this.passengers[this.outboundBundlePassengerIndexes[0]] as any)?.outboundBundle as PassengerBundle
+      : null;
+    const firstInbound = this.inboundBundlePassengerIndexes.length > 0
+      ? (this.passengers[this.inboundBundlePassengerIndexes[0]] as any)?.inboundBundle as PassengerBundle
+      : null;
+
+    const outboundFromPassengers = this.convertPassengerBundleToServiceBundle(firstOutbound);
+    const inboundFromPassengers = this.convertPassengerBundleToServiceBundle(firstInbound);
+
+    // หากข้อมูลจาก API ไม่สมบูรณ์ ให้ fallback เป็นข้อมูลจากผู้โดยสาร
+    const isValidServiceBundle = (b: ServiceBundle | null): boolean => {
+      if (!b) return false;
+      const hasName = !!(b.serviceName && b.serviceName.trim() !== '');
+      const hasAmount = typeof b.amountIncludingVat === 'number' && b.amountIncludingVat > 0;
+      const hasIncluded = Array.isArray(b.includedServices) && b.includedServices.length > 0;
+      return hasName || hasAmount || hasIncluded;
+    };
+
+    this.outboundBundleDisplay = isValidServiceBundle(this.outboundServiceBundle)
+      ? this.outboundServiceBundle
+      : outboundFromPassengers;
+
+    this.inboundBundleDisplay = isValidServiceBundle(this.inboundServiceBundle)
+      ? this.inboundServiceBundle
+      : inboundFromPassengers;
+
+    // จัดกลุ่มตาม title สำหรับการแสดงผลแบบไม่ซ้ำ
+    this.groupPassengerBundlesByTitle('outbound');
+    this.groupPassengerBundlesByTitle('inbound');
+  }
+
   goBack() {
     this.router.navigate(['/select-seat']);
   }
@@ -662,37 +851,37 @@ export class ReviewPageComponent {
 
   // Helper methods สำหรับตรวจสอบ discount
   hasOutboundDiscount(): boolean {
-    return this.outboundServiceBundle !== null && 
-           this.outboundServiceBundle.discountPercentage > 0;
+    return this.outboundBundleDisplay !== null && 
+           this.outboundBundleDisplay.discountPercentage > 0;
   }
 
   hasInboundDiscount(): boolean {
-    return this.inboundServiceBundle !== null && 
-           this.inboundServiceBundle.discountPercentage > 0;
+    return this.inboundBundleDisplay !== null && 
+           this.inboundBundleDisplay.discountPercentage > 0;
   }
 
   // Helper methods สำหรับตรวจสอบ original price
   hasOutboundOriginalPrice(): boolean {
-    return this.outboundServiceBundle !== null && 
-           this.outboundServiceBundle.originalAmount !== this.outboundServiceBundle.amount;
+    return this.outboundBundleDisplay !== null && 
+           this.outboundBundleDisplay.originalAmount !== this.outboundBundleDisplay.amount;
   }
 
   hasInboundOriginalPrice(): boolean {
-    return this.inboundServiceBundle !== null && 
-           this.inboundServiceBundle.originalAmount !== this.inboundServiceBundle.amount;
+    return this.inboundBundleDisplay !== null && 
+           this.inboundBundleDisplay.originalAmount !== this.inboundBundleDisplay.amount;
   }
 
   // Helper methods สำหรับตรวจสอบ promotional text
   hasOutboundPromotionalText(): boolean {
-    return this.outboundServiceBundle !== null && 
-           !!this.outboundServiceBundle.promotionalText && 
-           this.outboundServiceBundle.promotionalText.trim() !== '';
+    return this.outboundBundleDisplay !== null && 
+           !!this.outboundBundleDisplay.promotionalText && 
+           this.outboundBundleDisplay.promotionalText.trim() !== '';
   }
 
   hasInboundPromotionalText(): boolean {
-    return this.inboundServiceBundle !== null && 
-           !!this.inboundServiceBundle.promotionalText && 
-           this.inboundServiceBundle.promotionalText.trim() !== '';
+    return this.inboundBundleDisplay !== null && 
+           !!this.inboundBundleDisplay.promotionalText && 
+           this.inboundBundleDisplay.promotionalText.trim() !== '';
   }
 
   // ฟังก์ชันใหม่สำหรับแสดงจำนวนเครื่องบิน

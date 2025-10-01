@@ -434,7 +434,7 @@
                         </ng-container>
                     </div>
 
-                    <div class="no-seat-info" style="margin-left: 10px;" *ngIf="!hasOutboundSeats() && !hasOutbound2Seats() && !hasInboundSeats() && !hasInbound2Seats()">
+                    <div class="no-seat-info" *ngIf="!hasOutboundSeats() && !hasOutbound2Seats() && !hasInboundSeats() && !hasInbound2Seats()">
                         <div class="no-seat-info-text">ไม่มีบริการเสริม</div>
                     </div>
 
@@ -442,54 +442,144 @@
             </div>
         </ng-container>
 
-        <!-- Special Bundle -->
-        <div class="info-title">Special Bundle</div>
-        <div class="no-bundle-info" *ngIf="!hasOutboundServiceBundle() && !hasInboundServiceBundle()">ไม่ได้เลือก service bundle</div>
-        
+        <!-- Service Bundle -->
+        <div class="info-title">Service Bundle</div>
+        <div class="no-bundle-info" *ngIf="!hasOutboundServiceBundle() && !hasInboundServiceBundle() && !hasOutboundPassengerBundle() && !hasInboundPassengerBundle()">ไม่ได้เลือก service bundle</div>
+
         <!-- Outbound Service Bundle -->
-        <div class="special-bundle" *ngIf="hasOutboundServiceBundle()">
-            <div class="title-triptype">เทียวบินขาไป</div>
-            <div class="bundle-title">{{ outboundServiceBundle?.serviceName }}</div>
-            <div class="bundle-detail">
-                <div class="bundle-img">
-                    <img [src]="outboundServiceBundle?.imageUrl || 'assets/imgs/service_bundle.png'" alt="Bundle Image">
+        <div class="service-bundle-section" *ngIf="hasOutboundServiceBundle() || hasOutboundPassengerBundle()">
+            <!-- กรณีมี bundle จาก API (แสดงการ์ดหลัก) -->
+            <div class="bundle-card" *ngIf="(hasOutboundServiceBundle() && outboundBundleDisplay) as obd">
+                <div class="bundle-icon">
+                    <img [src]="(obd.imageUrl || 'assets/imgs/service_bundle.png')" alt="Bundle Image">
                 </div>
-                <div class="bundle-desc">
-                    <ul>
-                        <li>{{ outboundServiceBundle?.description }}</li>
-                        <li *ngIf="hasOutboundPromotionalText()">{{ outboundServiceBundle?.promotionalText }}</li>
-                    </ul>
+                <div class="bundle-body">
+                    <div class="bundle-name">{{ (obd.serviceName || 'Bundle') }}</div>
                 </div>
-                <div class="info-divider"></div>
                 <div class="bundle-price">
-                    <span class="price">{{ outboundServiceBundle?.amountIncludingVat }} {{ outboundServiceBundle?.currency }}</span>
-                    <span class="old-price" *ngIf="hasOutboundOriginalPrice()">{{ outboundServiceBundle?.originalAmount }} {{ outboundServiceBundle?.currency }}</span>
-                    <span class="discount" *ngIf="hasOutboundDiscount()">-{{ outboundServiceBundle?.discountPercentage }}%</span>
+                    <div class="price">{{ (obd.amountIncludingVat || obd.amount) | number:'1.2-2' }} {{ obd.currency || 'THB' }}</div>
+                    <div class="old-price" *ngIf="hasOutboundOriginalPrice()">{{ obd.originalAmount | number:'1.2-2' }} {{ obd.currency }}</div>
+                    <div class="discount-pill" *ngIf="hasOutboundDiscount()">-{{ obd.discountPercentage }}%</div>
                 </div>
+                <div class="bundle-divider"></div>
+                <ul class="bundle-features">
+                    <li *ngFor="let f of getOutboundBundleFeatures()">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3.2 6.2L5.1 8L8.8 4.4" stroke="#4F4F4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ f }}
+                    </li>
+                    <li *ngIf="hasOutboundPromotionalText()">{{ obd.promotionalText }}</li>
+                </ul>
             </div>
+
+            <!-- กรณี bundle จากผู้โดยสารหลายรายการ: แสดงต่อกลุ่ม title ไม่ซ้ำ -->
+            <ng-container *ngIf="outboundBundleGroups && outboundBundleGroups.length > 0">
+                <div class="bundle-passenger" *ngFor="let g of outboundBundleGroups">
+                    <div class="bundle-passenger-header">
+                        <span>{{ g.passengers.length }} ผู้โดยสารซื้อ: {{ g.title }}</span>
+                    </div>
+                    <ol class="bundle-passenger-list">
+                        <li *ngFor="let p of g.passengers; let idx = index">{{ idx+1 }} {{ p.firstName }} {{ p.lastName }}</li>
+                    </ol>
+                    <div class="bundle-card">
+                        <div class="bundle-icon">
+                            <img [src]="(g.sample?.imageUrl || 'assets/imgs/service_bundle.png')" alt="Bundle Image">
+                        </div>
+                        <div class="bundle-body">
+                            <div class="bundle-name">{{ g.sample?.serviceName || g.title }}</div>
+                        </div>
+                        <div class="bundle-price">
+                            <div class="price">{{ (g.sample?.amountIncludingVat || g.sample?.amount) | number:'1.2-2' }} {{ g.sample?.currency || 'THB' }}</div>
+                            <div class="old-price" *ngIf="g.sample && g.sample.originalAmount !== g.sample.amount">{{ g.sample.originalAmount | number:'1.2-2' }} {{ g.sample.currency }}</div>
+                            <div class="discount-pill" *ngIf="g.sample && g.sample.discountPercentage > 0">-{{ g.sample.discountPercentage }}%</div>
+                        </div>
+                        <div class="bundle-divider"></div>
+                        <ul class="bundle-features">
+                            <li *ngFor="let f of (g.sample ? (g.sample.includedServices || []) : [])">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3.2 6.2L5.1 8L8.8 4.4" stroke="#4F4F4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                {{ (f.description || f.serviceName) }}
+                            </li>
+                            <li *ngIf="g.sample && g.sample.promotionalText">{{ g.sample.promotionalText }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- Inbound - Not selected state -->
+        <div class="no-bundle-group" *ngIf="!hasInboundServiceBundle() && !hasInboundPassengerBundle()">
+            <div class="bundle-subtitle">ขากลับ</div>
+            <div class="no-bundle-info">ไม่ได้เลือก service bundle</div>
         </div>
 
         <!-- Inbound Service Bundle -->
-        <div class="special-bundle" *ngIf="hasInboundServiceBundle()">
-            <div class="title-triptype">เทียวบินขากลับ</div>
-            <div class="bundle-title">{{ inboundServiceBundle?.serviceName }}</div>
-            <div class="bundle-detail">
-                <div class="bundle-img">
-                    <img [src]="inboundServiceBundle?.imageUrl || 'assets/imgs/service_bundle.png'" alt="Bundle Image">
+        <div class="service-bundle-section" *ngIf="hasInboundServiceBundle() || hasInboundPassengerBundle()">
+            <div class="bundle-subtitle">ขากลับ</div>
+            <!-- การ์ดหลักจาก API ถ้ามี -->
+            <div class="bundle-card" *ngIf="(hasInboundServiceBundle() && inboundBundleDisplay) as ibd">
+                <div class="bundle-icon">
+                    <img [src]="(ibd.imageUrl || 'assets/imgs/service_bundle.png')" alt="Bundle Image">
                 </div>
-                <div class="bundle-desc">
-                    <ul>
-                        <li>{{ inboundServiceBundle?.description }}</li>
-                        <li *ngIf="hasInboundPromotionalText()">{{ inboundServiceBundle?.promotionalText }}</li>
-                    </ul>
+                <div class="bundle-body">
+                    <div class="bundle-name">{{ (ibd.serviceName || 'Bundle') }}</div>
                 </div>
-                <div class="info-divider"></div>
                 <div class="bundle-price">
-                    <span class="price">{{ inboundServiceBundle?.amountIncludingVat }} {{ inboundServiceBundle?.currency }}</span>
-                    <span class="old-price" *ngIf="hasInboundOriginalPrice()">{{ inboundServiceBundle?.originalAmount }} {{ inboundServiceBundle?.currency }}</span>
-                    <span class="discount" *ngIf="hasInboundDiscount()">-{{ inboundServiceBundle?.discountPercentage }}%</span>
+                    <div class="price">{{ (ibd.amountIncludingVat || ibd.amount) | number:'1.2-2' }} {{ ibd.currency || 'THB' }}</div>
+                    <div class="price-discount" *ngIf="hasInboundOriginalPrice()">{{ ibd.originalAmount | number:'1.2-2' }} {{ ibd.currency }}  <span class="discount-pill" *ngIf="hasInboundDiscount()">-{{ ibd.discountPercentage }}%</span></div>
                 </div>
+                <div class="bundle-divider"></div>
+                <ul class="bundle-features">
+                    <li *ngFor="let f of getInboundBundleFeatures()">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3.2 6.2L5.1 8L8.8 4.4" stroke="#4F4F4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ f }}
+                    </li>
+                    <li *ngIf="hasInboundPromotionalText()">{{ ibd.promotionalText }}</li>
+                </ul>
             </div>
+
+            <!-- กลุ่มจากผู้โดยสาร ไม่ซ้ำตาม title -->
+            <ng-container *ngIf="inboundBundleGroups && inboundBundleGroups.length > 0">
+                <div class="bundle-passenger" *ngFor="let g of inboundBundleGroups">
+                    <div class="bundle-passenger-header">
+                        <span>{{ g.passengers.length }} ผู้โดยสารซื้อ: {{ g.title }}</span>
+                    </div>
+                    <ol class="bundle-passenger-list">
+                        <li *ngFor="let p of g.passengers; let idx = index">{{ idx+1 }} {{ p.firstName }} {{ p.lastName }}</li>
+                    </ol>
+                    <div class="bundle-card">
+                        <div class="bundle-icon">
+                            <img [src]="(g.sample?.imageUrl || 'assets/imgs/service_bundle.png')" alt="Bundle Image">
+                        </div>
+                        <div class="bundle-body">
+                            <div class="bundle-name">{{ g.sample?.serviceName || g.title }}</div>
+                        </div>
+                        <div class="bundle-price">
+                            <div class="price">{{ (g.sample?.amountIncludingVat || g.sample?.amount) | number:'1.2-2' }} {{ g.sample?.currency || 'THB' }}</div>
+                            <div class="old-price" *ngIf="g.sample && g.sample.originalAmount !== g.sample.amount">{{ g.sample.originalAmount | number:'1.2-2' }} {{ g.sample.currency }}</div>
+                            <div class="discount-pill" *ngIf="g.sample && g.sample.discountPercentage > 0">-{{ g.sample.discountPercentage }}%</div>
+                        </div>
+                        <div class="bundle-divider"></div>
+                        <ul class="bundle-features">
+                            <li *ngFor="let f of (g.sample ? (g.sample.includedServices || []) : [])">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#4F4F4F" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3.2 6.2L5.1 8L8.8 4.4" stroke="#4F4F4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                {{ (f.description || f.serviceName) }}
+                            </li>
+                            <li *ngIf="g.sample && g.sample.promotionalText">{{ g.sample.promotionalText }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </ng-container>
         </div>
 
         <div class="review-page-actions-space"></div>
