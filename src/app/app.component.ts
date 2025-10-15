@@ -76,7 +76,7 @@ export class AppComponent {
         }),
         switchMap(() => this.apiService.getPDPA(userId)),
         catchError((err) => {
-          this.router.navigate(['/error']);
+          this.router.navigate(['/passenger-not-found']);
           return of(null);
         })
       )

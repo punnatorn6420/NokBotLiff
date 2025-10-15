@@ -31,6 +31,7 @@ import { LoadingComponent } from './loading/loading.component';
 import { HttpErrorInterceptorInterceptor } from './http-error-interceptor.interceptor';
 import { AlertErrorComponent } from './alert-error/alert-error.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { PassengerNotFoundComponent } from './passenger-not-found/passenger-not-found.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new MultiTranslateHttpLoader(http, [
@@ -58,7 +59,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     ConfirmPayComponent,
     CounterServicePageComponent,
     LoadingComponent,
-    AlertErrorComponent
+    AlertErrorComponent,
+    PassengerNotFoundComponent
   ],
   imports: [
     BrowserModule,
