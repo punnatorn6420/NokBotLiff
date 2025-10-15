@@ -114,6 +114,9 @@ export class FlightSeatComponent {
   // ตัวแปรเก็บข้อมูล seatmap แยกตาม outbound และ inbound
   outboundSeatMap: any[][] = [];
   inboundSeatMap: any[][] = [];
+  // เก็บ seatmap แบบแยกตาม segment (เช่น outbound1, outbound2)
+  outboundSeatMaps: any[][][] = [];
+  inboundSeatMaps: any[][][] = [];
 
   isConnectFlight: boolean = true;
   hasInbound: boolean = true;
@@ -940,33 +943,33 @@ export class FlightSeatComponent {
             }
           });
         } 
-        else {
-          // ไม่มีข้อมูลแถวนี้ - ใส่ ที่นั่งจองแล้ว ทั้งหมด
-          const seatPositions = ['A', 'B', 'C', null, 'H', 'J', 'K'];
+        // else {
+        //   // ไม่มีข้อมูลแถวนี้ - ใส่ ที่นั่งจองแล้ว ทั้งหมด
+        //   const seatPositions = ['A', 'B', 'C', null, 'H', 'J', 'K'];
           
-          seatPositions.forEach((position, index) => {
-            if (position === null) {
-              seatRow.push(null as any);
-            } else {
-              const seatMapItem: SeatMap = {
-                label: `${rowNumber} ${position}`,
-                status: 'unavailable',
-                type: 'regular',
-                price: 0,
-                exit: false,
-                seatId: `${rowNumber}:${position}`,
-                serviceCode: '',
-                amount: 0,
-                vat: 0,
-                amountIncludingVat: 0,
-                currency: 'THB',
-                wingSeat: false,
-                preBlockedSeat: false
-              };
-              seatRow.push(seatMapItem);
-            }
-          });
-        }
+        //   seatPositions.forEach((position, index) => {
+        //     if (position === null) {
+        //       seatRow.push(null as any);
+        //     } else {
+        //       const seatMapItem: SeatMap = {
+        //         label: `${rowNumber} ${position}`,
+        //         status: 'unavailable',
+        //         type: 'regular',
+        //         price: 0,
+        //         exit: false,
+        //         seatId: `${rowNumber}:${position}`,
+        //         serviceCode: '',
+        //         amount: 0,
+        //         vat: 0,
+        //         amountIncludingVat: 0,
+        //         currency: 'THB',
+        //         wingSeat: false,
+        //         preBlockedSeat: false
+        //       };
+        //       seatRow.push(seatMapItem);
+        //     }
+        //   });
+        // }
         
         seatMap.push(seatRow);
       });
@@ -1144,17 +1147,27 @@ export class FlightSeatComponent {
     
     if (this.currentSegmentKey.startsWith('outbound')) {
       // ใช้ seatmap ของ outbound
-      if (this.outboundSeatMap.length > 0) {
-        this.seatMap = JSON.parse(JSON.stringify(this.outboundSeatMap)); // deep copy
-        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น outbound seatmap');
+      const segIdx = (parseInt(this.currentSegmentKey.replace(/\D/g, ''), 10) || 1) - 1;
+      const segSeatMap = this.outboundSeatMaps[segIdx];
+      if (segSeatMap && segSeatMap.length > 0) {
+        this.seatMap = JSON.parse(JSON.stringify(segSeatMap));
+        console.log('updateSeatMapForCurrentSegment - ใช้ outbound seatmap ของ segment', segIdx + 1);
+      } else if (this.outboundSeatMap.length > 0) {
+        this.seatMap = JSON.parse(JSON.stringify(this.outboundSeatMap)); // fallback: เดิม
+        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น outbound seatmap (fallback)');
       } else {
         console.log('updateSeatMapForCurrentSegment - outbound seatmap ยังไม่พร้อม');
       }
     } else if (this.currentSegmentKey.startsWith('inbound')) {
       // ใช้ seatmap ของ inbound
-      if (this.inboundSeatMap.length > 0) {
-        this.seatMap = JSON.parse(JSON.stringify(this.inboundSeatMap)); // deep copy
-        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น inbound seatmap');
+      const segIdx = (parseInt(this.currentSegmentKey.replace(/\D/g, ''), 10) || 1) - 1;
+      const segSeatMap = this.inboundSeatMaps[segIdx];
+      if (segSeatMap && segSeatMap.length > 0) {
+        this.seatMap = JSON.parse(JSON.stringify(segSeatMap));
+        console.log('updateSeatMapForCurrentSegment - ใช้ inbound seatmap ของ segment', segIdx + 1);
+      } else if (this.inboundSeatMap.length > 0) {
+        this.seatMap = JSON.parse(JSON.stringify(this.inboundSeatMap)); // fallback: เดิม
+        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น inbound seatmap (fallback)');
       } else {
         console.log('updateSeatMapForCurrentSegment - inbound seatmap ยังไม่พร้อม');
       }
@@ -2001,51 +2014,69 @@ export class FlightSeatComponent {
   updatePricingFromAPI(seatMapPromise: Promise<any>, direction: 'outbound' | 'inbound') {
     try {
       seatMapPromise.then((seatMapData: any) => {
-        if (seatMapData && seatMapData.cabinInfos && seatMapData.cabinInfos.length > 0) {
+        // รวม seatMaps จากทั้งรูปแบบ API เก่า (cabinInfos)
+        // และรูปแบบใหม่ (data[] -> cabinInfos/canbins)
+        const aggregateSeatMaps: any[] = [];
+
+        if (seatMapData?.cabinInfos?.length > 0) {
           const cabinInfo = seatMapData.cabinInfos[0];
-          
-          // ตรวจสอบ service bundle ตาม direction
-          const flightData = this.passDataService.getFlightData();
-          let hasService = false;
-          
-          if (direction === 'outbound' && flightData?.outbound_flight_select?.service_bundle) {
-            hasService = flightData.outbound_flight_select.service_bundle.serviceName !== '';
-          } else if (direction === 'inbound' && flightData?.inbound_flight_select?.service_bundle) {
-            hasService = flightData.inbound_flight_select.service_bundle.serviceName !== '';
+          if (Array.isArray(cabinInfo.seatMaps)) {
+            aggregateSeatMaps.push(...cabinInfo.seatMaps);
           }
-          
-          console.log(`${direction} hasService:`, hasService);
-          
-          // วนลูปผ่านทุก seat เพื่อหาราคาตาม serviceCode
-          cabinInfo.seatMaps.forEach((row: any) => {
-            row.seats.forEach((seat: any) => {
-              if (seat.available) {
-                switch (seat.serviceCode) {
-                  case 'S500':
-                    if (seat.amountIncludingVat > this.premiumPlusPrice) {
-                      this.premiumPlusPrice = seat.amountIncludingVat;
-                    }
-                    break;
-                  case 'S300':
-                    if (seat.amountIncludingVat > this.premiumPrice) {
-                      this.premiumPrice = seat.amountIncludingVat;
-                    }
-                    break;
-                  case 'S150':
-                    if (seat.amountIncludingVat > this.regularPrice) {
-                      this.regularPrice = seat.amountIncludingVat;
-                    }
-                    break;
-                }
-              }
-            });
+        } else if (Array.isArray(seatMapData?.data) && seatMapData.data.length > 0) {
+          seatMapData.data.forEach((flightObj: any) => {
+            const cabinLike = (flightObj?.cabinInfos && flightObj.cabinInfos[0])
+              || (flightObj?.canbins && flightObj.canbins[0])
+              || null;
+            if (cabinLike?.seatMaps && Array.isArray(cabinLike.seatMaps)) {
+              aggregateSeatMaps.push(...cabinLike.seatMaps);
+            }
           });
-          
-          console.log(`updatePricingFromAPI ${direction} - premiumPlusPrice:`, this.premiumPlusPrice);
-          console.log(`updatePricingFromAPI ${direction} - premiumPrice:`, this.premiumPrice);
-          console.log(`updatePricingFromAPI ${direction} - regularPrice:`, this.regularPrice);
-          console.log(`updatePricingFromAPI ${direction} - hasService:`, hasService);
         }
+
+        // ถ้าไม่พบ seatMaps ก็จบการทำงาน
+        if (aggregateSeatMaps.length === 0) return;
+
+        // ตรวจสอบ service bundle ตาม direction (ใช้เพื่อ debug/log)
+        const flightData = this.passDataService.getFlightData();
+        let hasService = false;
+        if (direction === 'outbound' && flightData?.outbound_flight_select?.service_bundle) {
+          hasService = flightData.outbound_flight_select.service_bundle.serviceName !== '';
+        } else if (direction === 'inbound' && flightData?.inbound_flight_select?.service_bundle) {
+          hasService = flightData.inbound_flight_select.service_bundle.serviceName !== '';
+        }
+        console.log(`${direction} hasService:`, hasService);
+
+        // วนลูปผ่านทุก seat เพื่อหา Max ราคาแต่ละประเภทบริการ
+        aggregateSeatMaps.forEach((row: any) => {
+          const seats = Array.isArray(row?.seats) ? row.seats : [];
+          seats.forEach((seat: any) => {
+            if (seat?.available) {
+              switch (seat.serviceCode) {
+                case 'S500':
+                  if (seat.amountIncludingVat > this.premiumPlusPrice) {
+                    this.premiumPlusPrice = seat.amountIncludingVat;
+                  }
+                  break;
+                case 'S300':
+                  if (seat.amountIncludingVat > this.premiumPrice) {
+                    this.premiumPrice = seat.amountIncludingVat;
+                  }
+                  break;
+                case 'S150':
+                  if (seat.amountIncludingVat > this.regularPrice) {
+                    this.regularPrice = seat.amountIncludingVat;
+                  }
+                  break;
+              }
+            }
+          });
+        });
+
+        console.log(`updatePricingFromAPI ${direction} - premiumPlusPrice:`, this.premiumPlusPrice);
+        console.log(`updatePricingFromAPI ${direction} - premiumPrice:`, this.premiumPrice);
+        console.log(`updatePricingFromAPI ${direction} - regularPrice:`, this.regularPrice);
+        console.log(`updatePricingFromAPI ${direction} - hasService:`, hasService);
       }).catch((error) => {
         console.error(`Error in updatePricingFromAPI promise for ${direction}:`, error);
       });
@@ -2127,83 +2158,103 @@ export class FlightSeatComponent {
 
       let loadedCount = 0;
       let totalToLoad = 0;
-      const seatMapPromises: Promise<any>[] = [];
 
-      // โหลดข้อมูล seatmap สำหรับ outbound flights
+      // โหลดข้อมูล seatmap สำหรับ outbound: เรียกครั้งเดียวต่อทิศทาง
       if (flightData.outbound_flight_select?.flight_detail) {
         const outboundFlights = flightData.outbound_flight_select.flight_detail;
-        totalToLoad += outboundFlights.length;
-        
-        outboundFlights.forEach((flight: any, index: number) => {
-          const journeyKey = flightData.outbound_flight_select.journey_key;
-          const fareKey = flightData.outbound_flight_select.fare_key;
-          
-          if (journeyKey && fareKey) {
-            const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
-            this.updatePricingFromAPI(promise, 'outbound');
-            seatMapPromises.push(promise);
-            
-            promise.then((data: any) => {
-              console.log(`SeatMap Outbound ${index + 1}:`, data);
-              if (data && data.cabinInfos && Array.isArray(data.cabinInfos)) {
-                if (index === 0) {
-                  this.outboundSeatMap = this.transformCabinInfoToSeatMap(data);
-                }
-                console.log(`outboundSeatMap ${index + 1} loaded:`, this.outboundSeatMap.length, "rows");
-              }
-              loadedCount++;
-              this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-            }).catch((error) => {
-              console.error(`Error loading outbound seatmap ${index + 1}:`, error);
-              loadedCount++;
-              this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-            });
-          } else {
+        const journeyKey = flightData.outbound_flight_select.journey_key;
+        const fareKey = flightData.outbound_flight_select.fare_key;
+        if (journeyKey && fareKey) {
+          totalToLoad += 1;
+          const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
+          this.updatePricingFromAPI(promise, 'outbound');
+          promise.then((data: any) => {
+            console.log('SeatMap Outbound (merged):', data);
+            this.processSeatMapResponseForDirection(data, 'outbound', outboundFlights.length);
             loadedCount++;
             this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-          }
-        });
+          }).catch((error) => {
+            console.error('Error loading outbound seatmap:', error);
+            loadedCount++;
+            this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
+          });
+        }
       }
 
-      // โหลดข้อมูล seatmap สำหรับ inbound flights (สำหรับ round-trip)
+      // โหลดข้อมูล seatmap สำหรับ inbound: เรียกครั้งเดียวต่อทิศทาง
       if (flightData.inbound_flight_select?.flight_detail) {
         const inboundFlights = flightData.inbound_flight_select.flight_detail;
-        totalToLoad += inboundFlights.length;
-        
-        inboundFlights.forEach((flight: any, index: number) => {
-          const journeyKey = flightData.inbound_flight_select.journey_key;
-          const fareKey = flightData.inbound_flight_select.fare_key;
-          
-          if (journeyKey && fareKey) {
-            const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
-            this.updatePricingFromAPI(promise, 'inbound');
-            seatMapPromises.push(promise);
-            
-            promise.then((data: any) => {
-              console.log(`SeatMap Inbound ${index + 1}:`, data);
-              if (data && data.cabinInfos && Array.isArray(data.cabinInfos)) {
-                if (index === 0) {
-                  this.inboundSeatMap = this.transformCabinInfoToSeatMap(data);
-                }
-                console.log(`inboundSeatMap ${index + 1} loaded:`, this.inboundSeatMap.length, "rows");
-              }
-              loadedCount++;
-              this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-            }).catch((error) => {
-              console.error(`Error loading inbound seatmap ${index + 1}:`, error);
-              loadedCount++;
-              this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-            });
-          } else {
+        const journeyKey = flightData.inbound_flight_select.journey_key;
+        const fareKey = flightData.inbound_flight_select.fare_key;
+        if (journeyKey && fareKey) {
+          totalToLoad += 1;
+          const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
+          this.updatePricingFromAPI(promise, 'inbound');
+          promise.then((data: any) => {
+            console.log('SeatMap Inbound (merged):', data);
+            this.processSeatMapResponseForDirection(data, 'inbound', inboundFlights.length);
             loadedCount++;
             this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
-          }
-        });
+          }).catch((error) => {
+            console.error('Error loading inbound seatmap:', error);
+            loadedCount++;
+            this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
+          });
+        }
       }
 
-      console.log(`loadSeatMapData - totalToLoad: ${totalToLoad}, seatMapPromises: ${seatMapPromises.length}`);
+      console.log(`loadSeatMapData - totalToLoad: ${totalToLoad}`);
     } catch (error) {
       console.error('Error in loadSeatMapData:', error);
+    }
+  }
+
+  // แปลง response seat map ที่อาจรวมหลายเครื่องในครั้งเดียว และกระจายลงตาม segment
+  private processSeatMapResponseForDirection(data: any, direction: 'outbound' | 'inbound', segmentCount: number) {
+    try {
+      // กรณี API เดิม: cabinInfos เดียว
+      if (data && data.cabinInfos && Array.isArray(data.cabinInfos)) {
+        const transformed = this.transformCabinInfoToSeatMap(data as CabinInfoResponse);
+        if (direction === 'outbound') {
+          this.outboundSeatMap = transformed;
+          // กระจายให้ครบทุก segment ถ้าไม่มีข้อมูลราย segment
+          this.outboundSeatMaps = Array.from({ length: Math.max(1, segmentCount) }, () => transformed);
+        } else {
+          this.inboundSeatMap = transformed;
+          this.inboundSeatMaps = Array.from({ length: Math.max(1, segmentCount) }, () => transformed);
+        }
+        return;
+      }
+
+      // กรณีใหม่: data.data เป็น array ของเครื่อง/segment
+      const flightsArray = (data && Array.isArray(data.data)) ? data.data : [];
+      if (flightsArray.length > 0) {
+        const mapsPerSegment: any[][][] = [];
+        flightsArray.forEach((flightObj: any, idx: number) => {
+          const cabinLike = (flightObj && flightObj.cabinInfos && flightObj.cabinInfos[0])
+            || (flightObj && flightObj.canbins && flightObj.canbins[0])
+            || null;
+          const seatMaps = cabinLike && Array.isArray(cabinLike.seatMaps) ? cabinLike.seatMaps : [];
+          // สร้าง wrapper ให้ใช้ทรานส์ฟอร์มเดิมได้
+          const seatCount = seatMaps.reduce((sum: number, r: any) => sum + ((r && Array.isArray(r.seats)) ? r.seats.length : 0), 0);
+          const wrapper: CabinInfoResponse = { cabinInfos: [{ cabinName: cabinLike?.cabinName || 'ECONOMY', seatCount, seatMaps }] as any } as CabinInfoResponse;
+          const transformed = this.transformCabinInfoToSeatMap(wrapper);
+          mapsPerSegment[idx] = transformed;
+        });
+
+        if (direction === 'outbound') {
+          this.outboundSeatMaps = mapsPerSegment;
+          this.outboundSeatMap = mapsPerSegment[0] || [];
+        } else {
+          this.inboundSeatMaps = mapsPerSegment;
+          this.inboundSeatMap = mapsPerSegment[0] || [];
+        }
+        return;
+      }
+
+      console.warn('processSeatMapResponseForDirection - ไม่พบรูปแบบข้อมูลที่รองรับ', { direction, segmentCount });
+    } catch (e) {
+      console.error('processSeatMapResponseForDirection - error:', e);
     }
   }
 

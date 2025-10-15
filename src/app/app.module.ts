@@ -21,7 +21,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { MultiTranslateHttpLoader } from './i18n/multi-translate-loader';
 import { APP_BASE_HREF } from '@angular/common';
 import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from './review-page/review-page.component';
@@ -33,7 +33,16 @@ import { AlertErrorComponent } from './alert-error/alert-error.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/', '.json');
+  return new MultiTranslateHttpLoader(http, [
+    { prefix: './assets/i18n/', suffix: '/common.json' },
+    { prefix: './assets/i18n/', suffix: '/passenger.json' },
+    { prefix: './assets/i18n/', suffix: '/seat.json' },
+    { prefix: './assets/i18n/', suffix: '/review.json' },
+    { prefix: './assets/i18n/', suffix: '/confirm.json' },
+    { prefix: './assets/i18n/', suffix: '/counter.json' },
+    { prefix: './assets/i18n/', suffix: '/pdpa.json' },
+    { prefix: './assets/i18n/', suffix: '/dialog.json' }
+  ]);
 }
 
 

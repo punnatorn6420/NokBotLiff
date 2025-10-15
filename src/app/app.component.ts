@@ -4,6 +4,8 @@ import { PassDataService } from './pass-data.service';
 import { LiffService } from './liff.service';
 import { ApiService } from './api.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -62,22 +64,29 @@ export class AppComponent {
   }
 
    fetchInitialData(userId: string) {
-    this.apiService.getPDPA(userId).subscribe((response: any) => {
-      console.log(response);
-      if (response.consent) {
-        this.router.navigate(['/form']);
-      }
-      else {
-        this.router.navigate(['/pdpa']);
-      }
-    });
-
-    this.apiService.getPassengerInfo(userId).subscribe((response: any) => {
-      console.log(response.flight);
-      const apiLang = (response?.flight?.flight_search?.language || '').toString().toLowerCase();
-      const lang = apiLang === 'en' ? 'en' : 'th';
-      this.passDataService.setLanguage(lang);
-      this.passDataService.setPassengerInfo(response.flight);
-    });
+    this.apiService
+      .getPassengerInfo(userId)
+      .pipe(
+        tap((response: any) => {
+          console.log(response?.flight);
+          const apiLang = (response?.flight?.flight_search?.language || '').toString().toLowerCase();
+          const lang = apiLang === 'en' ? 'en' : 'th';
+          this.passDataService.setLanguage(lang);
+          this.passDataService.setPassengerInfo(response.flight);
+        }),
+        switchMap(() => this.apiService.getPDPA(userId)),
+        catchError((err) => {
+          this.router.navigate(['/error']);
+          return of(null);
+        })
+      )
+      .subscribe((response: any) => {
+        if (!response) return; 
+        if (response.consent) {
+          this.router.navigate(['/form']);
+        } else {
+          this.router.navigate(['/pdpa']);
+        }
+      });
   }
 }

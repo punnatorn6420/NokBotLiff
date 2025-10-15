@@ -57,4 +57,14 @@ export class ApiService {
     const headers = new HttpHeaders().set('X-Api-Key', 'dev');
     return this.http.post(`${this.baseUrl+'liff'}/pricing-summary-service`, payload, { headers });
   }
+
+  createBooking(payload: any) {
+    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/get-create-booking`, payload, { headers });
+  }
+
+  retrieveBooking(recordLocator: string) {
+    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/get-retrieve-booking`, { recordLocator }, { headers });
+  }
 }

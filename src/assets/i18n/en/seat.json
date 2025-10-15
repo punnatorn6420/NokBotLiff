@@ -1,0 +1,22 @@
+{
+  "SELECT_SEAT_OUTBOUND": "Select Seat Outbound",
+  "SELECT_SEAT_INBOUND": "Select Seat Inbound",
+  "DEPARTURE": "Departure",
+  "RETURN": "Return",
+  "ONE_WAY": "One Way",
+  "SEAT_SELECTION_FEES_VARY_BY_SEAT_TYPE": "Seat selection fees vary by seat type.",
+  "Nok_Premium_Seat_Front_Row": "Nok Premium Seat Front Row",
+  "Nok_Premium_Seat": "Nok Premium Seat",
+  "Nok_Happy_Seat": "Nok Happy Seat",
+  "Booked_Seat": "Booked Seat",
+  "Unavailable_Blocked": "Unavailable / Blocked",
+  "Selected_Seat": "Selected Seat",
+  "Cancel_Seat": "Cancel Selection",
+  "Confirm_Seat": "Confirm",
+  "NEXT_STEP_NO_SELECT_SEAT": "Continue Without Seat Selection",
+
+  
+  "ALERT_EXIT_CONFIRM": "I understand"
+}
+
+

@@ -1,0 +1,51 @@
+{
+    "Dialog_confirmform_data": {
+    "CHECK_PASSENGER_DATA": "Review Passenger Details",
+        "CHECK_PASSENGER_DATA_MESSAGE": "Before proceeding, please ensure all passenger information is correct.",
+        "CHECK_AGAIN": "Review Again",
+        "CONFIRM": "Confirm"
+    },
+
+    "Dialog_alert_offers_seat": {
+        "TITLE": "You can purchase additional seats",
+        "MESSAGE": "Other passengers can still select seats, with fees depending on the seat type.",
+        "INTERESTED": "Interested",
+        "UNDERSTAND": "I understand"
+    },
+
+    "Dialog_alert_exit": {
+        "TITLE": "You’ve chosen an emergency exit row seat.",
+        "MESSAGE": "To travel in this seat you must:",
+        "MESSAGE_1": "Be 16 years or older.",
+        "MESSAGE_2": "Be able to understand the instructions given by the flight attendant.",
+        "MESSAGE_3": "Have sufficient mobility, strength and dexterity to operate the emergency exit, i.e. must be able bodied.",
+        "MESSAGE_4": "Did not request for wheelchair service.",
+        "MESSAGE_5": "Be able to visually determine if the exit is safe to open.",
+        "MESSAGE_6": "Not require special handling or the use of a mobility aid or medical device.",
+        "MESSAGE_7": "Not be solely responsible for another person.",
+        "MESSAGE_8": "Not have condition that might cause them bodily harm by operating the exit.",
+        "MESSAGE_9": "Not require a seatbelt extension extender as this presents a tripping hazard.",
+        "MESSAGE_10": "Did not request for wheelchair service.",
+        "CONFIRM": "I understand"
+    },
+
+    "Dialog_alert_select_seat": {
+        "TITLE": "Please select your seat",
+        "MESSAGE": "Because your selected add-on package includes free seat selection at no extra cost.",
+        "CONFIRM": "Select Seat"
+    },
+
+    "Dialog_alert_select_seat_not_enough": {
+        "TITLE": "Seat Selection Incomplete",
+        "MESSAGE_FIRST": "Some passengers haven’t selected their seats yet.",
+        "MESSAGE_SECOND": "Please review and select seats for everyone.",
+        "CONFIRM": "Select Seats"
+    },
+
+    "Dialog_alert_select_seat_not_include_package": {
+        "TITLE": "Premium Seat Selection Not Included",
+        "MESSAGE": "Your current seat package only covers Nok Happy Seats. If you choose Nok Premium Seat Front Row or Nok Premium Seat, you’ll need to pay the full seat selection fee.",
+        "CONFIRM": "Yes, I Want It",
+        "CANCEL": "Cancel Selection"
+    }
+}

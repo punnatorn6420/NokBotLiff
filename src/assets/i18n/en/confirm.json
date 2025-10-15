@@ -1,0 +1,27 @@
+{
+  "CONFRIM_PAGE_FARE_TITLE": "Fare Details",
+  "CONFRIM_PAGE_Subtotal_Outbound": "Subtotal (Outbound)",
+  "CONFRIM_PAGE_Subtotal_Inbound": "Subtotal (Return)",
+  "CONFIRM_PAGE_Additional_Services": "Additional Services",
+  "CONFIRM_PAGE_Seat_Selection": "Seat Selection",
+  "CONFIRM_PAGE_Total_Add-on_Package_Fee": "Total Add-on Package Fee",
+  "CONFIRM_PAGE_Taxes": "Taxes",
+  "CONFIRM_PAGE_Total_Tax": "Total Tax",
+  "CONFIRM_PAGE_Payment_Method": "Payment Method",
+  "CONFIRM_PAGE_Payment_Service_Fee": "Payment Service Fee",
+  "CONFIRM_PAFE_per_transaction": "per transaction",
+  "CONFIRM_PAGE_Grand_Total": "Grand Total",
+  "CONFIRM_PAGE_Including_service_fees": "Including service fees",
+  "CONFIRM_PAGE_Back_to_Previous_Step": "Back",
+  "CONFIRM_PAGE_Confirm": "Confirm Booking",
+  "CONFIRM_PAGE_Direction_Outbound": "Outbound",
+  "CONFIRM_PAGE_Direction_Inbound": "Inbound",
+  "CONFIRM_PAGE_Pax_Adult": "Adult",
+  "CONFIRM_PAGE_Pax_Child": "Child",
+  "CONFIRM_PAGE_Pax_Infant": "Infant",
+  "CONFIRM_PAGE_Service_Bundle": "Service Bundle",
+  "CONFIRM_PAGE_Connecting_Fee_Title": "Flight Connecting Fee",
+  "CONFIRM_PAGE_Connecting_Fee_Total": "Total Connecting Fee"
+}
+
+

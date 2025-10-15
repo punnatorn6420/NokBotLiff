@@ -221,8 +221,8 @@
                 <div class="service-bundle-container" *ngIf="canShowBundles && ((visibleOutboundBundles?.length || 0) > 0 || (visibleReturnBundles?.length || 0) > 0)">
                     <div class="service-bundle-outbound" *ngIf="visibleOutboundBundles.length > 0">
                         <div class="service-bundle-header">
-                            <span>เลือก Bundle <span class="route-text">- ขาไป</span></span>
-                            <span class="muted">| Optional service</span>
+                            <span>{{ 'BUNDLE_SELECT' | translate }} <span class="route-text">- {{ 'OUTBOUND' | translate }}</span></span>
+                            <span class="muted">| {{ 'OPTIONAL_SERVICE' | translate }}</span>
                         </div>
                         <div class="bundle-list">
                             <div class="bundle-card"
@@ -258,15 +258,15 @@
                         </div>
                         <div *ngIf="currentOutboundBundleList.length > 4" style="margin-top: 12px; display: flex; justify-content: center;">
                             <button type="button" class="open-close-bundle-button" (click)="toggleShowAllOutbound()">
-                                {{ showAllOutboundBundles ? 'ย่อข้อมูล bundle' : 'ดูข้อมูล bundle เพิ่มเติม' }}
+                                {{ showAllOutboundBundles ? ( 'BUNDLE_COLLAPSE' | translate ) : ( 'BUNDLE_EXPAND' | translate ) }}
                             </button>
                         </div>
                     </div>
 
                     <div class="service-bundle-inbound" *ngIf="visibleReturnBundles.length > 0">
                         <div class="service-bundle-header">
-                            <span>เลือก Bundle <span class="route-text">- ขากลับ</span></span>
-                            <span class="muted">| Optional service</span>
+                            <span>{{ 'BUNDLE_SELECT' | translate }} <span class="route-text">- {{ 'INBOUND' | translate }}</span></span>
+                            <span class="muted">| {{ 'OPTIONAL_SERVICE' | translate }}</span>
                         </div>
                         <div class="bundle-list">
                             <div class="bundle-card"
@@ -302,7 +302,7 @@
                         </div>
                         <div *ngIf="currentReturnBundleList.length > 4" style="margin-top: 12px; display: flex; justify-content: center;">
                             <button type="button" class="open-close-bundle-button" (click)="toggleShowAllReturn()">
-                                {{ showAllReturnBundles ? 'ย่อข้อมูล bundle' : 'ดูข้อมูล bundle เพิ่มเติม' }}
+                                {{ showAllReturnBundles ? ( 'BUNDLE_COLLAPSE' | translate ) : ( 'BUNDLE_EXPAND' | translate ) }}
                             </button>
                         </div>
                     </div>
@@ -313,7 +313,7 @@
                         <div class="yellow-checkbox" [class.checked]="currentForm.get('needsSpecialAssistance')?.value === true" (click)="toggleMainAssistance()">
                             <div class="checkmark" *ngIf="currentForm.get('needsSpecialAssistance')?.value === true">✓</div>
                         </div>
-                        <span class="main-title">ผู้โดยสารต้องการความช่วยเหลือพิเศษ</span>
+                        <span class="main-title">{{ 'SPECIAL_ASSISTANCE_TITLE' | translate }}</span>
                     </div>
                     
                     <div class="assistance-options" *ngIf="currentForm.get('needsSpecialAssistance')?.value === true">
@@ -321,60 +321,60 @@
                             <div class="white-checkbox" [class.checked]="currentForm.get('disabledVision')?.value === true" (click)="toggleOption('disabledVision')">
                                 <div class="checkmark" *ngIf="currentForm.get('disabledVision')?.value === true">✓</div>
                             </div>
-                            <span>ผู้บกพร่องทางสายตา/ตาบอด</span>
+                            <span>{{ 'ASSISTANCE_DISABLED_VISION' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('disabledHearing')?.value === true" (click)="toggleOption('disabledHearing')">
                                 <div class="checkmark" *ngIf="currentForm.get('disabledHearing')?.value === true">✓</div>
                             </div>
-                            <span>ผู้บกพร่องทางการได้ยิน/หูหนวก</span>
+                            <span>{{ 'ASSISTANCE_DISABLED_HEARING' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('monk')?.value === true" (click)="toggleOption('monk')">
                                 <div class="checkmark" *ngIf="currentForm.get('monk')?.value === true">✓</div>
                             </div>
-                            <span>พระภิกษุ</span>
+                            <span>{{ 'ASSISTANCE_MONK' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('nun')?.value === true" (click)="toggleOption('nun')">
                                 <div class="checkmark" *ngIf="currentForm.get('nun')?.value === true">✓</div>
                             </div>
-                            <span>แม่ชี</span>
+                            <span>{{ 'ASSISTANCE_NUN' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('pregnantWoman')?.value === true" (click)="toggleOption('pregnantWoman')">
                                 <div class="checkmark" *ngIf="currentForm.get('pregnantWoman')?.value === true">✓</div>
                             </div>
-                            <span>สตรีตั้งครรภ์</span>
+                            <span>{{ 'ASSISTANCE_PREGNANT_WOMAN' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('wheelchairUser')?.value === true" (click)="toggleOption('wheelchairUser')">
                                 <div class="checkmark" *ngIf="currentForm.get('wheelchairUser')?.value === true">✓</div>
                             </div>
-                            <span>รถเข็น วีลแชร์</span>
+                            <span>{{ 'ASSISTANCE_WHEELCHAIR_USER' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('unaccompaniedMinor')?.value === true" (click)="toggleOption('unaccompaniedMinor')">
                                 <div class="checkmark" *ngIf="currentForm.get('unaccompaniedMinor')?.value === true">✓</div>
                             </div>
-                            <span>เด็กเดินทางคนเดียว</span>
+                            <span>{{ 'ASSISTANCE_UNACCOMPANIED_MINOR' | translate }}</span>
                         </div>
                         
                         <div class="assistance-option">
                             <div class="white-checkbox" [class.checked]="currentForm.get('other')?.value === true" (click)="toggleOption('other')">
                                 <div class="checkmark" *ngIf="currentForm.get('other')?.value === true">✓</div>
                             </div>
-                            <span>อื่นๆ<input matInput formControlName="otherReason" placeholder="โปรดระบุ"></span>
+                            <span>{{ 'ASSISTANCE_OTHER' | translate }}<input matInput formControlName="otherReason" [placeholder]="'ASSISTANCE_OTHER_PLACEHOLDER' | translate"></span>
                         </div>
                         
                         <div class="contact-info">
-                            <span>สามารถติดต่อเจ้าที่เพื่อสอบถาม โทร 1318</span>
+                            <span>{{ 'CONTACT_SUPPORT_TEXT' | translate }}</span>
                         </div>
                     </div>
                 </div>
@@ -397,13 +397,13 @@
                     </div> -->
                 </div>
                 <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger && !isAllPassengersValid()" (click)="checkPassengerValid(selectedPassenger)" [ngClass]="{'yellow-button': passengerForms[selectedPassenger].valid}">
-                    กรอกข้อมูลผู้โดยสารคนต่อไป
+                    {{ 'NEXT_PASSENGER' | translate }}
                 </button>
                 <button class="next-passenger-button" *ngIf="selectedPassenger === numberPassenger" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">
-                    ยืนยัน
+                    {{ 'CONFIRM' | translate }}
                 </button>
                 <button class="next-passenger-button" *ngIf="selectedPassenger < numberPassenger && isAllPassengersValid()" (click)="nextStep()"  [ngClass]="{'yellow-button': isAllPassengersValid()}">
-                    ยืนยัน
+                    {{ 'CONFIRM' | translate }}
                 </button>
                 <!-- <button mat-raised-button color="primary" [ngClass]="{'yellow-button': isAllPassengersValid()}"
                     (click)="nextStep()" [disabled]="!isAllPassengersValid()" *ngIf="selectedPassenger === numberPassenger">

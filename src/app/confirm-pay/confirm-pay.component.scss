@@ -65,8 +65,13 @@
     padding-bottom: 8px;
   display: flex;
   justify-content: space-between;
+  gap: 20px; /* ระยะห่างขั้นต่ำระหว่าง description กับจำนวนเงิน */
   margin: 2px 0;
   color: #444;
+}
+
+.fare-detail span {
+  white-space: nowrap;
 }
 
 .fare-detail.special-bundle {

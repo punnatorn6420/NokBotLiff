@@ -6,46 +6,46 @@
             <div class="section-title">{{ 'CONFRIM_PAGE_FARE_TITLE' | translate }}</div>
             <div class="fare-group" *ngFor="let j of ui.journeys">
                 <div class="fare-header">
-                    <span>ค่าโดยสาร ({{ j.fareFamilyName }})</span>
+                    <span>{{ 'CONFRIM_PAGE_FARE_TITLE' | translate }} ({{ j.fareFamilyName }})</span>
                     <span class="flight-type">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path *ngIf="j.directionLabel==='ไป'" d="M8 21H10L15 13H20.5C21.33 13 22 12.33 22 11.5C22 10.67 21.33 10 20.5 10H15L10 2H8L10.5 10H5L3.5 8H2L3 11.5L2 15H3.5L5 13H10.5L8 21Z" fill="#E5BB01"/>
-                        <path *ngIf="j.directionLabel==='กลับ'" d="M16 3H14L9 11H3.5C2.67 11 2 11.67 2 12.5C2 13.33 2.67 14 3.5 14H9L14 22H16L13.5 14H19L20.5 16H22L21 12.5L22 9H20.5L19 11H13.5L16 3Z" fill="#E5BB01"/>
+                        <path *ngIf="j.direction==='Outbound'" d="M8 21H10L15 13H20.5C21.33 13 22 12.33 22 11.5C22 10.67 21.33 10 20.5 10H15L10 2H8L10.5 10H5L3.5 8H2L3 11.5L2 15H3.5L5 13H10.5L8 21Z" fill="#E5BB01"/>
+                        <path *ngIf="j.direction==='Inbound'" d="M16 3H14L9 11H3.5C2.67 11 2 11.67 2 12.5C2 13.33 2.67 14 3.5 14H9L14 22H16L13.5 14H19L20.5 16H22L21 12.5L22 9H20.5L19 11H13.5L16 3Z" fill="#E5BB01"/>
                         </svg>
                          {{ j.directionLabel }}
                     </span>
                 </div>
                 <div class="fare-detail" *ngFor="let f of j.fareItems">x{{ f.count }} {{ f.label }} <span>{{ formatAmount(f.amount) }}</span></div>
-                <div class="fare-detail special-bundle" *ngIf="j.bundleItems?.length">Service Bundle</div>
-                <div class="fare-detail" *ngFor="let b of j.bundleItems">x{{ b.count }} {{ b.label }} <span>{{ formatAmount(b.amount) }}</span></div>
+                <div class="fare-detail special-bundle" *ngIf="j.bundleItems?.length">{{ 'CONFIRM_PAGE_Service_Bundle' | translate }}</div>
+                <div class="fare-detail" *ngFor="let b of j.bundleItems">x{{ b.count }} {{ b.label }}<ng-container *ngIf="b.description"> ( {{ b.description }} )</ng-container> <span>{{ formatAmount(b.amount) }}</span></div>
                 <div class="fare-total">
-                    รวมค่าใช้จ่าย ({{ j.directionLabel==='ไป' ? 'ขาไป' : 'ขากลับ' }})
+                    {{ j.direction==='Outbound' ? ('CONFRIM_PAGE_Subtotal_Outbound' | translate) : ('CONFRIM_PAGE_Subtotal_Inbound' | translate) }}
                     <span>{{ formatAmount(j.subtotal) }}</span>
                 </div>
             </div>
-            <div class="addon-section" *ngIf="ui.addOns?.total">
-                <div class="section-title">บริการเสริมที่นั่ง</div>
-                <div class="fare-detail" *ngFor="let s of ui.addOns?.seatItems">x{{ s.count }} {{ s.label }} <span>{{ formatAmount(s.amount) }}</span></div>
-                <div class="fare-total">ค่าบริการเสริมที่นั่งทั้งหมด <span>{{ formatAmount(ui.addOns.total) }}</span></div>
+            <div class="addon-section" *ngIf="(ui.addOns?.total || 0) > 0">
+                <div class="section-title">{{ 'CONFIRM_PAGE_Seat_Selection' | translate }}</div>
+                <div class="fare-detail" *ngFor="let s of (ui.addOns?.seatItems || [])">x{{ s.count }} {{ s.label }}<ng-container *ngIf="s.description"> ( {{ s.description }} )</ng-container> <span>{{ formatAmount(s.amount) }}</span></div>
+                <div class="fare-total">{{ 'CONFIRM_PAGE_Total_Add-on_Package_Fee' | translate }} <span>{{ formatAmount(ui.addOns.total) }}</span></div>
             </div>
             <div class="tax-section">
-                <div class="section-title">ภาษี</div>
+                <div class="section-title">{{ 'CONFIRM_PAGE_Taxes' | translate }}</div>
                 <div class="section-title">Airport Tax</div>
                 <div class="fare-detail" *ngFor="let t of ui.taxes.airportTaxItems">x{{ t.count }} {{ t.label }} <span>{{ formatAmount(t.amount) }}</span></div>
                 <div class="section-title">VAT</div>
                 <div class="fare-detail" *ngFor="let v of ui.taxes.vatItems">x{{ v.count }} {{ v.label }} <span>{{ formatAmount(v.amount) }}</span></div>
-                <div class="fare-total">ภาษีทั้งหมด <span>{{ formatAmount(ui.taxes.total) }}</span></div>
+                <div class="fare-total">{{ 'CONFIRM_PAGE_Total_Tax' | translate }} <span>{{ formatAmount(ui.taxes.total) }}</span></div>
             </div>
             <div class="fee-section" *ngIf="ui.fees?.total">
-                <div class="section-title">ค่าธรรมเนียมเที่ยวบินต่อเครื่อง (Flight Connecting Fee)</div>
+                <div class="section-title">{{ 'CONFIRM_PAGE_Connecting_Fee_Title' | translate }}</div>
                 <div class="fare-detail" *ngFor="let c of ui.fees.connectingItems">x{{ c.count }} {{ c.label }} <span>{{ formatAmount(c.amount) }}</span></div>
-                <div class="fare-total">ค่าธรรมเนียมต่อเครื่องทั้งหมด <span>{{ formatAmount(ui.fees.total) }}</span></div>
+                <div class="fare-total">{{ 'CONFIRM_PAGE_Connecting_Fee_Total' | translate }} <span>{{ formatAmount(ui.fees.total) }}</span></div>
             </div>
         </div>
-        <div class="promo-section">
+        <!-- <div class="promo-section">
             <div class="section-title">Promo code</div>
             <input type="text" class="promo-input" placeholder="รหัสโปรโมชัน" />
-        </div>
+        </div> -->
         <div class="payment-section">
             <div class="section-title">{{ 'CONFIRM_PAGE_Payment_Method' | translate }}</div>
             <div class="payment-method">

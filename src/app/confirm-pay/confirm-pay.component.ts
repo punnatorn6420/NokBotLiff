@@ -4,6 +4,7 @@ import { ApiService } from '../api.service';
 import { PassDataService } from '../pass-data.service';
 import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 interface BookingConfirmationResponse {
   collectionId: string;
@@ -104,7 +105,7 @@ interface Payment {
   styleUrls: ['./confirm-pay.component.scss']
 })
 export class ConfirmPayComponent {
-  selectedPayment = 'counterservice';
+  selectedPayment = 'credit';
   isLoading = false;
 
   currency = 'THB';
@@ -114,11 +115,11 @@ export class ConfirmPayComponent {
       directionLabel: string;
       fareFamilyName: string;
       fareItems: Array<{ label: string; count: number; amount: number }>;
-      bundleItems: Array<{ label: string; count: number; amount: number }>;
+      bundleItems: Array<{ label: string; count: number; amount: number; description?: string }>;
       subtotal: number;
     }>;
     addOns: {
-      seatItems: Array<{ label: string; count: number; amount: number }>;
+      seatItems: Array<{ label: string; count: number; amount: number; description?: string }>;
       total: number;
     };
     taxes: {
@@ -146,7 +147,8 @@ export class ConfirmPayComponent {
   constructor(
     private router: Router,
     private apiService: ApiService,
-    private passDataService: PassDataService) {}
+    private passDataService: PassDataService,
+    private translate: TranslateService) {}
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -160,9 +162,9 @@ export class ConfirmPayComponent {
   goNext() {
     console.log(this.selectedPayment);
     if (this.selectedPayment === 'credit') {
-      this.router.navigate(['/credit']);
+      this.createBooking();
     } else if (this.selectedPayment === 'counterservice') {
-      this.router.navigate(['/counter-service']);
+      this.createBooking();
     }
   }
 
@@ -184,7 +186,7 @@ export class ConfirmPayComponent {
 
   private buildPayload(formData: any, seatData: any, flightData: any) {
     // map payment method: 'credit' => masterCard, 'counterservice' => counterService
-    const paymentMethod = this.selectedPayment === 'credit' ? 'masterCard' : 'counterService';
+    const paymentMethod = this.selectedPayment === 'credit' ? 'Visa' : 'CounterService';
 
     const toISODate = (d: any) => {
       if (!d) return '';
@@ -238,7 +240,20 @@ export class ConfirmPayComponent {
       return result;
     };
 
-    // สร้างรายละเอียดต่อ Journey สำหรับผู้โดยสารคนหนึ่ง โดยมี selectedSeats และ addOnServices ต่อ segment
+    // แปลง seat ให้เป็นรูปแบบมี ":" ระหว่างหมายเลขแถวและตัวอักษรที่นั่ง เช่น "7 A" -> "7:A"
+    const normalizeSeatId = (raw: string): string => {
+      if (!raw) return '';
+      const s = String(raw).trim();
+      // ถ้ามีโคลอนอยู่แล้ว ให้จัดรูปแบบเว้นวรรครอบโคลอนให้ถูกต้อง
+      if (s.includes(':')) return s.replace(/\s*:\s*/, ':');
+      // จับคู่รูปแบบเลขตามด้วยช่องว่าง (หรือไม่มีช่องว่าง) แล้วตามด้วยตัวอักษร
+      const m = s.match(/^(\d+)\s*([A-Za-z])$/);
+      if (m) return `${m[1]}:${m[2].toUpperCase()}`;
+      // กรณีทั่วไป แทนที่ช่องว่างแรกด้วยโคลอน
+      return s.replace(/\s+/, ':');
+    };
+
+    // สร้างรายละเอียดต่อ Journey สำหรับผู้โดยสารคนหนึ่ง โดยรวม selectedSeats และ addOnServices ต่อ journey
     const buildJourneyDetailsForPassenger = (paxNumber: number) => {
       const details: any[] = [];
 
@@ -247,7 +262,17 @@ export class ConfirmPayComponent {
 
       const passengerSeatMap = getPassengerSeatBySegment(paxNumber);
 
-      // Helper: แปลงข้อมูลเที่ยวบินของฝั่งหนึ่งให้เป็นรายการ journey details ต่อ flight segment
+      // ดึง bundle ของผู้โดยสารตามทิศทาง (ถ้ามี)
+      const getPassengerBundleByDirection = (direction: 'outbound' | 'inbound') => {
+        const p = (formData as any)?.[String(paxNumber)] || {};
+        if (direction === 'outbound') {
+          return p?.['outboundBundle'] || null;
+        }
+        // รองรับทั้ง inboundBundle (เก่า) และ returnBundle (ใหม่) สำหรับทิศทางขากลับ
+        return p?.['inboundBundle'] || p?.['returnBundle'] || null;
+      };
+
+      // Helper: รวมข้อมูลเที่ยวบินของฝั่งหนึ่งให้เป็นหนึ่ง journey detail
       const pushDirection = (direction: 'outbound' | 'inbound', selection: any) => {
         if (!selection) return;
         const journeyKey = selection.journey_key || '';
@@ -255,24 +280,34 @@ export class ConfirmPayComponent {
         const serviceBundle = selection.service_bundle || null;
         const flights: any[] = Array.isArray(selection.flight_detail) ? selection.flight_detail : [];
 
+        const selectedSeats: Array<{ flightNumber: string; seatId: string }> = [];
+        const addOnServices: Array<{ flightNumber: string; serviceCode: string }> = [];
+
+        const passengerBundle = getPassengerBundleByDirection(direction);
+        const bundleServiceCode = (passengerBundle && passengerBundle.serviceCode)
+          || (serviceBundle && serviceBundle.serviceCode)
+          || '';
+
         flights.forEach((flight, idx) => {
           const segKey = `${direction}${idx + 1}`;
           const flightNumber = flight?.flightNumber || '';
 
           // seatId ของผู้โดยสารรายคนจาก seat map ต่อ segment
           const seatId = passengerSeatMap[segKey] || '';
+          if (seatId) {
+            selectedSeats.push({ flightNumber, seatId: normalizeSeatId(seatId) });
+          }
 
-          // addOnServices: อิงจาก service bundle ถ้ามี (แนบตาม flight)
-          const addOnServices = serviceBundle && serviceBundle.serviceCode
-            ? [{ flightNumber, serviceCode: serviceBundle.serviceCode }]
-            : [];
+          if (bundleServiceCode) {
+            addOnServices.push({ flightNumber, serviceCode: bundleServiceCode });
+          }
+        });
 
-          details.push({
-            journeyKey,
-            fareKey,
-            addOnServices,
-            selectedSeats: seatId ? [{ flightNumber, seatId }] : []
-          });
+        details.push({
+          journeyKey,
+          fareKey,
+          addOnServices,
+          selectedSeats
         });
       };
 
@@ -319,6 +354,11 @@ export class ConfirmPayComponent {
 
     return {
       paymentMethod,
+      paymentNotificationInfo: {
+        confirmationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/',
+        failedUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/',
+        cancellationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/'
+      },
       passengerInfos
     };
   }
@@ -346,16 +386,23 @@ export class ConfirmPayComponent {
     this.currency = root.currency || 'THB';
     this.ui.grandTotal = this.toNumber(root.totalAmount);
 
-    const directionLabelMap: Record<string, string> = { Outbound: 'ไป', Inbound: 'กลับ' };
-    const paxLabelMap: Record<string, string> = { Adult: 'ผู้ใหญ่', Child: 'เด็ก', Infant: 'ทารก' };
+    const directionLabelMap: Record<string, string> = {
+      Outbound: this.translate.instant('CONFIRM_PAGE_Direction_Outbound'),
+      Inbound: this.translate.instant('CONFIRM_PAGE_Direction_Inbound')
+    };
+    const paxLabelMap: Record<string, string> = {
+      Adult: this.translate.instant('CONFIRM_PAGE_Pax_Adult'),
+      Child: this.translate.instant('CONFIRM_PAGE_Pax_Child'),
+      Infant: this.translate.instant('CONFIRM_PAGE_Pax_Infant')
+    };
 
     const journeys: Journey[] = Array.isArray(root.journeys) ? root.journeys : [];
 
     const uniquePaxNumbers = new Set<number>();
     // เก็บชุดผู้โดยสารไม่ซ้ำต่อประเภทไว้ใช้เป็นตัวเลข x{count}
     const paxSetByType = new Map<string, Set<number>>();
-    let sumPaymentFeesAmount = 0;
-    let countPaymentFeeEntries = 0;
+    // เก็บค่าธรรมเนียมชำระเงินที่เป็นค่าจริงต่อผู้โดยสาร (ไม่เอา 0)
+    const paymentFeeAmounts: number[] = [];
     // รวมเฉพาะ Connecting Flight Fee แยกออกจาก payment fee
     const connectingMap = new Map<string, { count: number; amount: number }>();
     let connectingTotal = 0;
@@ -363,7 +410,9 @@ export class ConfirmPayComponent {
     // คำนวณข้อมูลต่อเที่ยวบิน
     this.ui.journeys = journeys.map((j: any) => {
       const fareItemsMap = new Map<string, { count: number; amount: number }>();
-      const bundleItemsMap = new Map<string, { count: number; amount: number }>();
+      const bundleItemsMap = new Map<string, { count: number; amount: number; descriptions: Set<string> }>();
+      // เก็บชุดผู้โดยสารที่มี bundled ต่อประเภท ต่อเที่ยวบินนี้ (count แบบไม่ซ้ำคน)
+      const bundledPaxSetByTypeForThisJourney = new Map<string, Set<number>>();
       let subtotal = 0;
 
       const passengerDetails: any[] = Array.isArray(j?.passengerDetails) ? j.passengerDetails : [];
@@ -390,16 +439,24 @@ export class ConfirmPayComponent {
 
         // Special Bundle = charges ที่ถูก bundle มากับ fare
         charges.filter((c: any) => c && c.isBundled).forEach((c: any) => {
-          const prev = bundleItemsMap.get(typeLabel) || { count: 0, amount: 0 };
-          prev.count += 1;
+          const prev = bundleItemsMap.get(typeLabel) || { count: 0, amount: 0, descriptions: new Set<string>() };
+          // เพิ่มเฉพาะยอดเงินรวมของ bundle ต่อประเภท และเก็บคำอธิบาย
           prev.amount += this.toNumber(c.amount);
+          const desc = (c.description || '').toString().trim();
+          if (desc) prev.descriptions.add(desc);
           bundleItemsMap.set(typeLabel, prev);
           subtotal += this.toNumber(c.amount);
+          // นับจำนวนผู้โดยสารที่มี bundle แบบ unique ต่อประเภท
+          const set = bundledPaxSetByTypeForThisJourney.get(typeLabel) || new Set<number>();
+          set.add(pd?.paxNumber);
+          bundledPaxSetByTypeForThisJourney.set(typeLabel, set);
         });
 
-        if (st && st.paymentFeesAmount) {
-          sumPaymentFeesAmount += this.toNumber(st.paymentFeesAmount);
-          countPaymentFeeEntries += 1;
+        if (st && st.paymentFeesAmount !== undefined && st.paymentFeesAmount !== null) {
+          const fee = this.toNumber(st.paymentFeesAmount);
+          if (fee > 0) {
+            paymentFeeAmounts.push(fee);
+          }
         }
 
         // ค่าธรรมเนียมต่อเครื่อง (Connecting Flight Fee) จาก charges ต่อผู้โดยสาร
@@ -427,7 +484,13 @@ export class ConfirmPayComponent {
         .map(([label, v]) => ({ label, count: v.count, amount: v.amount }))
         .filter(item => item.count > 0);
       const bundleItems = Array.from(bundleItemsMap.entries())
-        .map(([label, v]) => ({ label, count: v.count, amount: v.amount }))
+        .map(([label, v]) => ({
+          label,
+          // ใช้จำนวนผู้โดยสารที่มี bundled จริงแบบไม่ซ้ำ ต่อเที่ยวบินนี้
+          count: (bundledPaxSetByTypeForThisJourney.get(label) || new Set<number>()).size,
+          amount: v.amount,
+          description: Array.from(v.descriptions || [])?.join(' / ')
+        }))
         .filter(item => item.amount > 0);
 
       return {
@@ -441,7 +504,8 @@ export class ConfirmPayComponent {
     });
 
     // บริการเสริม (เช่น เลือกที่นั่ง): ใช้ charges ที่เป็น SSR และไม่ bundled
-    const seatAmountMap = new Map<string, number>();
+    // เก็บทั้งยอดรวมและรายละเอียดคำอธิบายที่นั่ง
+    const seatAmountMap = new Map<string, { amount: number; descriptions: Set<string> }>();
     let addOnTotal = 0;
     journeys.forEach((j: any) => {
       const passengerDetails: any[] = Array.isArray(j?.passengerDetails) ? j.passengerDetails : [];
@@ -449,26 +513,41 @@ export class ConfirmPayComponent {
         const typeLabel = paxLabelMap[pd?.paxType] || pd?.paxType || 'ผู้โดยสาร';
         const charges: any[] = Array.isArray(pd?.priceBreakdown?.charges) ? pd.priceBreakdown.charges : [];
         const st = pd?.priceBreakdown?.subtotals || {};
-        charges.filter((c: any) => c && c.isSSR && !c.isBundled).forEach((c: any) => {
+        // พิจารณาเฉพาะบริการเสริมที่เป็น "เลือกที่นั่ง" เท่านั้น (exclude payment/connecting fee)
+        const isSeatRelated = (c: any) => {
+          if (!c) return false;
+          const type = String(c?.chargeType || '').toLowerCase();
+          const code = String(c?.chargeCode || '').toUpperCase();
+          const desc = String(c?.description || '').toLowerCase();
+          // ตัดค่าธรรมเนียมการชำระเงินและค่าต่อเครื่องออก
+          if (type.includes('payment')) return false;
+          if (type === 'connectingflightfee' || code === 'FCF') return false;
+          if (desc.includes('payment')) return false;
+          return true;
+        };
+
+        const hasNonBundledSSR = charges.some((c: any) => c && c.isSSR && !c.isBundled && isSeatRelated(c));
+        const hasBundledServices = charges.some((c: any) => c && c.isBundled);
+
+        // เก็บเฉพาะ SSR ที่เกี่ยวกับที่นั่งจริง ๆ เท่านั้น
+        charges.filter((c: any) => c && c.isSSR && !c.isBundled && isSeatRelated(c)).forEach((c: any) => {
           const amount = this.toNumber(c.amount);
-          const prevAmount = seatAmountMap.get(typeLabel) || 0;
-          seatAmountMap.set(typeLabel, prevAmount + amount);
+          const record = seatAmountMap.get(typeLabel) || { amount: 0, descriptions: new Set<string>() };
+          record.amount += amount;
+          const desc = (c.description || '').toString().trim();
+          if (desc) record.descriptions.add(desc);
+          seatAmountMap.set(typeLabel, record);
           addOnTotal += amount;
         });
-        // หากไม่มี charges สำหรับบริการเสริม ให้ใช้ยอดรวม servicesAmount ต่อผู้โดยสาร
-        const servicesAmount = this.toNumber(st?.servicesAmount);
-        if (servicesAmount > 0 && !charges.some(c => c && c.isSSR && !c.isBundled)) {
-          const prevAmount = seatAmountMap.get(typeLabel) || 0;
-          seatAmountMap.set(typeLabel, prevAmount + servicesAmount);
-          addOnTotal += servicesAmount;
-        }
+        // ตัด fallback ออกเพื่อป้องกันการนับค่าธรรมเนียมอื่น (เช่น PAYMENT) เป็นที่นั่ง
       });
     });
     this.ui.addOns = {
-      seatItems: Array.from(seatAmountMap.entries()).map(([label, amount]) => ({
+      seatItems: Array.from(seatAmountMap.entries()).map(([label, data]) => ({
         label,
         count: (paxSetByType.get(label) || new Set<number>()).size,
-        amount
+        amount: data.amount,
+        description: Array.from(data.descriptions || [])?.join(' / ')
       })),
       total: addOnTotal
     };
@@ -535,10 +614,53 @@ export class ConfirmPayComponent {
     };
 
     // ค่าธรรมเนียมชำระเงิน (แยกจาก Connecting Fee)
-    this.ui.paymentFeePerPassenger = countPaymentFeeEntries > 0
-      ? sumPaymentFeesAmount / countPaymentFeeEntries
+    // ใช้ค่าที่ไม่เป็นศูนย์ต่อผู้โดยสาร (เช่น 100 ต่อคน) โดยเลือกค่าสูงสุดที่พบเพื่อกันค่าเฉลี่ยถูกดึงลงด้วย 0
+    this.ui.paymentFeePerPassenger = paymentFeeAmounts.length > 0
+      ? Math.max(...paymentFeeAmounts)
       : 0;
     // ไม่รวม Connecting Fee ใน per transaction อีกต่อไป
-    this.ui.paymentFeePerTransaction = 0;
+    this.ui.paymentFeePerTransaction = paymentFeeAmounts.length > 0
+    ? Math.max(...paymentFeeAmounts)
+    : 0;
+  }
+
+
+  createBooking() {
+    this.isLoading = true;
+    combineLatest([
+      this.passDataService.getFormData(),
+      this.passDataService.getSeatData(),
+      this.passDataService.getPassengerInfo()
+    ]).pipe(take(1)).subscribe(([formData, seatData, flightWrapper]: any) => {
+      const flightData = flightWrapper || this.passDataService.getFlightData();
+      const payload = this.buildPayload(formData, seatData, flightData);
+      console.log('create booking payload:', payload);
+      this.apiService.createBooking(payload).subscribe((response: any) => {
+        // ตรวจสอบสถานะจาก response
+        const status = String(response?.BookingConfirmationResponse?.status || response?.status || '').toLowerCase();
+        const data = response?.BookingConfirmationResponse?.data || response?.data || null;
+        if (status === 'success') {
+          // ถ้าเป็น Counter Service ให้ไปหน้าถัดไป
+          this.passDataService.setRecordLocator(data.recordLocator);
+          if (this.selectedPayment === 'counterservice') {
+            this.isLoading = false;
+            this.router.navigate(['/counter-service']);
+            return;
+          }
+          // กรณีบัตรเครดิต เปิดลิงก์ชำระเงินถ้ามี
+          if (data && Array.isArray(data.externalPaymentInfo)) {
+            const paymentLink = data.externalPaymentInfo?.[0]?.paymentLink;
+            if (paymentLink) {
+              window.location.href = paymentLink;
+              return;
+            }
+          }
+        }
+        this.isLoading = false;
+      }, (error: any) => {
+        console.error('Error creating booking:', error);
+        this.isLoading = false;
+      });
+    });
   }
 }

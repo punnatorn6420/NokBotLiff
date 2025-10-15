@@ -171,6 +171,9 @@ export class ReviewPageComponent {
   // toggle แสดง/ซ่อนรายชื่อผู้โดยสารที่ซื้อ bundle
   outboundBundleShow: boolean = true;
   inboundBundleShow: boolean = true;
+  // แยกสถานะย่อ/ขยายต่อกลุ่ม (key ใช้ title ของ bundle)
+  outboundBundleGroupOpen: { [title: string]: boolean } = {};
+  inboundBundleGroupOpen: { [title: string]: boolean } = {};
   // ข้อมูล bundle (หลังรวม/แปลง) ที่ใช้แสดงผลจริง
   outboundBundleDisplay: ServiceBundle | null = null;
   inboundBundleDisplay: ServiceBundle | null = null;
@@ -613,13 +616,31 @@ export class ReviewPageComponent {
     this.inboundBundleShow = !this.inboundBundleShow;
   }
 
+  // toggle รายชื่อผู้โดยสารต่อกลุ่ม (ใช้ title เป็น key)
+  toggleOutboundGroup(title: string) {
+    const key = (title || '').trim();
+    const current = this.outboundBundleGroupOpen[key];
+    // หากยังไม่เคยมีค่า (undefined) ให้ปิดทันทีในคลิกแรก
+    this.outboundBundleGroupOpen[key] = current === undefined ? false : !current;
+  }
+
+  toggleInboundGroup(title: string) {
+    const key = (title || '').trim();
+    const current = this.inboundBundleGroupOpen[key];
+    // หากยังไม่เคยมีค่า (undefined) ให้ปิดทันทีในคลิกแรก
+    this.inboundBundleGroupOpen[key] = current === undefined ? false : !current;
+  }
+
   // ===== Bundle (FormData) Helpers =====
   private extractPassengerBundlePassengers(direction: 'outbound' | 'inbound'): number[] {
     if (!this.passengers || this.passengers.length === 0) return [];
-    const key = direction === 'outbound' ? 'outboundBundle' : 'inboundBundle';
     const indexes: number[] = [];
     this.passengers.forEach((p: any, idx: number) => {
-      if (p && p[key]) indexes.push(idx);
+      if (!p) return;
+      const hasBundle = direction === 'outbound'
+        ? !!p.outboundBundle
+        : !!(p.inboundBundle || p.returnBundle);
+      if (hasBundle) indexes.push(idx);
     });
     return indexes;
   }
@@ -631,7 +652,9 @@ export class ReviewPageComponent {
 
     indexes.forEach(idx => {
       const p: any = this.passengers[idx];
-      const pb = direction === 'outbound' ? (p?.outboundBundle as PassengerBundle | null) : (p?.inboundBundle as PassengerBundle | null);
+      const pb = direction === 'outbound'
+        ? (p?.outboundBundle as PassengerBundle | null)
+        : ((p?.inboundBundle || p?.returnBundle) as PassengerBundle | null);
       if (!pb || !pb.title) return;
       const key = pb.title.trim();
       if (!groups.has(key)) {
@@ -721,7 +744,8 @@ export class ReviewPageComponent {
       ? (this.passengers[this.outboundBundlePassengerIndexes[0]] as any)?.outboundBundle as PassengerBundle
       : null;
     const firstInbound = this.inboundBundlePassengerIndexes.length > 0
-      ? (this.passengers[this.inboundBundlePassengerIndexes[0]] as any)?.inboundBundle as PassengerBundle
+      ? ((this.passengers[this.inboundBundlePassengerIndexes[0]] as any)?.inboundBundle
+        || (this.passengers[this.inboundBundlePassengerIndexes[0]] as any)?.returnBundle) as PassengerBundle
       : null;
 
     const outboundFromPassengers = this.convertPassengerBundleToServiceBundle(firstOutbound);
@@ -827,6 +851,15 @@ export class ReviewPageComponent {
     return this.inboundServiceBundle !== null && 
            !!this.inboundServiceBundle.serviceName && 
            this.inboundServiceBundle.serviceName.trim() !== '';
+  }
+
+  // ตรวจว่ามีข้อมูลเที่ยวบินของทิศทางนั้นจริงหรือไม่
+  hasOutboundDirection(): boolean {
+    return Array.isArray(this.outboundFlightData) && this.outboundFlightData.length > 0;
+  }
+
+  hasInboundDirection(): boolean {
+    return Array.isArray(this.inboundFlightData) && this.inboundFlightData.length > 0;
   }
 
   getServiceBundleInfo(bundle: ServiceBundle): string {

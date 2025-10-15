@@ -1,0 +1,21 @@
+{
+  "SELECT_SEAT_OUTBOUND": "เลือกที่นั่งผู้โดยสาร - ขาไป",
+  "SELECT_SEAT_INBOUND": "เลือกที่นั่งผู้โดยสาร - ขากลับ",
+  "DEPARTURE": "ขาไป",
+  "RETURN": "ขากลับ",
+  "ONE_WAY": "เที่ยวเดียว",
+  "SEAT_SELECTION_FEES_VARY_BY_SEAT_TYPE": "ค่าธรรมเนียมการเลือกที่นั่ง และที่นั่งประเภท",
+  "Nok_Premium_Seat_Front_Row": "นกพรีเมียมซีกแถวหน้า",
+  "Nok_Premium_Seat": "นกพรีเมียมซีก",
+  "Nok_Happy_Seat": "นกแฮปปี้ซีก",
+  "Booked_Seat": "ที่นั่งถูกจอง",
+  "Unavailable_Blocked": "ที่นั่งบล็อค / ไม่ว่าง",
+  "Selected_Seat": "ที่นั่งที่เลือก",
+  "Cancel_Seat": "ยกเลิกการเลือกที่นั่ง",
+  "Confirm_Seat": "ยืนยัน",
+  "NEXT_STEP_NO_SELECT_SEAT": "ขั้นตอนต่อไปโดยไม่เลือกที่นั่ง",
+
+  "ALERT_EXIT_CONFIRM": "ฉันเข้าใจแล้ว"
+}
+
+

@@ -404,7 +404,7 @@ export class PassengerFormComponent {
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+    this.isLoading = true;
     // ตั้งค่าเริ่มต้นก่อน
     this.passDataService.getPassengerInfo().subscribe((data: any) => {
       // คำนวณสถานะไฟลท์ในประเทศ/ต่างประเทศ จากข้อมูลเที่ยวบินที่เลือก
@@ -442,7 +442,6 @@ export class PassengerFormComponent {
     });
 
     this.passDataService.getUserId().pipe(take(1)).subscribe((userId: string) => {
-      this.isLoading = true;
       if (!userId) {
         console.warn('getServiceBundle skipped: empty userId');
         return;
@@ -491,13 +490,6 @@ export class PassengerFormComponent {
     this.apiService.getRestcountries().subscribe((res: any) => {
       this.convertRestcountries(res);
     });
-
-    // ตั้งค่า autocomplete filters ถูกเรียกในจุดที่เหมาะสมแล้ว (หลังสร้างฟอร์ม/โหลดข้อมูล) จึงไม่ต้องหน่วงเวลา
-
-    // ตั้งค่าภาษา
-    // this.passDataService.getLanguage().subscribe(language => {
-    //   this.switchLanguage(language as 'th' | 'en');
-    // });
   }
 
   // switchLanguage(lang: 'th' | 'en') {

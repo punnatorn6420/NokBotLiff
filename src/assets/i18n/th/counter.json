@@ -1,0 +1,12 @@
+{
+  "COUNTER_SERVICE_TITLE1": "การจองสำเร็จ",
+  "COUNTER_SERVICE_TITLE2": "ขอบคุณที่ใช้บริการนกแอร์",
+  "COUNTER_SERVICE_WARNNING": "หากไม่ชำระเงินภายใน 2568-06-27 12:19 การจองของคุณจะถูกยกเลิก",
+  "COUNTER_SERVICE_WARNNING_2": "หมายเลขอ้างอิงการชำระเงิน คือ 81088508",
+  "COUNTER_SERVICE_BOOKING_NUMBER": "Booking Number",
+  "COUNTER_SERVICE_BOOKING_REFERENCE": "Booking Reference (PNR)",
+  "COUNTER_SERVICE_Passenger_Name": "ชื่อผู้โดยสาร (ผู้จอง)",
+  "COUNTER_SAVE_IMAGE": "บันทึกรูปภาพ"
+}
+
+
