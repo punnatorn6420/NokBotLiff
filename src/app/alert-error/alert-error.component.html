@@ -1,4 +1,4 @@
-<div class="error-container">
+<div class="error-container" *ngIf="isError">
   <div class="error-content">
     <div class="error-icon">
       <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,5 +18,43 @@
         ลองรีเฟรชหน้านี้อีกครั้ง
       </button>
     </div>
+  </div>
+</div>
+
+<div class="notfound-container" *ngIf="isNotFound">
+  <div class="logo">
+    <svg width="96" height="97" viewBox="0 0 96 97" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <path d="M8 36.5V12.5H88V36.5M8 76.5V84.5H88V76.5M88 28.5H8M39.56 52.26V60.26C39.56 62.3817 40.4029 64.4166 41.9031 65.9169C43.4034 67.4171 45.4383 68.26 47.56 68.26C49.6817 68.26 51.7166 67.4171 53.2169 65.9169C54.7171 64.4166 55.56 62.3817 55.56 60.26V52.26C55.56 50.1383 54.7171 48.1034 53.2169 46.6031C51.7166 45.1029 49.6817 44.26 47.56 44.26C45.4383 44.26 43.4034 45.1029 41.9031 46.6031C40.4029 48.1034 39.56 50.1383 39.56 52.26Z" stroke="#FCCD01" stroke-width="6"/>
+      <path d="M85.7766 62.2598H65.7766V60.2598L79.7766 44.2598H81.7766V68.2598M30.2246 62.2598H10.2246V60.2598L24.2246 44.2598H26.2246V68.2598" stroke="#FCCD01" stroke-width="6" stroke-linecap="square"/>
+    </svg>
+  </div>
+
+  <div class="content">
+    <h1 class="title">ไม่สามารถทำรายการได้</h1>
+    <p class="desc">
+      กรุณาเริ่มต้นการทำรายการจากหน้าแชตของ Nok Air<br>
+      ก่อนเข้าสู่หน้านี้ เพื่อให้ระบบสามารถเชื่อมต่อข้อมูลการจองของ<br>
+      คุณได้อย่างถูกต้อง
+    </p>
+  </div>
+</div>
+
+<div class="notfound-container" *ngIf="isSeatAlreadyBooked">
+  <div class="logo">
+    <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50.0003 41.9991H72.0003M64.0003 71.9991L52.0003 87.9991M52.0003 87.9991H32.0003M52.0003 87.9991H72.0003M33.9283 71.9991H71.8883C76.3683 71.9991 80.0003 68.4311 80.0003 64.0271C80.0003 57.9991 71.8883 56.0551 71.8883 56.0551C71.8883 56.0551 57.1363 50.3831 40.0003 55.9991C40.0003 55.9991 39.4443 35.4911 30.8403 12.6791C29.1403 8.18311 23.6043 6.64711 19.5403 9.30711C18.2354 10.1537 17.215 11.373 16.6116 12.8066C16.0082 14.2403 15.8496 15.8222 16.1563 17.3471L25.9723 65.5871C26.3566 67.4089 27.3583 69.0421 28.808 70.2104C30.2577 71.3788 32.0664 72.0106 33.9283 71.9991Z" stroke="#FCCD01" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>      
+  </div>
+
+  <div class="content">
+    <h1 class="title">ที่นั่งถูกเลือกไปแล้ว</h1>
+    <p class="desc">
+      ดูเหมือนว่ามีผู้โดยสารท่านอื่นเลือกที่นั่งนี้ไปก่อน<br>
+       กรุณากลับไปเลือกที่นั่งใหม่อีกครั้ง
+    </p>
+  </div>
+
+  <div class="actions">
+    <button class="btn" (click)="BacktoSeatSelection()">เลือกที่นั่งใหม่</button>
   </div>
 </div>

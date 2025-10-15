@@ -7,7 +7,6 @@ import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
 import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
 import { AlertErrorComponent } from './alert-error/alert-error.component';
-import { PassengerNotFoundComponent } from './passenger-not-found/passenger-not-found.component';
 
 const routes: Routes = [
   {
@@ -37,10 +36,6 @@ const routes: Routes = [
   {
     path: 'error',
     component: AlertErrorComponent
-  },
-  {
-    path: 'passenger-not-found',
-    component: PassengerNotFoundComponent
   }
 ];
 

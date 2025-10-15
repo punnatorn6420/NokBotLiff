@@ -30,6 +30,6 @@ export class HttpErrorInterceptorInterceptor implements HttpInterceptor {
   }
 
   private handleServerError(error: HttpErrorResponse) {
-    this.router.navigate(['/error']);
+    this.router.navigate(['/error'], { queryParams: { isError: true } });
   }
 }

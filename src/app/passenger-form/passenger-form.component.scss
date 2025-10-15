@@ -311,13 +311,14 @@ mat-error {
 
 .footer-container-background {
   background-color: #fff;
-  height: 160px;
+  height: calc(160px + env(safe-area-inset-bottom));
 }
 
 .footer-container {
   background-color: #fff;
   border-top: 1px solid #e1e1e1;
   padding-top: 20px;
+  padding-bottom: env(safe-area-inset-bottom);
     position: fixed;
     bottom: 0;
     left: 0;

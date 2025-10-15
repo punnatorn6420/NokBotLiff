@@ -4,5 +4,18 @@
   box-sizing: border-box;
 }
 
-// html, body { height: 100%; }
-// body { margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('assets/font/DBOzoneX.woff2') format('woff2'),
+       url('assets/font/DBOzoneX.woff') format('woff'),
+       url('assets/font/DBOzoneX.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body, html, * {
+  font-family: 'DB Ozone X', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
+}

@@ -5,6 +5,8 @@ import { PassDataService } from '../pass-data.service';
 import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from '../dialog/dialog.component';
 
 interface BookingConfirmationResponse {
   collectionId: string;
@@ -148,7 +150,8 @@ export class ConfirmPayComponent {
     private router: Router,
     private apiService: ApiService,
     private passDataService: PassDataService,
-    private translate: TranslateService) {}
+    private translate: TranslateService,
+    private dialog: MatDialog) {}
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -373,6 +376,25 @@ export class ConfirmPayComponent {
       const payload = this.buildPayload(formData, seatData, flightData);
       console.log('Pricing payload:', payload);
       this.apiService.getPricingSummary(payload).subscribe((response: any) => {
+        const code = String(
+          response?.message ||
+          response?.code ||
+          response?.errorCode ||
+          response?.error?.code ||
+          response?.BookingConfirmationResponse?.message ||
+          response?.BookingConfirmationResponse?.code ||
+          response?.BookingConfirmationResponse?.data?.message ||
+          response?.BookingConfirmationResponse?.data?.code ||
+          response?.data?.message ||
+          response?.data?.code ||
+          ''
+        ).toUpperCase();
+
+        if (code === 'SEAT ALREADY BOOKED') {
+          this.router.navigate(['/error'], { queryParams: { isSeatAlreadyBooked: true } });
+          return;
+          }
+
         this.convertPricingSummary(response);
         this.isLoading = false;
       });
