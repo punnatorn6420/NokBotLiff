@@ -1103,6 +1103,34 @@ export class FlightSeatComponent {
     // เปลี่ยน seatmap ตาม segment ที่เลือก
     this.updateSeatMapForCurrentSegment();
     
+    // เคลียร์ที่นั่งที่ถูกจับจอง/ไม่ว่างแล้วหลังโหลด seat map ใหม่
+    // หากที่นั่งของผู้โดยสารไม่อยู่ใน seatMap ปัจจุบัน หรือสถานะเป็น 'unavailable' ให้ลบออก
+    let passengerSeatMapChanged = false;
+    Object.keys(this.passengerSeatMap).forEach((pIdxStr: string) => {
+      const pIdx = parseInt(pIdxStr, 10);
+      const seatLabel = this.passengerSeatMap[pIdx];
+      if (!seatLabel) return;
+      let foundSeat: any = null;
+      for (const row of this.seatMap) {
+        for (const seat of row) {
+          if (seat && seat.label === seatLabel) {
+            foundSeat = seat;
+            break;
+          }
+        }
+        if (foundSeat) break;
+      }
+      if (!foundSeat || foundSeat.status === 'unavailable') {
+        delete this.passengerSeatMap[pIdx];
+        passengerSeatMapChanged = true;
+      }
+    });
+    if (passengerSeatMapChanged) {
+      this.segmentSeatMap[this.currentSegmentKey] = { ...this.passengerSeatMap };
+      // อัปเดต SelectedSeat array ให้สอดคล้องหลังการล้าง
+      this.SelectedSeat = Object.values(this.passengerSeatMap).filter(seatId => !!seatId);
+    }
+
     // สร้าง selectedSeat array จาก passengerSeatMap และ seatMap ปัจจุบัน
     this.selectedSeat = [];
     Object.values(this.passengerSeatMap).forEach(seatLabel => {

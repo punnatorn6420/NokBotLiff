@@ -658,6 +658,26 @@ export class ConfirmPayComponent {
       const payload = this.buildPayload(formData, seatData, flightData);
       console.log('create booking payload:', payload);
       this.apiService.createBooking(payload).subscribe((response: any) => {
+
+        const code = String(
+          response?.message ||
+          response?.code ||
+          response?.errorCode ||
+          response?.error?.code ||
+          response?.BookingConfirmationResponse?.message ||
+          response?.BookingConfirmationResponse?.code ||
+          response?.BookingConfirmationResponse?.data?.message ||
+          response?.BookingConfirmationResponse?.data?.code ||
+          response?.data?.message ||
+          response?.data?.code ||
+          ''
+        ).toUpperCase();
+
+        if (code === 'SEAT ALREADY BOOKED') {
+          this.router.navigate(['/error'], { queryParams: { isSeatAlreadyBooked: true } });
+          return;
+          }
+          
         // ตรวจสอบสถานะจาก response
         const status = String(response?.BookingConfirmationResponse?.status || response?.status || '').toLowerCase();
         const data = response?.BookingConfirmationResponse?.data || response?.data || null;
