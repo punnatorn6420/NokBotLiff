@@ -28,8 +28,8 @@
     }
 
     .brand-logo {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 150px;
         object-fit: contain;
         z-index: 999;
     }
@@ -74,11 +74,12 @@
     border: 1px solid #D2D2D2;
     width: 90vw;
     max-width: 500px;
-    height: 530px;
+    height: auto; /* fit to content */
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 16px;
 
     .icon-succes { display: none; }
 

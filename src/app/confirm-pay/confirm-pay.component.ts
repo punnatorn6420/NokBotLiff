@@ -278,8 +278,10 @@ export class ConfirmPayComponent {
       // Helper: รวมข้อมูลเที่ยวบินของฝั่งหนึ่งให้เป็นหนึ่ง journey detail
       const pushDirection = (direction: 'outbound' | 'inbound', selection: any) => {
         if (!selection) return;
-        const journeyKey = selection.journey_key || '';
-        const fareKey = selection.fare_key || '';
+        const journeyKey = selection?.journey_key;
+        const fareKey = selection?.fare_key;
+        // ข้ามไม่เพิ่มรายการ ถ้าไม่มี journeyKey หรือ fareKey (เช่น one-way ที่ inbound เป็น object ว่าง)
+        if (!journeyKey || !fareKey) return;
         const serviceBundle = selection.service_bundle || null;
         const flights: any[] = Array.isArray(selection.flight_detail) ? selection.flight_detail : [];
 

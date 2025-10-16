@@ -539,9 +539,10 @@ export class FlightSeatComponent {
         this.farKeyOutbound = data.outbound_flight_select.fare_key;
         
         // เช็ค service bundle สำหรับ outbound
-        if (data.outbound_flight_select.service_bundle?.serviceName !== '') {
+        const outboundServiceNameOneWay = (data.outbound_flight_select.service_bundle?.serviceName || '').trim();
+        if (outboundServiceNameOneWay) {
           this.freeSeatOutbound = true;
-          console.log('Outbound has service bundle:', data.outbound_flight_select.service_bundle.serviceName);
+          console.log('Outbound has service bundle:', outboundServiceNameOneWay);
         } else {
           this.freeSeatOutbound = false;
           console.log('Outbound has no service bundle');
@@ -555,18 +556,20 @@ export class FlightSeatComponent {
         this.farKeyInbound = data.inbound_flight_select.fare_key;
         
         // เช็ค service bundle สำหรับ outbound
-        if (data.outbound_flight_select.service_bundle?.serviceName !== '') {
+        const outboundServiceNameRoundTrip = (data.outbound_flight_select.service_bundle?.serviceName || '').trim();
+        if (outboundServiceNameRoundTrip) {
           this.freeSeatOutbound = true;
-          console.log('Outbound has service bundle:', data.outbound_flight_select.service_bundle.serviceName);
+          console.log('Outbound has service bundle:', outboundServiceNameRoundTrip);
         } else {
           this.freeSeatOutbound = false;
           console.log('Outbound has no service bundle');
         }
         
         // เช็ค service bundle สำหรับ inbound
-        if (data.inbound_flight_select.service_bundle?.serviceName !== '') {
+        const inboundServiceNameRoundTrip = (data.inbound_flight_select.service_bundle?.serviceName || '').trim();
+        if (inboundServiceNameRoundTrip) {
           this.freeSeatInbound = true;
-          console.log('Inbound has service bundle:', data.inbound_flight_select.service_bundle.serviceName);
+          console.log('Inbound has service bundle:', inboundServiceNameRoundTrip);
         } else {
           this.freeSeatInbound = false;
           console.log('Inbound has no service bundle');
