@@ -1503,6 +1503,7 @@ export class FlightSeatComponent {
         } else {
           // ไม่สนใจ: ไปหน้าถัดไป (context สุดท้ายแล้ว)
           if (this.isInboundDirection() || !this.hasInbound) {
+            if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
             this.router.navigate(['/review']);
           } else {
             this.switchDirection('inbound');
@@ -1528,6 +1529,7 @@ export class FlightSeatComponent {
         if (nextSegTmp) {
           this.switchSegment(nextSegTmp);
         } else if (this.isInboundDirection() || !this.hasInbound) {
+          if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
           this.router.navigate(['/review']);
         } else {
           this.switchDirection('inbound');
@@ -1572,6 +1574,7 @@ export class FlightSeatComponent {
           return;
         }
         if (this.isInboundDirection() || !this.hasInbound) {
+          if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
           this.router.navigate(['/review']);
         } else {
           this.switchDirection('inbound');
@@ -1587,6 +1590,7 @@ export class FlightSeatComponent {
       return;
     }
     if (this.isInboundDirection() || !this.hasInbound) {
+      if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
       this.router.navigate(['/review']);
     } else {
       this.switchDirection('inbound');
@@ -1658,6 +1662,7 @@ export class FlightSeatComponent {
         } else {
           // ไม่สนใจ: ไปหน้าถัดไป (context สุดท้ายแล้ว)
           if (this.isInboundDirection() || !this.hasInbound) {
+            if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
             this.router.navigate(['/review']);
           } else {
             this.switchDirection('inbound');
@@ -1674,10 +1679,28 @@ export class FlightSeatComponent {
       return;
     }
     if (this.isInboundDirection() || !this.hasInbound) {
+      if (this.enforceAllServiceBundlesSelectedOrRedirect()) return;
       this.router.navigate(['/review']);
     } else {
       this.switchDirection('inbound');
     }
+  }
+
+  // --- ตรวจทุกทิศทาง: ถ้ามี segment ที่มี service bundle แต่ยังเลือกไม่ครบ ให้เปิด Dialog และสลับไปยัง segment นั้น ---
+  private enforceAllServiceBundlesSelectedOrRedirect(): boolean {
+    const { hasUnselectedService, unselectedSegments } = this.checkRemainingServiceSegments();
+    if (!hasUnselectedService) return false;
+
+    const targetSeg = unselectedSegments[0];
+    if (targetSeg && targetSeg !== this.currentSegmentKey) {
+      this.switchSegment(targetSeg);
+    }
+    this.dialog.open(DialogComponent, {
+      width: '350px',
+      disableClose: true,
+      data: { isDialog: 'alert_select_seat' }
+    });
+    return true;
   }
 
   // ฟังก์ชันคำนวณราคารวมจากทุก segment
@@ -2128,25 +2151,41 @@ export class FlightSeatComponent {
     let hasUnselectedService = false;
 
     this.segmentList.forEach(segment => {
-      // เช็คว่า segment นี้มี service bundle หรือไม่
-      const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
+      // // เช็คว่า segment นี้มี service bundle หรือไม่
+      // const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
       
-      // ถ้ามี service bundle ให้เช็คว่าเลือกที่นั่งครบแล้วหรือยัง
-      if (segmentHasService) {
-        const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
-        const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
-        let selectedSeatsCount = 0;
-        Object.keys(segmentSeatMap).forEach((pIdxStr: string) => {
-          const pIdx = parseInt(pIdxStr, 10);
-          if (eligibleIndexes.has(pIdx) && segmentSeatMap[pIdx]) selectedSeatsCount++;
-        });
-        // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสารที่มีสิทธิ์)
-        if (selectedSeatsCount < eligibleIndexes.size) {
-          hasUnselectedService = true;
-          unselectedSegments.push(segment.key);
-        }
+      // // ถ้ามี service bundle ให้เช็คว่าเลือกที่นั่งครบแล้วหรือยัง
+      // if (segmentHasService) {
+      //   const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
+      //   const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
+      //   let selectedSeatsCount = 0;
+      //   Object.keys(segmentSeatMap).forEach((pIdxStr: string) => {
+      //     const pIdx = parseInt(pIdxStr, 10);
+      //     if (eligibleIndexes.has(pIdx) && segmentSeatMap[pIdx]) selectedSeatsCount++;
+      //   });
+      //   // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสารที่มีสิทธิ์)
+      //   if (selectedSeatsCount < eligibleIndexes.size) {
+      //     hasUnselectedService = true;
+      //     unselectedSegments.push(segment.key);
+      //   }
+      // }
+      // // ถ้าไม่มี service bundle ไม่ต้องเช็คการเลือกที่นั่ง
+      const direction = this.getDirectionFromSegmentKey(segment.key);
+      // ใช้สิทธิ์จากระดับผู้โดยสารเป็นเกณฑ์หลัก (ไม่พึ่งพา flight-level service_bundle)
+      const entitledIndexes = new Set(this.getEntitledPassengerIndexes(direction));
+      if (entitledIndexes.size === 0) return; // ไม่มีผู้มีสิทธิ์ ไม่ต้องบังคับ
+
+      const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
+      let selectedForEntitled = 0;
+      Object.keys(segmentSeatMap).forEach((pIdxStr: string) => {
+        const pIdx = parseInt(pIdxStr, 10);
+        if (entitledIndexes.has(pIdx) && segmentSeatMap[pIdx]) selectedForEntitled++;
+      });
+
+      if (selectedForEntitled < entitledIndexes.size) {
+        hasUnselectedService = true;
+        unselectedSegments.push(segment.key);
       }
-      // ถ้าไม่มี service bundle ไม่ต้องเช็คการเลือกที่นั่ง
     });
 
     return { hasUnselectedService, unselectedSegments };
