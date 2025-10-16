@@ -1267,7 +1267,7 @@ export class FlightSeatComponent {
 
   // --- ฟังก์ชันเลือกที่นั่ง (selectSeat) ใช้ logic เดิม ---
   selectSeat(seat: any) {
-    if (this.selectedSeat.some(s => s.label === seat.label) && seat.status === 'selected') {
+    if (seat.status === 'selected') {
       // ยกเลิกการเลือกที่นั่ง
       seat.status = 'available';
       if ((seat as any).selectedByPassengerIndex !== undefined) {
@@ -1295,7 +1295,7 @@ export class FlightSeatComponent {
     }
 
     // ตรวจสอบที่นั่ง exit ก่อน
-    if (seat.exit) {
+    if (seat.exit && seat.status === 'available') {
       const dialogRef = this.dialog.open(DialogComponent, {
         width: '350px',
         disableClose: true,
