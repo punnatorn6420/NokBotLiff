@@ -9,14 +9,27 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { PassDataService } from './pass-data.service';
 
 @Injectable()
 export class HttpErrorInterceptorInterceptor implements HttpInterceptor {
+  token = '';
 
-  constructor(private router: Router) {}  
+  constructor(private router: Router, private passDataService: PassDataService  ) {
+    this.passDataService.getToken().subscribe((token: string) => {
+      this.token = token;
+    });
+
+  }  
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    return next.handle(request).pipe(
+    let authReq = request;
+    if (this.token) {
+      authReq = request.clone({
+        setHeaders: { Authorization: `Bearer ${this.token}` }
+      });
+    }
+    return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('HTTP Error:', error);
         if (error.status === 500 || error.status === 422 || error.status === 404) {

@@ -7,6 +7,9 @@ import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
 import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
 import { AlertErrorComponent } from './alert-error/alert-error.component';
+import { PaymentStatusSuccessComponent } from './payment-status-success/payment-status-success.component';
+import { PaymentStatusFailComponent } from './payment-status-fail/payment-status-fail.component';
+import { PaymentStatusCancelComponent } from './payment-status-cancel/payment-status-cancel.component';
 
 const routes: Routes = [
   {
@@ -36,6 +39,18 @@ const routes: Routes = [
   {
     path: 'error',
     component: AlertErrorComponent
+  },
+  {
+    path: 'payment-status-success',
+    component: PaymentStatusSuccessComponent
+  },
+  {
+    path: 'payment-status-fail',
+    component: PaymentStatusFailComponent
+  },
+  {
+    path: 'payment-status-cancel',
+    component: PaymentStatusCancelComponent
   }
 ];
 

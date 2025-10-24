@@ -15,15 +15,16 @@ export class ApiService {
       user_id: userId,
       consent: consent
     }
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/set-pdpa-consent`, body, { headers });
+    // const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post(`${this.baseUrl+'liff'}/set-pdpa-consent`, body);
   }
   getPDPA(userId: string) {
     const body = {
       user_id: userId
     }
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/get-pdpa-consent`, body, { headers });
+    // const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    console.log('getPDPA body', body);
+    return this.http.post(`${this.baseUrl+'liff'}/get-pdpa-consent`, body);
   }
 
   getRestcountries() {
@@ -32,16 +33,16 @@ export class ApiService {
 
   getPassengerInfo(userId: string) {
     const body = {
-     "user_id": userId
+     "user_id": userId,
     }
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/get-passenger-info`, body, { headers });
+    // const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post(`${this.baseUrl+'liff'}/get-passenger-info`, body);
   }
 
   getServiceBundle(userId: string, language: string, currency: string) {
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
     const params = { user_id: userId, language, currency } as const;
-    return this.http.get(`${this.baseUrl+'booking'}/list_service_bundle`, { headers, params });
+    return this.http.get(`${this.baseUrl+'liff'}/list_service_bundle`, {  params });
   }
 
   getSeatMap(journeyKey?: string, fareKey?: string) {
@@ -49,22 +50,28 @@ export class ApiService {
       journeyKey: journeyKey,
       fareKey: fareKey
     }
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/retrieve-seat-map`, body, { headers });
+    // const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/retrieve-seat-map`, body);
   }
 
   getPricingSummary(payload: any) {
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/pricing-summary-service`, payload, { headers });
+    // const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/pricing-summary-service`, payload);
   }
 
   createBooking(payload: any) {
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/get-create-booking`, payload, { headers });
+    //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/get-create-booking`, payload);
   }
 
   retrieveBooking(recordLocator: string) {
-    const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/get-retrieve-booking`, { recordLocator }, { headers });
+    //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    return this.http.post(`${this.baseUrl+'liff'}/get-retrieve-booking`, { recordLocator });
+  }
+
+  pushMessage(userId: string) {
+    //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
+    const body = { user_id: userId };
+    return this.http.post(`${this.baseUrl+'liff'}/push-message`, body);
   }
 }

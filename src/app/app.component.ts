@@ -15,6 +15,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 export class AppComponent {
   title = 'liff-nok-air';
   language: string = 'th';
+  token: string = '';
 
   constructor(
     private passDataService: PassDataService,
@@ -32,10 +33,15 @@ export class AppComponent {
   ngOnInit() {
     const searchParams = new URLSearchParams(window.location.search);
     const uidFromQuery = searchParams.get('uid') || searchParams.get('UID');
+    const tokenFromQuery = searchParams.get('token') || searchParams.get('TOKEN');
     const uidFromHrefMatch = window.location.href.match(/[?&]uid=([^&#]+)/i);
     const uidFromHref = uidFromHrefMatch ? decodeURIComponent(uidFromHrefMatch[1]) : null;
     const resolvedUid = (uidFromQuery || uidFromHref || '').trim();
-
+    const resolvedToken = (tokenFromQuery || '').trim();
+    if (resolvedToken.length > 0) {
+      this.passDataService.setToken(resolvedToken);
+      this.token=resolvedToken;
+    }
     if (resolvedUid.length > 0) {
       const userId = resolvedUid;
       this.passDataService.setUserId(userId);

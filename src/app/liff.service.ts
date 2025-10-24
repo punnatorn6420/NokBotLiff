@@ -47,6 +47,10 @@ export class LiffService {
     return null;
   }
 
+  getOS(): 'ios' | 'android' | 'web' {
+    return liff.getOS() as 'ios' | 'android' | 'web';
+  }
+
   async sendMessage(message: string): Promise<void> {
     if (this.isInClient()) {
       await liff.sendMessages([{

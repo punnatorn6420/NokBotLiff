@@ -31,6 +31,9 @@ import { LoadingComponent } from './loading/loading.component';
 import { HttpErrorInterceptorInterceptor } from './http-error-interceptor.interceptor';
 import { AlertErrorComponent } from './alert-error/alert-error.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { PaymentStatusSuccessComponent } from './payment-status-success/payment-status-success.component';
+import { PaymentStatusFailComponent } from './payment-status-fail/payment-status-fail.component';
+import { PaymentStatusCancelComponent } from './payment-status-cancel/payment-status-cancel.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new MultiTranslateHttpLoader(http, [
@@ -59,6 +62,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     CounterServicePageComponent,
     LoadingComponent,
     AlertErrorComponent,
+    PaymentStatusSuccessComponent,
+    PaymentStatusFailComponent,
+    PaymentStatusCancelComponent,
   ],
   imports: [
     BrowserModule,

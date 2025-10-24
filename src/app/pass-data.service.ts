@@ -12,6 +12,7 @@ export class PassDataService {
   private totalPrice = new BehaviorSubject<number>(0);
   private userId = new BehaviorSubject<string>('');
   private recordLocator = new BehaviorSubject<string>('');
+  private token = new BehaviorSubject<string>('');
   constructor() { }
 
   setPassengerInfo(data: any) {
@@ -73,5 +74,13 @@ export class PassDataService {
 
   getRecordLocator() {
     return this.recordLocator.asObservable();
+  }
+
+  setToken(token: string) {
+    this.token.next(token);
+  }
+
+  getToken() {
+    return this.token.asObservable();
   }
 }

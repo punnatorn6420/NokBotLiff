@@ -109,7 +109,7 @@ interface Payment {
 export class ConfirmPayComponent {
   selectedPayment = 'credit';
   isLoading = false;
-
+  token = '';
   currency = 'THB';
   ui: {
     journeys: Array<{
@@ -155,6 +155,9 @@ export class ConfirmPayComponent {
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.passDataService.getToken().subscribe((token: string) => {
+      this.token = token;
+    });
     this.isLoading = true;
     this.getPricingSummary();
   }
@@ -360,9 +363,9 @@ export class ConfirmPayComponent {
     return {
       paymentMethod,
       paymentNotificationInfo: {
-        confirmationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/',
-        failedUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/',
-        cancellationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/'
+        confirmationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-success?token=' + this.token,
+        failedUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-fail?token=' + this.token,
+        cancellationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-cancel?token=' + this.token
       },
       passengerInfos
     };

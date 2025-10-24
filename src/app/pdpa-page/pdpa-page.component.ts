@@ -12,7 +12,7 @@ import { ApiService } from '../api.service';
 export class PdpaPageComponent implements OnInit {
   isAccepted = false;
   userId = '';
-
+  token = '';
   constructor(
     private router: Router, 
     private translate: TranslateService, 
@@ -28,6 +28,9 @@ export class PdpaPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.passDataService.getToken().subscribe((token: string) => {
+      this.token = token;
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.passDataService.getLanguage().subscribe(language => {
       this.switchLanguage(language as 'th' | 'en');
@@ -48,8 +51,8 @@ export class PdpaPageComponent implements OnInit {
   }
 
   onConfirm() {
-    this.apiService.setPDPA(this.userId, this.isAccepted).subscribe(() => {
-      this.router.navigate(['/form']);
-    });
+    this.apiService.setPDPA(this.userId, this.isAccepted).subscribe(() =>
+      this.router.navigate(['/form'])
+    );
   }
 }
