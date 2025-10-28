@@ -110,6 +110,7 @@ export class ConfirmPayComponent {
   selectedPayment = 'credit';
   isLoading = false;
   token = '';
+  userId = '';
   currency = 'THB';
   ui: {
     journeys: Array<{
@@ -157,6 +158,9 @@ export class ConfirmPayComponent {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.passDataService.getToken().subscribe((token: string) => {
       this.token = token;
+    });
+    this.passDataService.getUserId().subscribe((userId: string) => {
+      this.userId = userId;
     });
     this.isLoading = true;
     this.getPricingSummary();
@@ -363,9 +367,9 @@ export class ConfirmPayComponent {
     return {
       paymentMethod,
       paymentNotificationInfo: {
-        confirmationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-success?token=' + this.token,
-        failedUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-fail?token=' + this.token,
-        cancellationUrl: 'http://uat-ddservices.nokair.com/botnoi-liff/payment-status-cancel?token=' + this.token
+        confirmationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token + '&from=2c2p',
+        failedUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-status-fail?uid=' + this.userId + '&token=' + this.token,
+        cancellationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token
       },
       passengerInfos
     };
@@ -691,7 +695,7 @@ export class ConfirmPayComponent {
           this.passDataService.setRecordLocator(data.recordLocator);
           if (this.selectedPayment === 'counterservice') {
             this.isLoading = false;
-            this.router.navigate(['/counter-service']);
+            this.router.navigate(['/payment-page']);
             return;
           }
           // กรณีบัตรเครดิต เปิดลิงก์ชำระเงินถ้ามี

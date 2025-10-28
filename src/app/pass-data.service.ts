@@ -13,6 +13,7 @@ export class PassDataService {
   private userId = new BehaviorSubject<string>('');
   private recordLocator = new BehaviorSubject<string>('');
   private token = new BehaviorSubject<string>('');
+  private passengerInfoPayment = new BehaviorSubject<any>(null);
   constructor() { }
 
   setPassengerInfo(data: any) {
@@ -21,6 +22,19 @@ export class PassDataService {
 
   getPassengerInfo() {
     return this.passengerInfo.asObservable();
+  }
+
+  setPassengerInfoPayment(data: any) {
+    this.passengerInfoPayment.next(data);
+  }
+
+  getPassengerInfoPayment() {
+    return this.passengerInfoPayment.asObservable();
+  }
+
+  // ใช้ดึงค่าปัจจุบันของ passenger info (รวม state/pnr)
+  getPassengerInfoPaymentData(): any {
+    return this.passengerInfoPayment.value;
   }
 
   setLanguage(language: string) {

@@ -19,3 +19,10 @@ html { -webkit-text-size-adjust: 100%; }
 body, html, * {
   font-family: 'DB Ozone X', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* ล็อกการสกอลล์เมื่อกำลังโหลด */
+html.no-scroll, body.no-scroll {
+  overflow: hidden !important;
+  height: 100%;
+  touch-action: none;
+}

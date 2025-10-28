@@ -24,7 +24,10 @@ export class HttpErrorInterceptorInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let authReq = request;
-    if (this.token) {
+    // แนบ Authorization เฉพาะ request ที่เป็น internal (เช่น ไปยัง base path ของระบบ)
+    // กรณี external (เช่น https://api.open-meteo.com, https://restcountries.com) จะไม่แต่ง header
+    const isExternal = /^https?:\/\//i.test(request.url) && !/localhost:4000\/.+|uat-ddservices\.nokair\.com\//i.test(request.url);
+    if (!isExternal && this.token) {
       authReq = request.clone({
         setHeaders: { Authorization: `Bearer ${this.token}` }
       });

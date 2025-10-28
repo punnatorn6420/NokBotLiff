@@ -26,7 +26,6 @@ import { APP_BASE_HREF } from '@angular/common';
 import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from './review-page/review-page.component';
 import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
-import { CounterServicePageComponent } from './counter-service-page/counter-service-page.component';
 import { LoadingComponent } from './loading/loading.component';
 import { HttpErrorInterceptorInterceptor } from './http-error-interceptor.interceptor';
 import { AlertErrorComponent } from './alert-error/alert-error.component';
@@ -42,7 +41,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     { prefix: './assets/i18n/', suffix: '/seat.json' },
     { prefix: './assets/i18n/', suffix: '/review.json' },
     { prefix: './assets/i18n/', suffix: '/confirm.json' },
-    { prefix: './assets/i18n/', suffix: '/counter.json' },
     { prefix: './assets/i18n/', suffix: '/pdpa.json' },
     { prefix: './assets/i18n/', suffix: '/dialog.json' }
   ]);
@@ -59,7 +57,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     PdpaPageComponent,
     ReviewPageComponent,
     ConfirmPayComponent,
-    CounterServicePageComponent,
     LoadingComponent,
     AlertErrorComponent,
     PaymentStatusSuccessComponent,

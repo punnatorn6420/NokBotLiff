@@ -1,1 +1,132 @@
-<p>payment-status-success works!</p>
+<app-loading *ngIf="isLoading"></app-loading>
+<div class="container-counter-service-page-content">
+    <div class="screenshot" #screenshotContainer>
+    <div class="header-section">
+        <div class="brand">
+            <img src="https://bn-sme-production-ap-southeast-1.s3.amazonaws.com/6892ccc117930b5c0e3d8ce5/6602da07-6081-40c4-b8a1-7595fcea20cd.png" alt="Nok Air" class="brand-logo" />
+        </div>
+        <div class="cloud-left">
+            <svg width="112" height="118" viewBox="0 0 112 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path opacity="0.5" d="M9.5 0C24.1355 0 36 11.8645 36 26.5C36 29.6093 35.4613 32.5923 34.4775 35.3643C53.8408 37.9495 68.9283 54.0483 69.9443 73.8662C74.3951 69.0144 80.6154 66 87.5 66C101.031 66 112 77.6406 112 92C112 106.359 101.031 118 87.5 118C75.8936 118 66.1722 109.435 63.6416 97.9365C56.3709 109.394 43.5744 117 29 117C6.35633 117 -12 98.6437 -12 76C-12 66.1395 -8.51877 57.0923 -2.71875 50.0195C-11.2045 45.6021 -17 36.7284 -17 26.5C-17 11.8645 -5.13555 0 9.5 0Z" fill="white"/>
+            </svg>                
+        </div>
+        <div class="cloud-right">
+            <svg width="114" height="131" viewBox="0 0 114 131" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path opacity="0.5" d="M116 0C140.853 0 161 20.1472 161 45C161 63.9881 149.239 80.2282 132.604 86.8359C134.147 90.5863 135 94.6934 135 99C135 116.673 120.673 131 103 131C98.1065 131 93.4706 129.899 89.3232 127.936C85.8028 129.268 81.9871 130 78 130C66.5538 130 56.5132 123.989 50.8574 114.953C46.8019 124.391 37.4233 131 26.5 131C11.8645 131 0 119.136 0 104.5C0 89.8645 11.8645 78 26.5 78C35.0451 78 42.6433 82.0461 47.4893 88.3252C51.4188 75.9216 62.702 66.7907 76.2207 66.0498C72.8898 59.7683 71 52.6053 71 45C71 20.1472 91.1472 0 116 0Z" fill="white"/>
+            </svg> 
+        </div>
+        <div class="plane">
+            <img src="https://bn-sme-production-ap-southeast-1.s3.amazonaws.com/6892ccc117930b5c0e3d8ce5/fb4a71ea-4ee9-43ce-b7b0-805628c07f9b.png" />
+        </div>
+    </div>
+    <div class="container-content-service">
+        <div class="content-section">
+            <div class="icon-succes" *ngIf="bookingStatus === 'Paid'">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 4.125C18.4647 4.125 15.0087 5.17335 12.0692 7.13748C9.12966 9.10161 6.83858 11.8933 5.48566 15.1595C4.13274 18.4258 3.77876 22.0198 4.46847 25.4872C5.15818 28.9547 6.86061 32.1397 9.36047 34.6395C11.8603 37.1394 15.0454 38.8418 18.5128 39.5315C21.9802 40.2212 25.5742 39.8673 28.8405 38.5143C32.1067 37.1614 34.8984 34.8703 36.8625 31.9308C38.8267 28.9913 39.875 25.5353 39.875 22C39.87 17.2608 37.9851 12.7171 34.634 9.36599C31.2829 6.01487 26.7392 4.13 22 4.125ZM29.8478 18.8478L20.2228 28.4728C20.0951 28.6007 19.9435 28.7021 19.7766 28.7713C19.6096 28.8405 19.4307 28.8761 19.25 28.8761C19.0693 28.8761 18.8904 28.8405 18.7235 28.7713C18.5565 28.7021 18.4049 28.6007 18.2772 28.4728L14.1522 24.3478C13.8942 24.0898 13.7492 23.7399 13.7492 23.375C13.7492 23.0101 13.8942 22.6602 14.1522 22.4022C14.4102 22.1442 14.7601 21.9992 15.125 21.9992C15.4899 21.9992 15.8398 22.1442 16.0978 22.4022L19.25 25.5561L27.9022 16.9022C28.0299 16.7744 28.1816 16.6731 28.3485 16.604C28.5154 16.5348 28.6943 16.4992 28.875 16.4992C29.0557 16.4992 29.2346 16.5348 29.4015 16.604C29.5684 16.6731 29.7201 16.7744 29.8478 16.9022C29.9756 17.0299 30.0769 17.1816 30.146 17.3485C30.2152 17.5154 30.2508 17.6943 30.2508 17.875C30.2508 18.0557 30.2152 18.2346 30.146 18.4015C30.0769 18.5684 29.9756 18.7201 29.8478 18.8478Z" fill="#3AC05E"/>
+                    </svg>                                 
+            </div>
+            <div class="icon-succes" *ngIf="bookingStatus === 'Unpaid'">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.9993 3.66602C32.1248 3.66602 40.3327 11.8738 40.3327 21.9993C40.3327 32.1248 32.1248 40.3327 21.9993 40.3327C11.8738 40.3327 3.66602 32.1248 3.66602 21.9993C3.66602 11.8738 11.8738 3.66602 21.9993 3.66602ZM21.9993 10.9993C21.5131 10.9993 21.0468 11.1925 20.703 11.5363C20.3592 11.8801 20.166 12.3465 20.166 12.8327V21.9993C20.1661 22.4855 20.3593 22.9518 20.7032 23.2955L26.2032 28.7955C26.549 29.1295 27.0121 29.3143 27.4928 29.3101C27.9734 29.3059 28.4333 29.1131 28.7732 28.7732C29.1131 28.4333 29.3059 27.9734 29.3101 27.4928C29.3143 27.0121 29.1295 26.549 28.7955 26.2032L23.8327 21.2404V12.8327C23.8327 12.3465 23.6395 11.8801 23.2957 11.5363C22.9519 11.1925 22.4856 10.9993 21.9993 10.9993Z" fill="#F79009"/>
+                    </svg>                                                
+            </div>
+            <span class="title" *ngIf="bookingStatus === 'Paid'">
+                <p>การจองที่สำเร็จ</p>
+                <p>ขอบคุณที่ใช้บริการนกแอร์</p>
+            </span>
+            <span class="title-unpaid" *ngIf="bookingStatus === 'Unpaid'">
+                <p>กรุณาชำระเงินที่เคาน์เตอร์</p>
+                <p>เพื่อทำรายการให้สำเร็จ</p>
+            </span>
+            <span class="warning" *ngIf="bookingStatus === 'Unpaid'">
+                <p *ngIf="holdExpireDisplay">หากไม่ชำระเงินภายใน {{ holdExpireDisplay }} การจองของคุณจะถูกยกเลิก</p>
+                <p *ngIf="!holdExpireDisplay">กรุณาชำระเงินที่เคาน์เตอร์ภายในเวลาที่กำหนด</p>
+            </span>
+            <p class="payment-ref" *ngIf="bookingStatus === 'Unpaid'">
+                หมายเลขอ้างอิงการชำระเงิน คือ {{ paymentReferenceNumber || '-' }}
+            </p>
+            <div class="container-booking-number-ref">
+                <div class="box-left">
+                    <p style="font-size: 16px; margin-top: 15px;">Booking Number</p>
+                    <p style="font-size: 24px; margin-top: -10px;">{{ bookingId || '-' }}</p>
+                </div>
+                <div class="box-right">
+                    <p style="font-size: 16px; margin-top: 15px;">Booking Reference (PNR)</p>
+                    <P style="font-size: 24px; margin-top: -10px;">{{ bookingReferencePNR || '-' }}</P>
+                </div>
+            </div>
+            <div class="container-name">
+                <p style="font-size: 16px; margin-top: 15px;">ชื่อผู้โดยสาร (ผู้จอง)</p>
+                <p style="font-size: 22px; margin-top: -10px;">{{ passengerName || '-' }}</p>
+            </div>
+            <div class="flight-info" *ngIf="outboundView">
+                <div class="header-flight-info">
+                    <p>{{ outboundView.header }}</p>
+                    <p>{{ outboundView.dateText }}</p>
+                </div>
+                <div class="content-flight-info">
+                    <div class="departure-time">
+                        <p>{{ outboundView.depTime }}</p>
+                    </div>
+                    <div class="dash-line"></div>
+                    <div class="icon-plane">
+                        <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.5 21H10.5L15.5 13H21C21.83 13 22.5 12.33 22.5 11.5C22.5 10.67 21.83 10 21 10H15.5L10.5 2H8.5L11 10H5.5L4 8H2.5L3.5 11.5L2.5 15H4L5.5 13H11L8.5 21Z" fill="#FCCD01"/>
+                        </svg>                            
+                    </div>
+                    <div class="dash-line"></div>
+                    <div class="arrival-time">
+                        <p>{{ outboundView.arrTime }}</p>
+                    </div>
+                </div>
+                <div class="footer-flight-info">
+                    <p>{{ outboundView.originText }}</p>
+                    <p>{{ outboundView.stopText }}</p>
+                    <p>{{ outboundView.destText }}</p>
+                </div>
+            </div>
+
+            <div class="flight-info" *ngIf="inboundView">
+                <div class="header-flight-info">
+                    <p>{{ inboundView.header }}</p>
+                    <p>{{ inboundView.dateText }}</p>
+                </div>
+                <div class="content-flight-info">
+                    <div class="departure-time">
+                        <p>{{ inboundView.depTime }}</p>
+                    </div>
+                    <div class="dash-line"></div>
+                    <div class="icon-plane">
+                        <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.5 21H10.5L15.5 13H21C21.83 13 22.5 12.33 22.5 11.5C22.5 10.67 21.83 10 21 10H15.5L10.5 2H8.5L11 10H5.5L4 8H2.5L3.5 11.5L2.5 15H4L5.5 13H11L8.5 21Z" fill="#FCCD01"/>
+                        </svg>                            
+                    </div>
+                    <div class="dash-line"></div>
+                    <div class="arrival-time">
+                        <p>{{ inboundView.arrTime }}</p>
+                    </div>
+                </div>
+                <div class="footer-flight-info">
+                    <p>{{ inboundView.originText }}</p>
+                    <p>{{ inboundView.stopText }}</p>
+                    <p>{{ inboundView.destText }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="note-box" *ngIf="bookingStatus === 'Unpaid'">
+        <div class="note-icon">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.0168 16.999L11.0748 5.21604C11.2234 4.97121 11.4326 4.7688 11.6822 4.62833C11.9318 4.48786 12.2134 4.41406 12.4998 4.41406C12.7862 4.41406 13.0678 4.48786 13.3174 4.62833C13.567 4.7688 13.7762 4.97121 13.9248 5.21604L20.9828 16.999C21.1282 17.2511 21.2051 17.5368 21.2059 17.8278C21.2067 18.1187 21.1313 18.4049 20.9872 18.6577C20.8431 18.9104 20.6353 19.1211 20.3846 19.2687C20.1338 19.4163 19.8488 19.4957 19.5578 19.499H5.4418C5.15072 19.496 4.86551 19.4168 4.61457 19.2693C4.36364 19.1217 4.15574 18.911 4.01159 18.6581C3.86743 18.4052 3.79206 18.119 3.79298 17.8279C3.79389 17.5368 3.87106 17.251 4.0168 16.999ZM12.4998 8.99904C12.765 8.99904 13.0194 9.1044 13.2069 9.29193C13.3944 9.47947 13.4998 9.73382 13.4998 9.99904V12.999C13.4998 13.2643 13.3944 13.5186 13.2069 13.7061C13.0194 13.8937 12.765 13.999 12.4998 13.999C12.2346 13.999 11.9802 13.8937 11.7927 13.7061C11.6052 13.5186 11.4998 13.2643 11.4998 12.999V9.99904C11.4998 9.73382 11.6052 9.47947 11.7927 9.29193C11.9802 9.1044 12.2346 8.99904 12.4998 8.99904ZM11.4998 15.999C11.4998 15.7338 11.6052 15.4795 11.7927 15.2919C11.9802 15.1044 12.2346 14.999 12.4998 14.999H12.5078C12.773 14.999 13.0274 15.1044 13.2149 15.2919C13.4024 15.4795 13.5078 15.7338 13.5078 15.999C13.5078 16.2643 13.4024 16.5186 13.2149 16.7061C13.0274 16.8937 12.773 16.999 12.5078 16.999H12.4998C12.2346 16.999 11.9802 16.8937 11.7927 16.7061C11.6052 16.5186 11.4998 16.2643 11.4998 15.999Z" fill="#FCCD01"/>
+                </svg>                
+        </div>
+        <div class="note-text">กรุณาบันทึกหน้าจอ เพื่อความสะดวกในการชำระเงินที่เคาน์เตอร์สนามบินค่ะ</div>
+    </div>
+
+    <!-- <div class="button-save">
+        <button (click)="saveImage()">บันทึกหน้าจอ</button>
+    </div> -->
+</div>

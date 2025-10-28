@@ -70,10 +70,12 @@ export class AppComponent {
   }
 
    fetchInitialData(userId: string) {
+    let passengerInfoFull: any = null;
     this.apiService
       .getPassengerInfo(userId)
       .pipe(
         tap((response: any) => {
+          passengerInfoFull = response;
           console.log(response?.flight);
           const apiLang = (response?.flight?.flight_search?.language || '').toString().toLowerCase();
           const lang = apiLang === 'en' ? 'en' : 'th';
@@ -86,10 +88,27 @@ export class AppComponent {
           return of(null);
         })
       )
-      .subscribe((response: any) => {
-        if (!response) return; 
-        if (response.consent) {
-          this.router.navigate(['/form']);
+      .subscribe((pdpaResponse: any) => {
+        if (!pdpaResponse) return; 
+        if (pdpaResponse.consent) {
+          const currentPath = (this.router.url || '').split('?')[0];
+          console.log('currentPath', currentPath);
+          const isPaymentRedirect = (
+            currentPath === '/payment-page' ||
+            currentPath === '/payment-status-fail'
+          );
+          if (isPaymentRedirect) {
+            console.log('isPaymentRedirect');
+            return;
+          }
+
+          const hasBooked = (passengerInfoFull?.state === 'booked') && !!passengerInfoFull?.pnr;
+
+          if (hasBooked) {
+            this.router.navigate(['/payment-page']);
+          } else {
+            this.router.navigate(['/form']);
+          }
         } else {
           this.router.navigate(['/pdpa']);
         }

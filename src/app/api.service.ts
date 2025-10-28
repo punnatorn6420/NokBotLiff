@@ -5,8 +5,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApiService {
-  baseUrl = "https://uat-ddservices.nokair.com/botnoi-api/api/";
-  // baseUrl = "http://localhost:4000/api/";
+  // baseUrl = "https://uat-ddservices.nokair.com/botnoi-api/api/";
+  baseUrl = "http://localhost:4000/api/";
 
   constructor(private http: HttpClient) { }
 
