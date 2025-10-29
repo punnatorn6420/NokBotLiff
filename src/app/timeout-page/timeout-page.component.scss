@@ -1,0 +1,38 @@
+.timeout-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.content {
+  padding: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  svg {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4A4A4A;
+  margin: 12px 0 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #6B6B6B;
+  line-height: 1.6;
+}
+
+

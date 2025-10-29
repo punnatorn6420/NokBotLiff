@@ -9,6 +9,7 @@ import { AlertErrorComponent } from './alert-error/alert-error.component';
 import { PaymentStatusSuccessComponent } from './payment-status-success/payment-status-success.component';
 import { PaymentStatusFailComponent } from './payment-status-fail/payment-status-fail.component';
 import { PaymentStatusCancelComponent } from './payment-status-cancel/payment-status-cancel.component';
+import { TimeoutPageComponent } from './timeout-page/timeout-page.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,10 @@ const routes: Routes = [
   {
     path: 'payment-status-cancel',
     component: PaymentStatusCancelComponent
+  },
+  {
+    path: 'timeout-page',
+    component: TimeoutPageComponent
   }
 ];
 

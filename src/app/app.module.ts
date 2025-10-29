@@ -33,6 +33,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { PaymentStatusSuccessComponent } from './payment-status-success/payment-status-success.component';
 import { PaymentStatusFailComponent } from './payment-status-fail/payment-status-fail.component';
 import { PaymentStatusCancelComponent } from './payment-status-cancel/payment-status-cancel.component';
+import { TimeoutPageComponent } from './timeout-page/timeout-page.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new MultiTranslateHttpLoader(http, [
@@ -62,6 +63,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     PaymentStatusSuccessComponent,
     PaymentStatusFailComponent,
     PaymentStatusCancelComponent,
+    TimeoutPageComponent,
   ],
   imports: [
     BrowserModule,

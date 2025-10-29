@@ -103,9 +103,12 @@ export class AppComponent {
           }
 
           const hasBooked = (passengerInfoFull?.state === 'booked') && !!passengerInfoFull?.pnr;
+          const hasBookTimeout = (passengerInfoFull?.state === 'timeout');
 
           if (hasBooked) {
             this.router.navigate(['/payment-page']);
+          }else if (hasBookTimeout) {
+            this.router.navigate(['/timeout-page']);
           } else {
             this.router.navigate(['/form']);
           }
