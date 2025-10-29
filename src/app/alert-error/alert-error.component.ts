@@ -12,6 +12,7 @@ export class AlertErrorComponent {
   isError = false;
   isNotFound = false;
   isSeatAlreadyBooked = false;
+  isTimeout = false;
   constructor(
     private location: Location,
     private route: ActivatedRoute,
@@ -21,6 +22,7 @@ export class AlertErrorComponent {
       this.isError = params.isError;
       this.isNotFound = params.isNotFound;
       this.isSeatAlreadyBooked = params.isSeatAlreadyBooked;
+      this.isTimeout = params.isTimeout;
     });
    }
 
