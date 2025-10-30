@@ -540,6 +540,26 @@ export class PassengerFormComponent {
     this.dialCodeOptions = _data;
 
     this.revalidateOptionControls();
+
+    // ตั้งค่า default สำหรับทริปในประเทศ: สัญชาติไทย และ dial code +66
+    if (!this.isInternationalTrip) {
+      // ตั้งสัญชาติเป็น Thailand หากยังว่าง
+      Object.values(this.passengerForms).forEach((form: FormGroup) => {
+        const nat = form?.get('nationality');
+        if (nat && !nat.value) {
+          const thName = 'Thailand';
+          if (this.nationalityOptions.includes(thName)) {
+            nat.setValue(thName, { emitEvent: false });
+          }
+        }
+      });
+      // ตั้ง dial code เริ่มต้นเป็น +66 สำหรับผู้โดยสารคนที่ 1 หากยังว่าง
+      const form1 = this.passengerForms[1];
+      const dc = form1?.get('dialCode');
+      if (dc && !dc.value) {
+        dc.setValue('+66', { emitEvent: false });
+      }
+    }
   }
 
   // ปรับปรุงฟังก์ชัน extractDialCode
@@ -584,6 +604,45 @@ export class PassengerFormComponent {
     return option.flag;
   }
 
+  // หารหัสโทรศัพท์จากชื่อประเทศ (สัญชาติ)
+  private getDialCodeByCountryName(countryName: string): string | null {
+    if (!countryName) return null;
+    const lower = countryName.toLowerCase();
+    const matches = (this.dialCodeOptions || []).filter((opt: any) => {
+      if (typeof opt === 'string') return false;
+      return (opt.name || '').toLowerCase() === lower;
+    });
+    if (matches.length === 0) return null;
+    // เลือก idd ที่สั้นสุด (เช่น root) หากมีหลายรายการ
+    const best = matches.reduce((prev: any, curr: any) => {
+      const prevLen = (this.extractDialCode(prev) || '').length;
+      const currLen = (this.extractDialCode(curr) || '').length;
+      return currLen < prevLen ? curr : prev;
+    });
+    return this.extractDialCode(best) || null;
+  }
+
+  // ผูกการเปลี่ยนแปลงของสัญชาติเพื่ออัปเดต dial code อัตโนมัติ (เฉพาะผู้โดยสารคนที่ 1 ที่มี dialCode)
+  private subscribeNationalityToDialCode(form: FormGroup) {
+    const nationalityControl = form.get('nationality');
+    const dialCodeControl = form.get('dialCode');
+    if (!nationalityControl || !dialCodeControl) return;
+
+    // ตั้งค่าครั้งแรกจากค่าปัจจุบัน (ถ้ามี)
+    const initialNat = (nationalityControl.value ?? '').toString();
+    const initialDial = this.getDialCodeByCountryName(initialNat);
+    if (initialDial && !dialCodeControl.value) {
+      dialCodeControl.setValue(initialDial, { emitEvent: false });
+    }
+
+    nationalityControl.valueChanges.subscribe((val: string) => {
+      const code = this.getDialCodeByCountryName((val ?? '').toString());
+      if (code) {
+        dialCodeControl.setValue(code, { emitEvent: false });
+      }
+    });
+  }
+
   // สร้าง FormGroup สำหรับผู้โดยสารแต่ละคน
   private initializePassengerForms() {
     if (!this.numberPassengerArray || this.numberPassengerArray.length === 0) {
@@ -610,7 +669,7 @@ export class PassengerFormComponent {
           firstName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
           middleName: new FormControl('', [Validators.pattern(/^[a-zA-Z\s]+$/)]),
           lastName: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]),
-          birthDate: new FormControl(null, [Validators.required, this.minAgeValidator(18)]),
+          birthDate: new FormControl(null, [Validators.required, this.minAgeValidator(12)]),
           nationality: new FormControl('', nationalityValidators),
           country: new FormControl('', countryValidators),
           passportNumber: new FormControl('', passportValidators),
@@ -640,6 +699,8 @@ export class PassengerFormComponent {
           this.passengerForms[passengerNumber].patchValue(prefill);
           this.normalizeDialCodeValue(this.passengerForms[passengerNumber]);
         }
+        // ผูกสัญชาติกับ dial code อัตโนมัติสำหรับผู้โดยสารคนที่ 1
+        this.subscribeNationalityToDialCode(this.passengerForms[passengerNumber]);
         // ผูกการสลับ validators ตามอายุ (Infant ไม่ตรวจพาสปอร์ต)
         this.bindInfantPassportValidators(passengerNumber);
       } else {

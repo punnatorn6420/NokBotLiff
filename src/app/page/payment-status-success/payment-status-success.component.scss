@@ -100,6 +100,13 @@
         color: #FF8A00;
         margin-top: 15px;
     }
+    .title-WaitingForPayment {
+        text-align: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #DE3024;
+        margin-top: 15px;
+    }
 
     .warning {
         text-align: center;
@@ -111,7 +118,7 @@
 
     .payment-ref {
         text-align: center;
-        font-size: 14px;
+        font-size: 16px;
         color: #DE3024;
         margin: 0 0 8px 0;
     }
@@ -282,4 +289,24 @@
 .note-text { 
     font-size: 16px; 
     // text-align: center;
+}
+
+.button-try-again {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 24px 0 32px;
+
+    button {
+        background-color: #FCCD01; /* Nok Air yellow */
+        color: #111111;
+        width: 90vw;
+        max-width: 500px;
+        height: 56px;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        border: 1px solid #111111;
+        cursor: pointer;
+    }
 }
