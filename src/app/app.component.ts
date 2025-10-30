@@ -108,7 +108,7 @@ export class AppComponent {
           if (hasBooked) {
             this.router.navigate(['/payment-page']);
           }else if (hasBookTimeout) {
-            this.router.navigate(['/error'], { queryParams: { isTimeout: true } });
+            this.router.navigate(['/error'], { queryParams: { isTimeout: true }, replaceUrl: true });
           } else {
             this.router.navigate(['/form']);
           }
