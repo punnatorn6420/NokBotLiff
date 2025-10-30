@@ -1,0 +1,150 @@
+
+@font-face {
+  font-family: 'DB Ozone X';
+  src: url('../../../assets/font/DBOzoneX.woff2') format('woff2'),
+       url('../../../assets/font/DBOzoneX.woff') format('woff'),
+       url('../../../assets/font/DBOzoneX.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+    font-family: 'DB Ozone X';
+  }
+
+.pdpa-header {
+    display: flex;
+    align-items: center;
+    height: 64px;
+    padding: 16px;
+    background: #FCCD01;
+    .logo {
+      margin-left: 16px;
+      margin-right: 16px;
+      height: 48px;
+      width: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+        img {
+            width: 48px;
+            height: 48px;
+        }
+    }
+    .pdpa-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #000;
+    }
+  }
+  
+.pdpa-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 32px 0;
+  }
+  .pdpa-content {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 18px;
+    padding-bottom: 120px;
+  }
+  .pdpa-title-main {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .pdpa-list {
+    padding-left: 18px;
+    margin-bottom: 18px;
+  }
+  .pdpa-list > li {
+    margin-bottom: 16px;
+    font-size: 22px;
+    line-height: 1.6;
+  }
+  .pdpa-list b {
+    font-size: 22px;
+  }
+  .pdpa-list ul {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-left: 18px;
+  }
+  .pdpa-list ul li {
+    list-style: disc;
+    font-size: 22px;
+    margin-bottom: 2px;
+  }
+  .pdpa-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    float: right;
+    margin-left: 10px;
+    margin-top: 4px;
+  }
+
+
+.pdpa-checkbox-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+  .pdpa-checkbox-row {
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+  }
+  .pdpa-checkbox-row input[type="checkbox"] {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    margin-right: 14px;
+    accent-color: #FFD600;
+    vertical-align: middle;
+  }
+  .pdpa-checkbox-row label {
+    line-height: 1.4;
+    user-select: none;
+  }
+  .pdpa-confirm-btn {
+    margin-top: 30px;
+    width: 100%;
+    background: #e0e0e0;
+    color: #888;
+    font-size: 22px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 0;
+    cursor: not-allowed;
+    margin-bottom: 8px;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid #222;
+    max-width: 500px;
+  }
+  .pdpa-confirm-btn.active {
+    background: #FFD600;
+    border: 1px solid #222;
+    color: #222;
+    cursor: pointer;
+  }
+  

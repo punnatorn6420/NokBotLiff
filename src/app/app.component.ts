@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { PassDataService } from './pass-data.service';
-import { LiffService } from './liff.service';
-import { ApiService } from './api.service';
+import { PassDataService } from './core/services/pass-data.service';
+import { LiffService } from './core/services/liff.service';
+import { ApiService } from './core/services/api.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';

@@ -3,36 +3,25 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PassengerFormComponent } from './passenger-form/passenger-form.component';
-import { HeaderComponent } from './header/header.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
-import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from './date-adapter-th';
+import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from './core/services/date-adapter-th';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import { FlightSeatComponent } from './flight-seat/flight-seat.component';
-import { DialogComponent } from './dialog/dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { MultiTranslateHttpLoader } from './i18n/multi-translate-loader';
+import { MultiTranslateHttpLoader } from './core/services/i18n/multi-translate-loader';
 import { APP_BASE_HREF } from '@angular/common';
-import { PdpaPageComponent } from './pdpa-page/pdpa-page.component';
-import { ReviewPageComponent } from './review-page/review-page.component';
-import { ConfirmPayComponent } from './confirm-pay/confirm-pay.component';
-import { LoadingComponent } from './loading/loading.component';
-import { HttpErrorInterceptorInterceptor } from './http-error-interceptor.interceptor';
-import { AlertErrorComponent } from './alert-error/alert-error.component';
+import { HttpErrorInterceptorInterceptor } from './core/interceptors/http-error-interceptor.interceptor';
+import { SharedModule } from './shared/shared.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { PaymentStatusSuccessComponent } from './payment-status-success/payment-status-success.component';
-import { PaymentStatusFailComponent } from './payment-status-fail/payment-status-fail.component';
-import { PaymentStatusCancelComponent } from './payment-status-cancel/payment-status-cancel.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new MultiTranslateHttpLoader(http, [
@@ -50,22 +39,11 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-    PassengerFormComponent,
-    HeaderComponent,
-    FlightSeatComponent,
-    DialogComponent,
-    PdpaPageComponent,
-    ReviewPageComponent,
-    ConfirmPayComponent,
-    LoadingComponent,
-    AlertErrorComponent,
-    PaymentStatusSuccessComponent,
-    PaymentStatusFailComponent,
-    PaymentStatusCancelComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    SharedModule,
     BrowserAnimationsModule,
     MatFormFieldModule,
     MatSelectModule,

@@ -1,0 +1,75 @@
+
+@font-face {
+    font-family: 'DB Ozone X';
+    src: url('../../../assets/font/DBOzoneX.woff2') format('woff2'),
+         url('../../../assets/font/DBOzoneX.woff') format('woff'),
+         url('../../../assets/font/DBOzoneX.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+:host {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255, 255, 255);
+}
+
+.plane-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.plane-animation {
+  position: relative;
+  width: 80px;
+  height: 60px;
+}
+
+.paper-plane-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: fly 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.plane-shadow {
+  position: absolute;
+  left: 15px;
+  top: 38px;
+  width: 50px;
+  height: 8px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 50%;
+  filter: blur(1px);
+  animation: shadow-move 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes fly {
+  0%   { transform: translateY(0) scale(1) rotate(-2deg);}
+  50%  { transform: translateY(-18px) scale(1.05) rotate(2deg);}
+  100% { transform: translateY(0) scale(1) rotate(-2deg);}
+}
+
+@keyframes shadow-move {
+  0%   { transform: scaleX(1) scaleY(1);}
+  50%  { transform: scaleX(1.2) scaleY(0.8);}
+  100% { transform: scaleX(1) scaleY(1);}
+}
+
+.loading-text {
+  margin-top: 24px;
+  font-size: 1.2rem;
+  font-family: 'DB Ozone X';
+  color: #ffd600;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
