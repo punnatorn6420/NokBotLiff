@@ -200,6 +200,9 @@
                             <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('required')">
                                 {{ 'ERROR_REQUIRED_PHONE' | translate }}
                             </mat-error>
+                            <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('invalidPhoneByCountry')">
+                                {{ 'ERROR_INVALID_PHONE_BY_COUNTRY' | translate }}
+                            </mat-error>
                             <!-- <mat-error *ngIf="currentForm.get('phoneNumber')?.hasError('pattern')">
                                 {{ 'ERROR_PATTERN_PHONE' | translate }}
                             </mat-error> -->
@@ -221,7 +224,7 @@
                 <div class="service-bundle-container" *ngIf="canShowBundles && ((visibleOutboundBundles?.length || 0) > 0 || (visibleReturnBundles?.length || 0) > 0)">
                     <div class="service-bundle-outbound" *ngIf="visibleOutboundBundles.length > 0">
                         <div class="service-bundle-header">
-                            <span>{{ 'BUNDLE_SELECT' | translate }} <span class="route-text">- {{ 'OUTBOUND' | translate }}</span></span>
+                            <span>{{ 'BUNDLE_SELECT' | translate }} <span *ngIf="isRoundTrip()" class="route-text">- {{ 'OUTBOUND' | translate }}</span></span>
                             <span class="muted">| {{ 'OPTIONAL_SERVICE' | translate }}</span>
                         </div>
                         <div class="bundle-list">
@@ -265,7 +268,7 @@
 
                     <div class="service-bundle-inbound" *ngIf="visibleReturnBundles.length > 0">
                         <div class="service-bundle-header">
-                            <span>{{ 'BUNDLE_SELECT' | translate }} <span class="route-text">- {{ 'INBOUND' | translate }}</span></span>
+                            <span>{{ 'BUNDLE_SELECT' | translate }} <span *ngIf="isRoundTrip()" class="route-text">- {{ 'INBOUND' | translate }}</span></span>
                             <span class="muted">| {{ 'OPTIONAL_SERVICE' | translate }}</span>
                         </div>
                         <div class="bundle-list">

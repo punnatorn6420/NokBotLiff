@@ -294,7 +294,7 @@
         
         <!-- Outbound: แสดงเมื่อมีทิศทางขาไป -->
         <div *ngIf="hasOutboundDirection()">
-            <div class="bundle-subtitle" *ngIf="hasOutboundDirection()">{{ 'REVIEW_PAGE_OUTBOUND' | translate }}</div>
+            <div class="bundle-subtitle" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_OUTBOUND' | translate }}</div>
             <!-- Outbound Service Bundle -->
             <div class="service-bundle-section" *ngIf="hasOutboundServiceBundle() || hasOutboundPassengerBundle()">
             <!-- กรณีมี bundle จาก API (แสดงการ์ดหลัก) -->

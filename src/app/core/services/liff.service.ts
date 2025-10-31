@@ -28,9 +28,9 @@ export class LiffService {
     return liff.isLoggedIn();
   }
 
-  async login(): Promise<void> {
+  async login(token: string): Promise<void> {
     if (!this.isLoggedIn()) {
-      liff.login();
+      liff.login({ redirectUri: window.location.href + '?token=' + token });
     }
   }
 

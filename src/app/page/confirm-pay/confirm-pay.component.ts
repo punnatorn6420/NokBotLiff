@@ -367,12 +367,12 @@ export class ConfirmPayComponent {
     return {
       paymentMethod,
       paymentNotificationInfo: {
-        confirmationUrl: 'http://localhost:4200/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token + '&from=2c2p',
-        failedUrl: 'http://localhost:4200/botnoi-liff/payment-status-fail?uid=' + this.userId + '&token=' + this.token,
-        cancellationUrl: 'http://localhost:4200/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token
-        // confirmationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token + '&from=2c2p',
-        // failedUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-status-fail?uid=' + this.userId + '&token=' + this.token,
-        // cancellationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token
+        // confirmationUrl: 'http://localhost:4200/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token + '&from=2c2p',
+        // failedUrl: 'http://localhost:4200/botnoi-liff/payment-status-fail?uid=' + this.userId + '&token=' + this.token,
+        // cancellationUrl: 'http://localhost:4200/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token
+        confirmationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token + '&from=2c2p',
+        failedUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-status-fail?uid=' + this.userId + '&token=' + this.token,
+        cancellationUrl: 'https://uat-ddservices.nokair.com/botnoi-liff/payment-page?uid=' + this.userId + '&token=' + this.token
       },
       passengerInfos
     };

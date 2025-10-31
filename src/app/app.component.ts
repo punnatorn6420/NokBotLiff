@@ -58,7 +58,7 @@ export class AppComponent {
       // }
 
       if (!this.liffService.isLoggedIn()) {
-        await this.liffService.login();
+        await this.liffService.login(this.token);
         return;
       }
 

@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { ApiService } from '../../core/services/api.service';
 import { PassDataService } from '../../core/services/pass-data.service';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 // import { TranslateService } from '@ngx-translate/core';
 
 interface BundleDetail {
@@ -147,6 +148,10 @@ export class PassengerFormComponent {
   lastFilteredDialCodeOptions: any[] = [];
 
   isLoading = false;
+
+  // เก็บเที่ยวบินขาไป/ขากลับ เพื่อใช้เช็คการมีอยู่ของแต่ละขา
+  outboundFlightData: any[] = [];
+  inboundFlightData: any[] = [];
 
   // ลบ state ระดับคอมโพเนนต์สำหรับ Special Assistance ออก เพื่อใช้ค่าจากฟอร์มแทน
 
@@ -415,6 +420,16 @@ export class PassengerFormComponent {
       } catch (_) {
         this.isInternationalTrip = false;
       }
+
+    // กำหนดข้อมูลเที่ยวบินขาไป/ขากลับจาก passenger info
+    const outboundFlights = Array.isArray(data?.outbound_flight_select?.flight_detail)
+      ? data.outbound_flight_select.flight_detail
+      : [];
+    const inboundFlights = Array.isArray(data?.inbound_flight_select?.flight_detail)
+      ? data.inbound_flight_select.flight_detail
+      : [];
+    this.outboundFlightData = outboundFlights;
+    this.inboundFlightData = inboundFlights;
       const adults = data?.flight_search?.adults ?? 0;
       const children = data?.flight_search?.children ?? 0;
       const infants = data?.flight_search?.infants ?? 0;
@@ -693,6 +708,22 @@ export class PassengerFormComponent {
           other: new FormControl(false),
           otherReason: new FormControl('')
         });
+        // ผูกตัวตรวจสอบเบอร์โทรตาม dial code และอัปเดตเมื่อเปลี่ยนรหัสประเทศ (เฉพาะผู้โดยสารคนที่ 1)
+        const dialCtrl = this.passengerForms[passengerNumber].get('dialCode');
+        const phoneCtrl = this.passengerForms[passengerNumber].get('phoneNumber');
+        if (dialCtrl && phoneCtrl) {
+          phoneCtrl.setValidators([
+            Validators.required,
+            this.phoneNumberByDialCodeValidator(() => {
+              const raw = dialCtrl.value;
+              return typeof raw === 'string' ? raw : this.extractDialCode(raw);
+            })
+          ]);
+          phoneCtrl.updateValueAndValidity({ emitEvent: false });
+          dialCtrl.valueChanges.subscribe(() => {
+            phoneCtrl.updateValueAndValidity({ emitEvent: false });
+          });
+        }
         // พรีโหลดข้อมูลจาก service ถ้ามี เพื่อให้ฟอร์ม valid ตั้งแต่เริ่มต้น
         const prefill = (this.passengersData && this.passengersData[passengerNumber]) ? this.passengersData[passengerNumber] : null;
         if (prefill) {
@@ -1278,6 +1309,32 @@ export class PassengerFormComponent {
     };
   }
 
+  // ตรวจสอบความถูกต้องของเบอร์โทรศัพท์ด้วย libphonenumber-js โดยอิงจาก dialCode
+  private phoneNumberByDialCodeValidator(getDialCode: () => string | null): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const nationalPartRaw = (control.value ?? '').toString();
+      if (!nationalPartRaw) return null; // ปล่อยให้ required จัดการค่าว่าง
+
+      // เอาเฉพาะตัวเลขจากช่องเบอร์โทร
+      const nationalPart = nationalPartRaw.replace(/\D/g, '');
+      const dial = (getDialCode() || '').toString();
+      if (!dial) return null; // ถ้าไม่มี dialCode ไม่บังคับตรวจ
+
+      const normalizedDial = dial.startsWith('+') ? dial : `+${dial}`;
+      const fullNumber = `${normalizedDial}${nationalPart}`;
+
+      try {
+        const parsed = parsePhoneNumberFromString(fullNumber);
+        if (!parsed || !parsed.isValid()) {
+          return { invalidPhoneByCountry: true };
+        }
+        return null;
+      } catch (_) {
+        return { invalidPhoneByCountry: true };
+      }
+    };
+  }
+
   // isAnyFieldFilled(passenger: any): boolean {
   //   const controls = this.passengerForms[passenger].controls;
   //   return Object.values(controls).some(control => !!control.value);
@@ -1392,10 +1449,24 @@ export class PassengerFormComponent {
     const phoneControl = this.currentForm.get('phoneNumber');
     if (!phoneControl) return;
     
-    let value = event.target.value;
-    
+    let value = (event?.target?.value ?? '').toString();
+
+    // ตัดช่องว่างหัว-ท้ายออกทันที
+    const trimmed = value.trim();
+    if (trimmed !== value) {
+      value = trimmed;
+      if (event?.target) {
+        event.target.value = value;
+      }
+      phoneControl.setValue(value, { emitEvent: false });
+    }
+
+    // ตัดเลข 0 นำหน้าถ้ามี (เมื่อความยาว > 1)
     if (value.startsWith('0') && value.length > 1) {
       value = value.substring(1);
+      if (event?.target) {
+        event.target.value = value;
+      }
       phoneControl.setValue(value, { emitEvent: false });
     }
   }
@@ -1438,5 +1509,17 @@ export class PassengerFormComponent {
     console.log("convertServiceBundle passenger-form", data);
     this.serviceBundleRaw = data;
     return data;
+  }
+
+  hasOutboundDirection(): boolean {
+    return Array.isArray(this.outboundFlightData) && this.outboundFlightData.length > 0;
+  }
+
+  hasInboundDirection(): boolean {
+    return Array.isArray(this.inboundFlightData) && this.inboundFlightData.length > 0;
+  }
+
+  isRoundTrip(): boolean {
+    return this.hasOutboundDirection() && this.hasInboundDirection();
   }
 }
