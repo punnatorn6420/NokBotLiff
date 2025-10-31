@@ -84,7 +84,7 @@ export class AppComponent {
         }),
         switchMap(() => this.apiService.getPDPA(userId)),
         catchError((err) => {
-          this.router.navigate(['/error'], { queryParams: { isNotFound: true } });
+          this.router.navigate(['/error'], { queryParams: { isNotFound: true }, replaceUrl: true });
           return of(null);
         })
       )

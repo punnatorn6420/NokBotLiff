@@ -26,3 +26,24 @@ html.no-scroll, body.no-scroll {
   height: 100%;
   touch-action: none;
 }
+
+/* Global datepicker typography: ensure popup calendar uses 22px font */
+.mat-datepicker-content,
+.mat-calendar,
+.mat-calendar-table,
+.mat-calendar-body,
+.mat-calendar-body-cell-content,
+.mat-calendar-period-button,
+.mat-calendar-previous-button,
+.mat-calendar-next-button,
+.mat-calendar-body-label {
+  font-size: 22px !important;
+  font-family: 'DB Ozone X', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Make day cells visually balanced with larger font */
+.mat-calendar-body-cell-content {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+}
