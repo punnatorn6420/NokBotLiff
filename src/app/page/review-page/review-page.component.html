@@ -378,7 +378,7 @@
 
         <!-- Inbound: แสดงเมื่อมีทิศทางขากลับ -->
         <div *ngIf="hasInboundDirection()">
-            <div class="bundle-subtitle">{{ 'REVIEW_PAGE_INBOUND' | translate }}</div>
+            <div class="bundle-subtitle" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_INBOUND' | translate }}</div>
             <!-- Inbound Service Bundle -->
             <div class="service-bundle-section" *ngIf="hasInboundServiceBundle() || hasInboundPassengerBundle()">
             <!-- การ์ดหลักจาก API ถ้ามี -->
