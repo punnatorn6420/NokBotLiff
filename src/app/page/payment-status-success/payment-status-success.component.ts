@@ -4,6 +4,7 @@ import { PassDataService } from '../../core/services/pass-data.service';
 import { ApiService } from '../../core/services/api.service';
 import { of } from 'rxjs';
 import { finalize, switchMap, tap, take } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-payment-status-success',
@@ -24,12 +25,14 @@ export class PaymentStatusSuccessComponent implements OnInit {
   bookingStatus: string = '';
   isLoading: boolean = false;
   userId: string = '';
+  language: string = '';
+  pnr: string = '';
 
   constructor(
     // private translate: TranslateService,
     private passDataService: PassDataService,
     private apiService: ApiService,
-    private liffService: LiffService
+    private translate: TranslateService
   ) {
     // this.passDataService.getLanguage().subscribe((language) => {
     //   this.switchLanguage(language);
@@ -52,6 +55,10 @@ export class PaymentStatusSuccessComponent implements OnInit {
         switchMap((info: any) => {
           if (info) {
             console.log('info', info);
+            if (info.language) {
+              this.language = info.language;
+              this.translate.use(this.language);
+            }
             if (info.outbound_flight_select) {
               this.outboundView = this.buildFlightView(info.outbound_flight_select, 'outbound');
             }
@@ -59,8 +66,9 @@ export class PaymentStatusSuccessComponent implements OnInit {
               this.inboundView = this.buildFlightView(info.inbound_flight_select, 'inbound');
             }
             if (info.pnr) {
+              this.pnr = info.pnr;
               return this.apiService
-                .retrieveBooking(info.pnr)
+                .retrieveBooking(info.pnr, this.language)
                 .pipe(tap((bookingData: any) => this.hydrateBooking(bookingData, isFrom2c2p)));
             }
           }
@@ -82,6 +90,8 @@ export class PaymentStatusSuccessComponent implements OnInit {
 
 
   private hydrateBooking(resp: any, isFrom2c2p?: boolean) {
+    console.log("isFrom2c2p", isFrom2c2p);
+    
     if (!resp || resp.status !== 'Success' || !resp.data) return;
     const data = resp.data;
     this.bookingRecordLocator = data.recordLocator || '';
@@ -120,6 +130,7 @@ export class PaymentStatusSuccessComponent implements OnInit {
 
     // ส่งข้อความเข้า LINE แชท เมื่อสถานะการชำระเงินเป็น Paid (และส่งเพียงครั้งเดียวต่อ booking)
     if (isFrom2c2p && (this.bookingStatus || '').toLowerCase() === 'paid') {
+      console.log('send paid message');
       this.trySendPaidMessageOnce();
     }
   }
@@ -234,31 +245,24 @@ export class PaymentStatusSuccessComponent implements OnInit {
 
   private trySendPaidMessageOnce(): void {
     console.log('trySendPaidMessageOnce');
-    const ref = (this.paymentReferenceNumber || this.bookingId || this.bookingReferencePNR || '').toString();
-    if (!ref) return;
-    const key = `paid_msg_${ref}`;
-    try {
-      if (localStorage.getItem(key) === '1') return;
-      // mark first to avoid duplicate even if calls overlap
-      localStorage.setItem(key, '1');
-    } catch {
-      // ignore storage errors and proceed once
-    }
+    const ref = this.pnr;
+    console.log('ref', ref);
+    
 
     // ถ้าเปิดใน LIFF บนมือถือ (iOS/Android) ให้ส่งข้อความผ่าน LIFF
-    const os = this.liffService.getOS();
-    const inClient = this.liffService.isInClient();
-    if (inClient && (os === 'ios' || os === 'android')) {
-      this.liffService.sendMessage('ชำระเงินแล้วววว').catch(() => {});
-      return;
-    }
+    // const os = this.liffService.getOS();
+    // const inClient = this.liffService.isInClient();
+    // if (inClient && (os === 'ios' || os === 'android')) {
+    //   this.liffService.sendMessage('ชำระเงินแล้วววว').catch(() => {});
+    //   return;
+    // }
 
     // กรณี Desktop หรือไม่ใช่ LIFF ให้เรียก backend push message
-    // if (this.userId) {
-    //   this.apiService.pushMessage(this.userId).subscribe({
-    //     next: () => {},
-    //     error: () => {}
-    //   });
-    // }
+    if (this.userId) {
+      this.apiService.pushMessage(this.userId, ref, this.language).subscribe({
+        next: () => {},
+        error: () => {}
+      });
+    }
   }
 }

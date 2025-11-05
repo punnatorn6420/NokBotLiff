@@ -6,8 +6,6 @@ import { PdpaPageComponent } from '../../page/pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from '../../page/review-page/review-page.component';
 import { ConfirmPayComponent } from '../../page/confirm-pay/confirm-pay.component';
 import { PaymentStatusSuccessComponent } from '../../page/payment-status-success/payment-status-success.component';
-import { PaymentStatusFailComponent } from '../../page/payment-status-fail/payment-status-fail.component';
-import { PaymentStatusCancelComponent } from '../../page/payment-status-cancel/payment-status-cancel.component';
 
 const routes: Routes = [
   { path: 'pdpa', component: PdpaPageComponent },
@@ -16,8 +14,6 @@ const routes: Routes = [
   { path: 'review', component: ReviewPageComponent },
   { path: 'confirm-pay', component: ConfirmPayComponent },
   { path: 'payment-page', component: PaymentStatusSuccessComponent },
-  { path: 'payment-status-fail', component: PaymentStatusFailComponent },
-  { path: 'payment-status-cancel', component: PaymentStatusCancelComponent },
 ];
 
 @NgModule({

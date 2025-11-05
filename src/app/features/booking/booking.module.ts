@@ -20,8 +20,6 @@ import { PdpaPageComponent } from '../../page/pdpa-page/pdpa-page.component';
 import { ReviewPageComponent } from '../../page/review-page/review-page.component';
 import { ConfirmPayComponent } from '../../page/confirm-pay/confirm-pay.component';
 import { PaymentStatusSuccessComponent } from '../../page/payment-status-success/payment-status-success.component';
-import { PaymentStatusFailComponent } from '../../page/payment-status-fail/payment-status-fail.component';
-import { PaymentStatusCancelComponent } from '../../page/payment-status-cancel/payment-status-cancel.component';
 
 @NgModule({
   declarations: [
@@ -31,8 +29,6 @@ import { PaymentStatusCancelComponent } from '../../page/payment-status-cancel/p
     ReviewPageComponent,
     ConfirmPayComponent,
     PaymentStatusSuccessComponent,
-    PaymentStatusFailComponent,
-    PaymentStatusCancelComponent,
   ],
   imports: [
     CommonModule,

@@ -31,7 +31,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     { prefix: './assets/i18n/', suffix: '/review.json' },
     { prefix: './assets/i18n/', suffix: '/confirm.json' },
     { prefix: './assets/i18n/', suffix: '/pdpa.json' },
-    { prefix: './assets/i18n/', suffix: '/dialog.json' }
+    { prefix: './assets/i18n/', suffix: '/dialog.json' },
+    { prefix: './assets/i18n/', suffix: '/counter.json' }
   ]);
 }
 

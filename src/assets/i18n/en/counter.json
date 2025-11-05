@@ -1,12 +1,28 @@
 {
-  "COUNTER_SERVICE_TITLE1": "Booking Successful",
+  "TITLE_COUNTER_SERVICE": {
+    "COUNTER_SERVICE_TITLE_SUCCESS1": "Booking Successful",
+    "COUNTER_SERVICE_TITLE_SUCCESS2": "Thank you for flying with Nok Air",
+    "COUNTER_SERVICE_TITLE_UNPAID1": "Please pay at the counter",
+    "COUNTER_SERVICE_TITLE_UNPAID2": "to complete your booking",
+    "COUNTER_SERVICE_TITLE_WAITING1": "Payment failed",
+    "COUNTER_SERVICE_TITLE_WAITING2": "Your payment was unsuccessful. Please try again."
+  },
   "COUNTER_SERVICE_TITLE2": "Thank you for flying with Nok Air",
   "COUNTER_SERVICE_WARNNING": "If payment is not completed by 27 June 2025, 12:19 PM, your booking will be cancelled.",
   "COUNTER_SERVICE_WARNNING_2": "Your payment reference number is 81088508",
   "COUNTER_SERVICE_BOOKING_NUMBER": "Booking Number",
   "COUNTER_SERVICE_BOOKING_REFERENCE": "Booking Reference (PNR)",
-  "COUNTER_SERVICE_Passenger_Name": "ชื่อผู้โดยสาร (ผู้จอง)",
-  "COUNTER_SAVE_IMAGE": "บันทึกรูปภาพ"
+  "COUNTER_SERVICE_Passenger_Name": "Passenger Name (Booker)",
+  "COUNTER_SAVE_IMAGE": "Save image",
+  "COUNTER_UNPAID_TITLE1": "Please pay at the counter",
+  "COUNTER_UNPAID_TITLE2": "to complete your booking",
+  "COUNTER_WAITING_TITLE": "Payment failed",
+  "COUNTER_WAITING_WARNING": "Your payment was unsuccessful. Please try again.",
+  "COUNTER_UNPAID_WARNING_WITH_DEADLINE": "If payment is not completed by {{time}}, your booking will be cancelled.",
+  "COUNTER_UNPAID_WARNING_GENERIC": "Please make payment at the counter within the allotted time.",
+  "COUNTER_UNPAID_PAYMENT_REF": "Your payment reference number is {{ref}}",
+  "COUNTER_NOTE_SAVE_SCREEN": "Please save this screen for convenience when paying at the airport counter.",
+  "COUNTER_TRY_PAY_AGAIN": "Pay again"
 }
 
 

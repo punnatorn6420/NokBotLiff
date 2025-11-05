@@ -1,12 +1,28 @@
 {
-  "COUNTER_SERVICE_TITLE1": "การจองสำเร็จ",
+  "TITLE_COUNTER_SERVICE": {
+    "COUNTER_SERVICE_TITLE_SUCCESS1": "การจองสำเร็จ",
+    "COUNTER_SERVICE_TITLE_SUCCESS2": "ขอบคุณที่ใช้บริการนกแอร์",
+    "COUNTER_SERVICE_TITLE_UNPAID1": "กรุณาชำระเงินที่เคาน์เตอร์",
+    "COUNTER_SERVICE_TITLE_UNPAID2": "เพื่อทำรายการให้สำเร็จ",
+    "COUNTER_SERVICE_TITLE_WAITING1": "การชำระเงินไม่สำเร็จ",
+    "COUNTER_SERVICE_TITLE_WAITING2": "การชำระเงินของคุณไม่สำเร็จกรุณาลองใหม่อีกครั้งค่ะ"
+  },
   "COUNTER_SERVICE_TITLE2": "ขอบคุณที่ใช้บริการนกแอร์",
   "COUNTER_SERVICE_WARNNING": "หากไม่ชำระเงินภายใน 2568-06-27 12:19 การจองของคุณจะถูกยกเลิก",
   "COUNTER_SERVICE_WARNNING_2": "หมายเลขอ้างอิงการชำระเงิน คือ 81088508",
-  "COUNTER_SERVICE_BOOKING_NUMBER": "Booking Number",
-  "COUNTER_SERVICE_BOOKING_REFERENCE": "Booking Reference (PNR)",
+  "COUNTER_SERVICE_BOOKING_NUMBER": "หมายเลขการจอง",
+  "COUNTER_SERVICE_BOOKING_REFERENCE": "รหัสการจอง (PNR)",
   "COUNTER_SERVICE_Passenger_Name": "ชื่อผู้โดยสาร (ผู้จอง)",
-  "COUNTER_SAVE_IMAGE": "บันทึกรูปภาพ"
+  "COUNTER_SAVE_IMAGE": "บันทึกรูปภาพ",
+  "COUNTER_UNPAID_TITLE1": "กรุณาชำระเงินที่เคาน์เตอร์",
+  "COUNTER_UNPAID_TITLE2": "เพื่อทำรายการให้สำเร็จ",
+  "COUNTER_WAITING_TITLE": "การชำระเงินไม่สำเร็จ",
+  "COUNTER_WAITING_WARNING": "การชำระเงินของคุณไม่สำเร็จกรุณาลองใหม่อีกครั้งค่ะ",
+  "COUNTER_UNPAID_WARNING_WITH_DEADLINE": "หากไม่ชำระเงินภายใน {{time}} การจองของคุณจะถูกยกเลิก",
+  "COUNTER_UNPAID_WARNING_GENERIC": "กรุณาชำระเงินที่เคาน์เตอร์ภายในเวลาที่กำหนด",
+  "COUNTER_UNPAID_PAYMENT_REF": "หมายเลขอ้างอิงการชำระเงิน คือ {{ref}}",
+  "COUNTER_NOTE_SAVE_SCREEN": "กรุณาบันทึกหน้าจอ เพื่อความสะดวกในการชำระเงินที่เคาน์เตอร์สนามบินค่ะ",
+  "COUNTER_TRY_PAY_AGAIN": "ชำระเงินอีกครั้ง"
 }
 
 

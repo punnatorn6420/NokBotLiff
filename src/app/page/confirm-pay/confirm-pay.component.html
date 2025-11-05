@@ -42,10 +42,10 @@
                 <div class="fare-total">{{ 'CONFIRM_PAGE_Connecting_Fee_Total' | translate }} <span>{{ formatAmount(ui.fees.total) }}</span></div>
             </div>
         </div>
-        <!-- <div class="promo-section">
-            <div class="section-title">Promo code</div>
-            <input type="text" class="promo-input" placeholder="รหัสโปรโมชัน" />
-        </div> -->
+        <div class="promo-section">
+            <div class="section-title">{{ 'CONFIRM_PAGE_Promo_code' | translate }}</div>
+            <input type="text" class="promo-input" placeholder="{{ 'CONFIRM_PAGE_Promo_code' | translate }}" [(ngModel)]="promoCode" />
+        </div>
         <div class="payment-section">
             <div class="section-title">{{ 'CONFIRM_PAGE_Payment_Method' | translate }}</div>
             <div class="payment-method">

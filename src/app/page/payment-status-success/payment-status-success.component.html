@@ -37,39 +37,39 @@
                     </svg>                                                           
             </div>
             <span class="title" *ngIf="bookingStatus === 'Paid'">
-                <p>การจองที่สำเร็จ</p>
-                <p>ขอบคุณที่ใช้บริการนกแอร์</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_SUCCESS1' | translate }}</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_SUCCESS2' | translate }}</p>
             </span>
             <span class="title-unpaid" *ngIf="bookingStatus === 'Unpaid'">
-                <p>กรุณาชำระเงินที่เคาน์เตอร์</p>
-                <p>เพื่อทำรายการให้สำเร็จ</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_UNPAID1' | translate }}</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_UNPAID2' | translate }}</p>
             </span>
             <span class="title-WaitingForPayment" *ngIf="bookingStatus === 'WaitingForPayment'">
-                <p>การชำระเงินไม่สำเร็จ</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_WAITING1' | translate }}</p>
             </span>
             <span class="warning" *ngIf="bookingStatus === 'WaitingForPayment'">
-                <p>การชำระเงินของคุณไม่สำเร็จกรุณาลองใหม่อีกครั้งค่ะ</p>
+                <p>{{ 'TITLE_COUNTER_SERVICE.COUNTER_SERVICE_TITLE_WAITING2' | translate }}</p>
             </span>
             <span class="warning" *ngIf="bookingStatus === 'Unpaid'">
-                <p *ngIf="holdExpireDisplay">หากไม่ชำระเงินภายใน {{ holdExpireDisplay }} การจองของคุณจะถูกยกเลิก</p>
-                <p *ngIf="!holdExpireDisplay">กรุณาชำระเงินที่เคาน์เตอร์ภายในเวลาที่กำหนด</p>
-                <P> หมายเลขอ้างอิงการชำระเงิน คือ {{ paymentReferenceNumber || '-' }}</P>
+                <p *ngIf="holdExpireDisplay">{{ 'COUNTER_UNPAID_WARNING_WITH_DEADLINE' | translate:{ time: holdExpireDisplay } }}</p>
+                <p *ngIf="!holdExpireDisplay">{{ 'COUNTER_UNPAID_WARNING_GENERIC' | translate }}</p>
+                <P>{{ 'COUNTER_UNPAID_PAYMENT_REF' | translate:{ ref: (paymentReferenceNumber || '-') } }}</P>
             </span>
             <!-- <p class="payment-ref" *ngIf="bookingStatus === 'Unpaid'">
                 หมายเลขอ้างอิงการชำระเงิน คือ {{ paymentReferenceNumber || '-' }}
             </p> -->
             <div class="container-booking-number-ref" *ngIf="bookingStatus != 'WaitingForPayment'">
                 <div class="box-left">
-                    <p style="font-size: 16px; margin-top: 15px;">Booking Number</p>
+                    <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_BOOKING_NUMBER' | translate }}</p>
                     <p style="font-size: 24px; margin-top: -10px;">{{ bookingId || '-' }}</p>
                 </div>
                 <div class="box-right">
-                    <p style="font-size: 16px; margin-top: 15px;">Booking Reference (PNR)</p>
+                    <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_BOOKING_REFERENCE' | translate }}</p>
                     <P style="font-size: 24px; margin-top: -10px;">{{ bookingReferencePNR || '-' }}</P>
                 </div>
             </div>
             <div class="container-name">
-                <p style="font-size: 16px; margin-top: 15px;">ชื่อผู้โดยสาร (ผู้จอง)</p>
+                <p style="font-size: 16px; margin-top: 15px;">{{ 'COUNTER_SERVICE_Passenger_Name' | translate }}</p>
                 <p style="font-size: 22px; margin-top: -10px;">{{ passengerName || '-' }}</p>
             </div>
             <div class="flight-info" *ngIf="outboundView">
@@ -93,9 +93,9 @@
                     </div>
                 </div>
                 <div class="footer-flight-info">
-                    <p>{{ outboundView.originText }}</p>
-                    <p>{{ outboundView.stopText }}</p>
-                    <p>{{ outboundView.destText }}</p>
+                    <p>{{ outboundView.originText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
+                    <p>{{ outboundView.stopText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
+                    <p>{{ outboundView.destText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
                 </div>
             </div>
 
@@ -120,9 +120,9 @@
                     </div>
                 </div>
                 <div class="footer-flight-info">
-                    <p>{{ inboundView.originText }}</p>
-                    <p>{{ inboundView.stopText }}</p>
-                    <p>{{ inboundView.destText }}</p>
+                    <p>{{ inboundView.originText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
+                    <p>{{ inboundView.stopText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
+                    <p>{{ inboundView.destText?.replace('INTERNATIONAL AIRPORT', '')?.trim() }}</p>
                 </div>
             </div>
         </div>
@@ -135,11 +135,11 @@
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M4.0168 16.999L11.0748 5.21604C11.2234 4.97121 11.4326 4.7688 11.6822 4.62833C11.9318 4.48786 12.2134 4.41406 12.4998 4.41406C12.7862 4.41406 13.0678 4.48786 13.3174 4.62833C13.567 4.7688 13.7762 4.97121 13.9248 5.21604L20.9828 16.999C21.1282 17.2511 21.2051 17.5368 21.2059 17.8278C21.2067 18.1187 21.1313 18.4049 20.9872 18.6577C20.8431 18.9104 20.6353 19.1211 20.3846 19.2687C20.1338 19.4163 19.8488 19.4957 19.5578 19.499H5.4418C5.15072 19.496 4.86551 19.4168 4.61457 19.2693C4.36364 19.1217 4.15574 18.911 4.01159 18.6581C3.86743 18.4052 3.79206 18.119 3.79298 17.8279C3.79389 17.5368 3.87106 17.251 4.0168 16.999ZM12.4998 8.99904C12.765 8.99904 13.0194 9.1044 13.2069 9.29193C13.3944 9.47947 13.4998 9.73382 13.4998 9.99904V12.999C13.4998 13.2643 13.3944 13.5186 13.2069 13.7061C13.0194 13.8937 12.765 13.999 12.4998 13.999C12.2346 13.999 11.9802 13.8937 11.7927 13.7061C11.6052 13.5186 11.4998 13.2643 11.4998 12.999V9.99904C11.4998 9.73382 11.6052 9.47947 11.7927 9.29193C11.9802 9.1044 12.2346 8.99904 12.4998 8.99904ZM11.4998 15.999C11.4998 15.7338 11.6052 15.4795 11.7927 15.2919C11.9802 15.1044 12.2346 14.999 12.4998 14.999H12.5078C12.773 14.999 13.0274 15.1044 13.2149 15.2919C13.4024 15.4795 13.5078 15.7338 13.5078 15.999C13.5078 16.2643 13.4024 16.5186 13.2149 16.7061C13.0274 16.8937 12.773 16.999 12.5078 16.999H12.4998C12.2346 16.999 11.9802 16.8937 11.7927 16.7061C11.6052 16.5186 11.4998 16.2643 11.4998 15.999Z" fill="#FCCD01"/>
                 </svg>                
         </div>
-        <div class="note-text">กรุณาบันทึกหน้าจอ เพื่อความสะดวกในการชำระเงินที่เคาน์เตอร์สนามบินค่ะ</div>
+        <div class="note-text">{{ 'COUNTER_NOTE_SAVE_SCREEN' | translate }}</div>
     </div>
 
     <div class="button-try-again" *ngIf="bookingStatus === 'WaitingForPayment'">
-        <button>ชำระเงินอีกครั้ง</button>
+        <button>{{ 'COUNTER_TRY_PAY_AGAIN' | translate }}</button>
     </div>
 
     <!-- <div class="button-save">

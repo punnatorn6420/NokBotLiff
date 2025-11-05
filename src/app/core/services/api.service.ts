@@ -5,8 +5,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApiService {
-  baseUrl = "https://uat-ddservices.nokair.com/botnoi-api/api/";
-  // baseUrl = "http://localhost:4000/api/";
+  // baseUrl = "https://uat-ddservices.nokair.com/botnoi-api/api/";
+  baseUrl = "http://localhost:4000/api/";
 
   constructor(private http: HttpClient) { }
 
@@ -64,15 +64,16 @@ export class ApiService {
     return this.http.post(`${this.baseUrl+'liff'}/get-create-booking`, payload);
   }
 
-  retrieveBooking(recordLocator: string) {
+  retrieveBooking(recordLocator: string, language: string) {
     //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    return this.http.post(`${this.baseUrl+'liff'}/get-retrieve-booking`, { recordLocator });
+    const body = { recordLocator: recordLocator, preferredLanguage: language };
+    return this.http.post(`${this.baseUrl+'liff'}/get-retrieve-booking`, body);
   }
 
-  pushMessage(userId: string) {
+  pushMessage(userId: string, pnr: string, language: string) {
     //  const headers = new HttpHeaders().set('X-Api-Key', 'dev');
-    const body = { user_id: userId };
-    return this.http.post(`${this.baseUrl+'liff'}/push-message`, body);
+    const body = { user_id: userId, pnr: pnr, preferredLanguage: language };
+    return this.http.post(`${this.baseUrl+'liff'}/push-message-payment-success`, body);
   }
 }
 
