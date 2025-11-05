@@ -19,7 +19,7 @@
                 <div class="fare-detail special-bundle" *ngIf="j.bundleItems?.length">{{ 'CONFIRM_PAGE_Service_Bundle' | translate }}</div>
                 <div class="fare-detail" *ngFor="let b of j.bundleItems">x{{ b.count }} {{ b.label }}<ng-container *ngIf="b.description"> ( {{ b.description }} )</ng-container> <span>{{ formatAmount(b.amount) }}</span></div>
                 <div class="fare-total">
-                    {{ j.direction==='Outbound' ? ('CONFRIM_PAGE_Subtotal_Outbound' | translate) : ('CONFRIM_PAGE_Subtotal_Inbound' | translate) }}
+                    {{ (ui.journeys.length === 1) ? ('CONFRIM_PAGE_Subtotal' | translate) : (j.direction==='Outbound' ? ('CONFRIM_PAGE_Subtotal_Outbound' | translate) : ('CONFRIM_PAGE_Subtotal_Inbound' | translate)) }}
                     <span>{{ formatAmount(j.subtotal) }}</span>
                 </div>
             </div>

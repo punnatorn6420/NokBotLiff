@@ -106,7 +106,7 @@
                                 กรุณาเลือกกรอกภาษาอังกฤษ
                             </mat-error> -->
                             <mat-error *ngIf="currentForm.get('nationality')?.hasError('notFound')">
-                                ไม่พบข้อมูล
+                                {{ 'ERROR_NOT_FOUND_NATIONALITY' | translate }}
                             </mat-error>
                         </mat-form-field>
 
@@ -125,7 +125,7 @@
                                 กรุณาเลือกกรอกภาษาอังกฤษ
                             </mat-error> -->
                             <mat-error *ngIf="currentForm.get('country')?.hasError('notFound')">
-                                ไม่พบข้อมูล
+                                {{ 'ERROR_NOT_FOUND_COUNTRY' | translate }}
                             </mat-error>
                         </mat-form-field>
                     </div>
@@ -155,7 +155,7 @@
                             กรุณาเลือกกรอกภาษาอังกฤษ
                         </mat-error> -->
                         <mat-error *ngIf="currentForm.get('issuedBy')?.hasError('notFound')">
-                            ไม่พบข้อมูล
+                            {{ 'ERROR_NOT_FOUND_ISSUED_BY' | translate }}
                         </mat-error>
                     </mat-form-field>
                     <br>

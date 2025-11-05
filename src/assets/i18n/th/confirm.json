@@ -2,6 +2,7 @@
   "CONFRIM_PAGE_FARE_TITLE": "ค่าโดยสาร",
   "CONFRIM_PAGE_Subtotal_Outbound": "รวมค่าใช้จ่าย (ขาไป) ",
   "CONFRIM_PAGE_Subtotal_Inbound": "รวมค่าใช้จ่าย (ขากลับ) ",
+  "CONFRIM_PAGE_Subtotal": "รวมค่าใช้จ่าย",
   "CONFIRM_PAGE_Additional_Services": "บริการเสริม",
   "CONFIRM_PAGE_Seat_Selection": "ที่นั่งผู้โดยสาร",
   "CONFIRM_PAGE_Total_Add-on_Package_Fee": "ค่าบริการ package เสริมทั้งหมด",

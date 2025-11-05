@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { PassDataService } from './core/services/pass-data.service';
 import { LiffService } from './core/services/liff.service';
 import { ApiService } from './core/services/api.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 
@@ -12,25 +12,54 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'liff-nok-air';
   language: string = 'th';
   token: string = '';
 
   constructor(
-    private passDataService: PassDataService,
-    private liffService: LiffService,
-    private apiService: ApiService,
-    private translate: TranslateService,
-    private router: Router,
-    private route: ActivatedRoute
+    private readonly passDataService: PassDataService,
+    private readonly liffService: LiffService,
+    private readonly apiService: ApiService,
+    private readonly translate: TranslateService,
+    private readonly router: Router
   ) {
-    // this.passDataService.setLanguage('en');
-    // this.translate.setDefaultLang('en');
-    // this.translate.use('en');
   }
 
   ngOnInit() {
+    const { uid, token } = this.resolveUidAndToken();
+
+    if (token) {
+      this.passDataService.setToken(token);
+      this.token = token;
+    }
+
+    if (uid) {
+      this.passDataService.setUserId(uid);
+      this.fetchInitialData(uid);
+      return;
+    }
+
+    this.handleLiffFlow();
+  }
+
+  private async handleLiffFlow(): Promise<void> {
+    await this.liffService.initializeLiff();
+
+    if (!this.liffService.isLoggedIn()) {
+      await this.liffService.login(this.token);
+      return;
+    }
+
+    const profile = await this.liffService.getProfile();
+    const userId = profile?.userId;
+    if (userId) {
+      this.passDataService.setUserId(userId);
+      this.fetchInitialData(userId);
+    }
+  }
+
+  private resolveUidAndToken(): { uid: string | null; token: string | null } {
     const searchParams = new URLSearchParams(window.location.search);
     const uidFromQuery = searchParams.get('uid') || searchParams.get('UID');
     const tokenFromQuery = searchParams.get('token') || searchParams.get('TOKEN');
@@ -38,45 +67,20 @@ export class AppComponent {
     const uidFromHref = uidFromHrefMatch ? decodeURIComponent(uidFromHrefMatch[1]) : null;
     const resolvedUid = (uidFromQuery || uidFromHref || '').trim();
     const resolvedToken = (tokenFromQuery || '').trim();
-    if (resolvedToken.length > 0) {
-      this.passDataService.setToken(resolvedToken);
-      this.token=resolvedToken;
-    }
-    if (resolvedUid.length > 0) {
-      const userId = resolvedUid;
-      this.passDataService.setUserId(userId);
-      this.fetchInitialData(userId);
-      return;
-    }
 
-    this.liffService.initializeLiff().then(async (initialized) => {
-      // if (!initialized) {
-      //   const userId = 'U197dceb79bc625b5811cfa6174397c88';
-      //   this.passDataService.setUserId(userId);
-      //   this.fetchInitialData(userId);
-      //   return;
-      // }
-
-      if (!this.liffService.isLoggedIn()) {
-        await this.liffService.login(this.token);
-        return;
-      }
-
-      const profile = await this.liffService.getProfile();
-      const userId = profile?.userId;
-      this.passDataService.setUserId(userId);
-      this.fetchInitialData(userId);
-    });
+    return {
+      uid: resolvedUid.length > 0 ? resolvedUid : null,
+      token: resolvedToken.length > 0 ? resolvedToken : null
+    };
   }
 
-   fetchInitialData(userId: string) {
+   fetchInitialData(userId: string): void {
     let passengerInfoFull: any = null;
     this.apiService
       .getPassengerInfo(userId)
       .pipe(
         tap((response: any) => {
           passengerInfoFull = response;
-          console.log(response?.flight);
           const apiLang = (response?.flight?.flight_search?.language || '').toString().toLowerCase();
           const lang = apiLang === 'en' ? 'en' : 'th';
           this.passDataService.setLanguage(lang);
@@ -92,17 +96,14 @@ export class AppComponent {
         if (!pdpaResponse) return; 
         if (pdpaResponse.consent) {
           const currentPath = (this.router.url || '').split('?')[0];
-          console.log('currentPath', currentPath);
           const isPaymentRedirect = (
-            currentPath === '/payment-page' ||
-            currentPath === '/payment-status-fail'
+            currentPath === '/payment-page'
           );
           if (isPaymentRedirect) {
-            console.log('isPaymentRedirect');
             return;
           }
 
-          const hasBooked = (passengerInfoFull?.state === 'booked') && !!passengerInfoFull?.pnr;
+          const hasBooked = (passengerInfoFull?.state === 'booked');
           const hasBookTimeout = (passengerInfoFull?.state === 'timeout');
 
           if (hasBooked) {

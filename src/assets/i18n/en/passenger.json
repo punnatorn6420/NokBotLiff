@@ -55,7 +55,13 @@
   "ASSISTANCE_UNACCOMPANIED_MINOR": "Unaccompanied minor",
   "ASSISTANCE_OTHER": "Other",
   "ASSISTANCE_OTHER_PLACEHOLDER": "Please specify",
-  "CONTACT_SUPPORT_TEXT": "For assistance, call 1318"
+  "CONTACT_SUPPORT_TEXT": "For assistance, call 1318",
+
+  "ERROR_NOT_FOUND_NATIONALITY": "No data found",
+  "ERROR_NOT_FOUND_COUNTRY": "No data found",
+  "ERROR_NOT_FOUND_ISSUED_BY": "No data found",
+  "ERROR_NOT_FOUND_PHONE": "No data found",
+  "ERROR_NOT_FOUND_EMAIL": "No data found"
 }
 
 

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LiffService } from '../../core/services/liff.service';
 import { PassDataService } from '../../core/services/pass-data.service';
 import { ApiService } from '../../core/services/api.service';
 import { of } from 'rxjs';
@@ -12,10 +11,10 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./payment-status-success.component.scss']
 })
 export class PaymentStatusSuccessComponent implements OnInit {
-  
+
   passengerName: string = '';
-  outboundView: any = null;
-  inboundView: any = null;
+  outboundView: FlightView | null = null;
+  inboundView: FlightView | null = null;
   // booking data from retrieveBooking API
   bookingRecordLocator: string = '';
   bookingReferencePNR: string = '';
@@ -29,21 +28,23 @@ export class PaymentStatusSuccessComponent implements OnInit {
   pnr: string = '';
 
   constructor(
-    // private translate: TranslateService,
     private passDataService: PassDataService,
     private apiService: ApiService,
     private translate: TranslateService
-  ) {
-    // this.passDataService.getLanguage().subscribe((language) => {
-    //   this.switchLanguage(language);
-    // });
-  }
+  ) {}
 
   ngOnInit() {
     this.isLoading = true;
+    const isFrom2c2p = this.isFrom2c2p();
+    this.loadContextAndBooking(isFrom2c2p);
+  }
+
+  private isFrom2c2p(): boolean {
     const searchParams = new URLSearchParams(window.location.search);
-    const fromParam = (searchParams.get('from') || '').toLowerCase();
-    const isFrom2c2p = fromParam === '2c2p';
+    return ((searchParams.get('from') || '').toLowerCase() === '2c2p');
+  }
+
+  private loadContextAndBooking(isFrom2c2p: boolean): void {
     this.passDataService
       .getUserId()
       .pipe(
@@ -54,7 +55,6 @@ export class PaymentStatusSuccessComponent implements OnInit {
         switchMap((userId: string) => this.apiService.getPassengerInfo(userId)),
         switchMap((info: any) => {
           if (info) {
-            console.log('info', info);
             if (info.language) {
               this.language = info.language;
               this.translate.use(this.language);
@@ -84,14 +84,8 @@ export class PaymentStatusSuccessComponent implements OnInit {
       });
   }
 
-    // switchLanguage(language: string) {
-    //   this.translate.use(language);
-    // }
-
 
   private hydrateBooking(resp: any, isFrom2c2p?: boolean) {
-    console.log("isFrom2c2p", isFrom2c2p);
-    
     if (!resp || resp.status !== 'Success' || !resp.data) return;
     const data = resp.data;
     this.bookingRecordLocator = data.recordLocator || '';
@@ -103,7 +97,7 @@ export class PaymentStatusSuccessComponent implements OnInit {
     this.paymentReferenceNumber = (data.bookingId || data.recordLocator || '').toString();
 
     // holdTimeExpiredDate might be '0001-01-01T00:00:00' when not set
-    this.holdExpireDisplay = this.buildExpireText(data.bookDate, data.holdTimeExpiredDate);
+    this.holdExpireDisplay = this.buildExpireText(data.holdTimeExpiredDate);
 
     // Prefer journeys from API when available to build views
     try {
@@ -130,12 +124,11 @@ export class PaymentStatusSuccessComponent implements OnInit {
 
     // ส่งข้อความเข้า LINE แชท เมื่อสถานะการชำระเงินเป็น Paid (และส่งเพียงครั้งเดียวต่อ booking)
     if (isFrom2c2p && (this.bookingStatus || '').toLowerCase() === 'paid') {
-      console.log('send paid message');
       this.trySendPaidMessageOnce();
     }
   }
 
-  private buildExpireText(bookDate: string, holdTimeExpiredDate: string): string {
+  private buildExpireText(holdTimeExpiredDate: string): string {
     const invalid = !holdTimeExpiredDate || holdTimeExpiredDate.startsWith('0001-');
     if (invalid) return '';
     const d = new Date(holdTimeExpiredDate);
@@ -153,13 +146,6 @@ export class PaymentStatusSuccessComponent implements OnInit {
     if (!p) return '';
     const parts = [p.selectedPrefix || p.title, p.firstName, p.middleName, p.lastName].filter(Boolean);
     return parts.join(' ').replace(/\s+/g, ' ').trim();
-  }
-
-  private buildPassengerName(formData: any): string {
-    if (!formData || typeof formData !== 'object') return '';
-    const firstKey = Object.keys(formData).sort((a, b) => Number(a) - Number(b))[0];
-    if (!firstKey) return '';
-    return this.buildPassengerNameFromOne(formData[firstKey]);
   }
 
   private formatThaiShortDate(dateStr: string): string {
@@ -183,7 +169,7 @@ export class PaymentStatusSuccessComponent implements OnInit {
     return `${hh}:${mm}`;
   }
 
-  private buildFlightView(selection: any, direction: 'outbound' | 'inbound'): any {
+  private buildFlightView(selection: any, direction: TripDirection): FlightView | null {
     if (!selection || !Array.isArray(selection.flight_detail) || selection.flight_detail.length === 0) return null;
     const flights = selection.flight_detail;
     const first = flights[0];
@@ -213,7 +199,7 @@ export class PaymentStatusSuccessComponent implements OnInit {
     };
   }
 
-  private buildFlightViewFromRetrieve(journey: any): any {
+  private buildFlightViewFromRetrieve(journey: any): FlightView | null {
     if (!journey || !Array.isArray(journey.transportSegments) || journey.transportSegments.length === 0) return null;
     const segments = journey.transportSegments;
     const first = segments[0] || {};
@@ -244,19 +230,7 @@ export class PaymentStatusSuccessComponent implements OnInit {
   }
 
   private trySendPaidMessageOnce(): void {
-    console.log('trySendPaidMessageOnce');
     const ref = this.pnr;
-    console.log('ref', ref);
-    
-
-    // ถ้าเปิดใน LIFF บนมือถือ (iOS/Android) ให้ส่งข้อความผ่าน LIFF
-    // const os = this.liffService.getOS();
-    // const inClient = this.liffService.isInClient();
-    // if (inClient && (os === 'ios' || os === 'android')) {
-    //   this.liffService.sendMessage('ชำระเงินแล้วววว').catch(() => {});
-    //   return;
-    // }
-
     // กรณี Desktop หรือไม่ใช่ LIFF ให้เรียก backend push message
     if (this.userId) {
       this.apiService.pushMessage(this.userId, ref, this.language).subscribe({
@@ -265,4 +239,16 @@ export class PaymentStatusSuccessComponent implements OnInit {
       });
     }
   }
+}
+
+type TripDirection = 'outbound' | 'inbound';
+
+interface FlightView {
+  header: string;
+  dateText: string;
+  depTime: string;
+  arrTime: string;
+  originText: string;
+  stopText: string;
+  destText: string;
 }

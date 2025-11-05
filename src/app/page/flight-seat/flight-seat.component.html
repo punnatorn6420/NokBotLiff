@@ -321,7 +321,7 @@
         </div>
         <div *ngIf="hasSelectedSeatsInAnySegment()" class="select-seat-btn">
             <!-- <button class="btn-cancel" (click)="onCancelSelect()">{{ 'Cancel_Seat' | translate }}</button> -->
-             <button class="btn-go-back" (click)="goToPassengerForm()">{{ 'BACK' | translate }}</button>
+             <button class="btn-go-back" (click)="goToPassengerForm()">{{ 'BACK_TO_PASSENGER_FORM' | translate }}</button>
             <button class="btn-confirm" (click)="confirmSelectSeat()">
                 <span class="btn-confirm-text">{{ 'Confirm_Seat' | translate }}</span>
                 <span class="btn-price">{{ getTotalPrice() | number:'1.2-2' }} THB</span>

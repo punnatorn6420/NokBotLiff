@@ -55,7 +55,13 @@
   "ASSISTANCE_UNACCOMPANIED_MINOR": "เด็กเดินทางคนเดียว",
   "ASSISTANCE_OTHER": "อื่นๆ",
   "ASSISTANCE_OTHER_PLACEHOLDER": "โปรดระบุ",
-  "CONTACT_SUPPORT_TEXT": "สามารถติดต่อเจ้าหน้าที่เพื่อสอบถาม โทร 1318"
+  "CONTACT_SUPPORT_TEXT": "สามารถติดต่อเจ้าหน้าที่เพื่อสอบถาม โทร 1318",
+
+  "ERROR_NOT_FOUND_NATIONALITY": "ไม่พบข้อมูล",
+  "ERROR_NOT_FOUND_COUNTRY": "ไม่พบข้อมูล",
+  "ERROR_NOT_FOUND_ISSUED_BY": "ไม่พบข้อมูล",
+  "ERROR_NOT_FOUND_PHONE": "ไม่พบข้อมูล",
+  "ERROR_NOT_FOUND_EMAIL": "ไม่พบข้อมูล"
 }
 
 

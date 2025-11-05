@@ -110,7 +110,7 @@
         </div>
         <!-- Flight Info -->
 
-        <div class="container-flight-card">
+        <div class="container-flight-card" [ngClass]="{ 'single-direction': (hasOutboundDirection() && !hasInboundDirection()) || (hasInboundDirection() && !hasOutboundDirection()) }">
             <p class="info-title">{{ 'REVIEW_PAGE_TRAVEL_INFORMATION' | translate }}</p>
             
             <!-- ขาไป (Outbound) -->

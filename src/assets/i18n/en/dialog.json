@@ -14,7 +14,7 @@
     },
 
     "Dialog_alert_exit": {
-        "TITLE": "You’ve chosen an emergency exit row seat.",
+        "ALERT_EXIT_TITLE": "You’ve chosen an emergency exit row seat.",
         "MESSAGE": "To travel in this seat you must:",
         "MESSAGE_1": "Be 16 years or older.",
         "MESSAGE_2": "Be able to understand the instructions given by the flight attendant.",

@@ -42,7 +42,6 @@ export class DialogComponent {
   }
 
   switchLanguage(lang: 'th' | 'en') {
-    console.log(lang);
     this.translate.use(lang);
   }
 

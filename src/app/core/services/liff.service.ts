@@ -6,7 +6,6 @@ import liff from '@line/liff';
 })
 export class LiffService {
   private liffId: string = '2007963873-Nm3zln4x'; 
-
   constructor() { }
 
   async initializeLiff(): Promise<boolean> {

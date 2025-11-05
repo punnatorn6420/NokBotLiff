@@ -268,6 +268,11 @@
     max-width: 500px;
   }
 
+  // กรณีมีแค่ขาเดียว ให้ยืดการ์ดเต็มความกว้าง
+  .container-flight-card.single-direction .flight-card-stack {
+    max-width: none;
+  }
+
   .flight-card {
     background: #fff;
     border-radius: 22px;
@@ -759,6 +764,11 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     align-items: start;
+  }
+
+  // ถ้ามีแค่ขาเดียว ปรับเป็น 1 คอลัมน์ และไม่จำกัดความกว้างของสแตก
+  .container-flight-card.single-direction {
+    grid-template-columns: 1fr;
   }
 
   .container-flight-card > .info-title {

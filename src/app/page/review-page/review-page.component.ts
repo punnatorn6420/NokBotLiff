@@ -192,7 +192,6 @@ export class ReviewPageComponent {
     ) { 
       this.passDataService.getFormData().subscribe((data: any) => {
         if (data && Object.keys(data).length > 0) {
-          console.log("getFormData review-page",data);
           this.formData = data as any[];
           // ตรวจสอบว่า data เป็น object หรือ array
           if (Array.isArray(data)) {
@@ -207,7 +206,6 @@ export class ReviewPageComponent {
             this.passengers = this.convertToOrderedArray(data);
           }
           this.isPassengerInfoOpen = new Array(this.passengers.length).fill(true);
-          console.log(this.passengers);
           // อัปเดตข้อมูล bundle จากผู้โดยสาร (fallback)
           this.updateBundleDisplays();
         } else {
@@ -222,7 +220,6 @@ export class ReviewPageComponent {
 
       this.passDataService.getSeatData().subscribe((data: any) => {
         if (data && Object.keys(data).length > 0) {
-          console.log("getSeatData review-page",data);
           // this.seatData = data as { [key: string]: { [key: number]: string } };
           // console.log("seatData",this.seatData);
           this.seatData = this.convertSeatData(data);
@@ -233,7 +230,6 @@ export class ReviewPageComponent {
 
       this.passDataService.getPassengerInfo().subscribe((data: any) => {
         if (data && Object.keys(data).length > 0) {
-          console.log("getFlightData review-page", data);
           this.getFlightDetail(data);
           // อัปเดตข้อมูล bundle หลังได้ flight detail
           this.updateBundleDisplays();
@@ -267,7 +263,6 @@ export class ReviewPageComponent {
   }
 
   convertSeatData(seatData: any) {
-    console.log("convertSeatData", seatData);
     
     if (!seatData || typeof seatData !== 'object') {
       return [];
@@ -300,7 +295,6 @@ export class ReviewPageComponent {
     
     
     this.seatData = convertedData;
-    console.log("Converted seat data:", convertedData);
     return convertedData;
   }
 
@@ -491,13 +485,11 @@ export class ReviewPageComponent {
   }
 
   getFlightSegments(flightType: string): string[] {
-    console.log("getFlightSegments",this.seatData);
     
     return Object.keys(this.seatData).filter(key => key.startsWith(flightType));
   }
 
   getFlightDetail(data: any): void {
-    console.log("getFlightDetail review-page", data);
     
     // Reset flight data
     this.outboundFlightData = [];
@@ -506,43 +498,35 @@ export class ReviewPageComponent {
     this.inboundServiceBundle = null;
     
     if (data) {
-      console.log("outbound_flight_select:", data.outbound_flight_select);
-      console.log("inbound_flight_select:", data.inbound_flight_select);
       
       // ตรวจสอบ outbound flight
       if (data.outbound_flight_select && data.outbound_flight_select.flight_detail) {
         this.outboundFlightData = data.outbound_flight_select.flight_detail as FlightDetail[];
-        console.log("outboundFlightData processed:", this.outboundFlightData);
       }
       
       // ตรวจสอบ inbound flight
       if (data.inbound_flight_select && data.inbound_flight_select.flight_detail) {
         this.inboundFlightData = data.inbound_flight_select.flight_detail as FlightDetail[];
-        console.log("inboundFlightData processed:", this.inboundFlightData);
       }
       
       // เก็บข้อมูล service bundle ขาไป
       if (data.outbound_flight_select && data.outbound_flight_select.service_bundle) {
         this.outboundServiceBundle = data.outbound_flight_select.service_bundle as ServiceBundle;
-        console.log("outboundServiceBundle:", this.outboundServiceBundle);
       }
       
       // เก็บข้อมูล service bundle ขากลับ
       if (data.inbound_flight_select && data.inbound_flight_select.service_bundle) {
         this.inboundServiceBundle = data.inbound_flight_select.service_bundle as ServiceBundle;
-        console.log("inboundServiceBundle:", this.inboundServiceBundle);
       }
       
       // สำหรับข้อมูล flight_detail ที่อยู่โดยตรง (fallback)
       if (data.flight_detail && Array.isArray(data.flight_detail)) {
         if (this.outboundFlightData.length === 0) {
           this.outboundFlightData = data.flight_detail as FlightDetail[];
-          console.log("flight_detail assigned to outbound:", this.outboundFlightData);
         }
       }
     }
     
-    console.log("Final flight data - Outbound:", this.outboundFlightData.length, "Inbound:", this.inboundFlightData.length);
   }
 
   getFlightDate(dateTimeString: string): string {

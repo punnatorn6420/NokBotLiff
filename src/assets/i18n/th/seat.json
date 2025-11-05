@@ -14,6 +14,7 @@
   "Cancel_Seat": "ยกเลิกการเลือกที่นั่ง",
   "Confirm_Seat": "ยืนยัน",
   "NEXT_STEP_NO_SELECT_SEAT": "ขั้นตอนต่อไปโดยไม่เลือกที่นั่ง",
+  "BACK_TO_PASSENGER_FORM": "กลับ",
 
   "ALERT_EXIT_CONFIRM": "ฉันเข้าใจแล้ว"
 }

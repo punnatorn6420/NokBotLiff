@@ -497,7 +497,6 @@ export class FlightSeatComponent {
 
       this.passDataService.getFormData().subscribe((data: any) => {
         if (data && Object.keys(data).length > 0) {
-          console.log("getFormData flight-seat",data);
           this.formData = data as Passenger[];
           this.passengers = Object.values(this.formData);
   
@@ -531,9 +530,7 @@ export class FlightSeatComponent {
     this.isLoading = true;
 
     this.passDataService.getPassengerInfo().subscribe((data: any) => {
-      console.log("getPassengerInfo flight-seat", data);
       if (data.flight_search.trip_type === "one-way") { 
-        console.log("one-way");
         this.tripType = "one-way";
         this.journeyKeyOutbound = data.outbound_flight_select.journey_key;
         this.farKeyOutbound = data.outbound_flight_select.fare_key;
@@ -542,13 +539,10 @@ export class FlightSeatComponent {
         const outboundServiceNameOneWay = (data.outbound_flight_select.service_bundle?.serviceName || '').trim();
         if (outboundServiceNameOneWay) {
           this.freeSeatOutbound = true;
-          console.log('Outbound has service bundle:', outboundServiceNameOneWay);
         } else {
           this.freeSeatOutbound = false;
-          console.log('Outbound has no service bundle');
         }
       } else if (data.flight_search.trip_type === "round-trip") {
-        console.log("round-trip");
         this.tripType = "round-trip";
         this.journeyKeyOutbound = data.outbound_flight_select.journey_key;
         this.farKeyOutbound = data.outbound_flight_select.fare_key;
@@ -559,26 +553,18 @@ export class FlightSeatComponent {
         const outboundServiceNameRoundTrip = (data.outbound_flight_select.service_bundle?.serviceName || '').trim();
         if (outboundServiceNameRoundTrip) {
           this.freeSeatOutbound = true;
-          console.log('Outbound has service bundle:', outboundServiceNameRoundTrip);
         } else {
           this.freeSeatOutbound = false;
-          console.log('Outbound has no service bundle');
         }
         
         // เช็ค service bundle สำหรับ inbound
         const inboundServiceNameRoundTrip = (data.inbound_flight_select.service_bundle?.serviceName || '').trim();
         if (inboundServiceNameRoundTrip) {
           this.freeSeatInbound = true;
-          console.log('Inbound has service bundle:', inboundServiceNameRoundTrip);
         } else {
           this.freeSeatInbound = false;
-          console.log('Inbound has no service bundle');
         }
       }
-      // console.log("journeyKeyOutbound flight-seat", this.journeyKeyOutbound);
-      // console.log("farKeyOutbound flight-seat", this.farKeyOutbound);
-      // console.log("journeyKeyInbound flight-seat", this.journeyKeyInbound);
-      // console.log("farKeyInbound flight-seat", this.farKeyInbound);
 
       if (this.journeyKeyInbound && this.journeyKeyOutbound) {
         this.isConnectFlight = true;
@@ -663,8 +649,6 @@ export class FlightSeatComponent {
 
   // อัปเดตสถานะที่นั่งใน seatMap
   private updateSeatMapStatus() {
-    console.log('updateSeatMapStatus - เริ่มต้น');
-    console.log('updateSeatMapStatus - selectedSeat:', this.selectedSeat);
     
     // ทำ reverse map: label -> passengerIndex สำหรับ segment ปัจจุบัน
     const labelToPassengerIndex: { [label: string]: number } = {};
@@ -691,34 +675,22 @@ export class FlightSeatComponent {
     
     // ตั้งค่าสถานะ selected สำหรับที่นั่งที่เลือกแล้ว
     this.selectedSeat.forEach(selectedSeat => {
-      console.log('updateSeatMapStatus - กำลังอัปเดตที่นั่ง:', selectedSeat.label);
       this.seatMap.forEach(row => {
         row.forEach(seat => {
           if (seat && seat.label === selectedSeat.label) {
             seat.status = 'selected';
             // ระบุว่าใครเลือกที่นั่งนี้
             (seat as any).selectedByPassengerIndex = labelToPassengerIndex[selectedSeat.label];
-            console.log('updateSeatMapStatus - อัปเดตที่นั่งสำเร็จ:', seat.label);
           }
         });
       });
     });
     
-    console.log('updateSeatMapStatus - เสร็จสิ้น');
   }
 
-  setPassengerData() {
-    console.log("setPassengerData",this.passengers);
-    // แปลง array กลับเป็น object ที่มี key เป็นตัวเลข
-    const passengerObject: { [key: number]: any } = {};
-    this.passengers.forEach((passenger, index) => {
-      passengerObject[index + 1] = passenger;
-    });
-    this.passDataService.setFormData(passengerObject);
-  }
+  
 
   setSeatData(data: any) {
-    console.log("setSeatData", data);
     
     // ถ้าเป็นข้อมูลแบบใหม่ที่มี segment data
     if (data && typeof data === 'object' && !Array.isArray(data)) {
@@ -770,7 +742,6 @@ export class FlightSeatComponent {
   //   // อัปเดตสถานะที่นั่งใน seatMap
   //   this.updateSeatMapStatus();
   //   this.saveCurrentSegmentData();
-  //   console.log('clearAllSeats - ล้างที่นั่งที่เลือกในทุก segment แล้ว');
 
   //   // เคลียร์ข้อมูลที่นั่งใน service และรีเซ็ตราคารวม
   //   this.setSeatData({});
@@ -802,20 +773,7 @@ export class FlightSeatComponent {
     return seat.label;
   }
 
-  // อัปเดตฟังก์ชัน hasSeat เพื่อตรวจสอบว่าผู้โดยสารมีที่นั่งในทุกเที่ยวบินแล้ว
-  hasSeat(passengerIndex: number): boolean {
-    // เช็คว่า segment ปัจจุบันมี service bundle หรือไม่
-    const currentSegmentHasService = this.getCurrentSegmentFreeSeat();
-    
-    // ถ้า segment ปัจจุบันไม่มี service bundle ไม่ต้องแสดงไอคอน
-    if (!currentSegmentHasService) {
-      return false;
-    }
-    
-    // เช็คว่าผู้โดยสารเลือกที่นั่งใน segment ปัจจุบันหรือไม่
-    const passengerSeat = this.passengerSeatMap[passengerIndex];
-    return !!passengerSeat;
-  }
+  
 
   // ฟังก์ชันเช็คว่าผู้โดยสารเลือกที่นั่งครบใน connect flight หรือไม่
   hasSeatInServiceSegments(passengerIndex: number): boolean {
@@ -993,22 +951,12 @@ export class FlightSeatComponent {
     }
   }
 
-  // Method สำหรับอัปเดตข้อมูลที่นั่งจาก Cabin Info
-  updateSeatMapFromCabinInfo2(cabinInfoResponse: CabinInfoResponse) {
-    this.cabinInfoData = cabinInfoResponse;
-    console.log("cabinInfoResponse", cabinInfoResponse);
-    console.log("cabinInfoData", this.cabinInfoData);
-    this.seatMap = this.transformCabinInfoToSeatMap(cabinInfoResponse);
-    console.log('Updated seat map from API:', this.seatMap);
-  }
+  
 
   // แยก method สำหรับ subscribe getSeatData
   subscribeToSeatData() {
-    console.log('subscribeToSeatData - เริ่มต้น');
     this.passDataService.getSeatData().subscribe((data: any) => {
-      console.log('subscribeToSeatData - ข้อมูลที่ได้รับ:', data);
       if (data && Object.keys(data).length > 0) {
-        console.log('subscribeToSeatData - มีข้อมูล เริ่มโหลด');
         // โหลดข้อมูลทุก segment
         this.loadAllSegmentData(data);
         
@@ -1020,7 +968,6 @@ export class FlightSeatComponent {
         //   this.checkAndNavigateToIncompleteSegment();
         // }, 100);
       } else {
-        console.log('subscribeToSeatData - ไม่มีข้อมูล เริ่มโหลด segment ปัจจุบัน');
         // แม้ไม่มีข้อมูลที่บันทึกไว้ ก็ต้องโหลด segment ปัจจุบันเพื่อแสดง seatmap
         this.loadSegmentData();
         
@@ -1076,7 +1023,6 @@ export class FlightSeatComponent {
         if (!this.segmentSelectedSeatPrice[seg.key]) this.segmentSelectedSeatPrice[seg.key] = 0;
       });
 
-      console.log('setupSegments - segmentList:', this.segmentList);
     } catch (error) {
       console.error('Error in setupSegments:', error);
     }
@@ -1160,11 +1106,6 @@ export class FlightSeatComponent {
     this.segmentSelectedSeatPrice[this.currentSegmentKey] = this.selectedSeatPrice;
     // อัปเดตรายการผู้โดยสารสำหรับแสดงผลตามสิทธิ์ bundle ของ segment ปัจจุบัน
     
-    console.log('loadSegmentData - currentSegmentKey:', this.currentSegmentKey);
-    console.log('loadSegmentData - passengerSeatMap:', this.passengerSeatMap);
-    console.log('loadSegmentData - selectedSeat:', this.selectedSeat);
-    console.log('loadSegmentData - selectedSeatPrice:', this.selectedSeatPrice);
-    console.log('loadSegmentData - segmentSelectedSeat:', this.segmentSelectedSeat);
 
     // เลื่อนรายการผู้โดยสารไปยังคนที่กำลังเลือกอยู่
     this.scrollSelectingPassengerIntoView();
@@ -1172,9 +1113,6 @@ export class FlightSeatComponent {
 
   // อัปเดต seatmap ตาม segment ปัจจุบัน
   updateSeatMapForCurrentSegment() {
-    console.log('updateSeatMapForCurrentSegment - currentSegmentKey:', this.currentSegmentKey);
-    console.log('updateSeatMapForCurrentSegment - outboundSeatMap length:', this.outboundSeatMap.length);
-    console.log('updateSeatMapForCurrentSegment - inboundSeatMap length:', this.inboundSeatMap.length);
     
     if (this.currentSegmentKey.startsWith('outbound')) {
       // ใช้ seatmap ของ outbound
@@ -1182,12 +1120,9 @@ export class FlightSeatComponent {
       const segSeatMap = this.outboundSeatMaps[segIdx];
       if (segSeatMap && segSeatMap.length > 0) {
         this.seatMap = JSON.parse(JSON.stringify(segSeatMap));
-        console.log('updateSeatMapForCurrentSegment - ใช้ outbound seatmap ของ segment', segIdx + 1);
       } else if (this.outboundSeatMap.length > 0) {
         this.seatMap = JSON.parse(JSON.stringify(this.outboundSeatMap)); // fallback: เดิม
-        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น outbound seatmap (fallback)');
       } else {
-        console.log('updateSeatMapForCurrentSegment - outbound seatmap ยังไม่พร้อม');
       }
     } else if (this.currentSegmentKey.startsWith('inbound')) {
       // ใช้ seatmap ของ inbound
@@ -1195,19 +1130,15 @@ export class FlightSeatComponent {
       const segSeatMap = this.inboundSeatMaps[segIdx];
       if (segSeatMap && segSeatMap.length > 0) {
         this.seatMap = JSON.parse(JSON.stringify(segSeatMap));
-        console.log('updateSeatMapForCurrentSegment - ใช้ inbound seatmap ของ segment', segIdx + 1);
       } else if (this.inboundSeatMap.length > 0) {
         this.seatMap = JSON.parse(JSON.stringify(this.inboundSeatMap)); // fallback: เดิม
-        console.log('updateSeatMapForCurrentSegment - เปลี่ยนเป็น inbound seatmap (fallback)');
       } else {
-        console.log('updateSeatMapForCurrentSegment - inbound seatmap ยังไม่พร้อม');
       }
     }
   }
 
   // --- โหลดข้อมูลทุก segment จากข้อมูลที่บันทึกไว้ ---
   loadAllSegmentData(data: any) {
-    console.log('loadAllSegmentData - ข้อมูลที่ได้รับ:', data);
     
     this.segmentList.forEach(seg => {
       // โหลดข้อมูลที่นั่งของแต่ละ segment
@@ -1219,9 +1150,6 @@ export class FlightSeatComponent {
       // โหลดข้อมูลที่นั่งที่เลือกของแต่ละ segment
       this.segmentSelectedSeat[seg.key] = data[`${seg.key}SelectedSeat`] || [];
       
-      console.log(`loadAllSegmentData - ${seg.key}:`, this.segmentSeatMap[seg.key]);
-      console.log(`loadAllSegmentData - ${seg.key}Price:`, this.segmentSelectedSeatPrice[seg.key]);
-      console.log(`loadAllSegmentData - ${seg.key}SelectedSeat:`, this.segmentSelectedSeat[seg.key]);
     });
   }
 
@@ -1919,10 +1847,7 @@ export class FlightSeatComponent {
     }
   }
 
-  // ได้ label ของ direction ปัจจุบัน
-  getCurrentDirectionLabel(): string {
-    return this.isInboundDirection() ? 'ขากลับ' : 'ขาไป';
-  }
+  
 
   // ได้ segments ของ direction ปัจจุบัน
   getCurrentDirectionSegments() {
@@ -2006,17 +1931,7 @@ export class FlightSeatComponent {
     return false;
   }
 
-  // หา segment แรกในทิศทางปัจจุบันที่ผู้โดยสารที่ไม่มี bundle ยังไม่ได้เลือกครบ
-  private findFirstSegmentWithUnseatedNonBundleInCurrentDirection(nonBundleIdxs: number[]): string | null {
-    const direction = this.isInboundDirection() ? 'inbound' : 'outbound';
-    const segs = this.getSortedDirectionSegments(direction);
-    for (const seg of segs) {
-      const seatMap = this.segmentSeatMap[seg.key] || {};
-      const missing = nonBundleIdxs.some(idx => !seatMap[idx]);
-      if (missing) return seg.key;
-    }
-    return null;
-  }
+  
 
   getOriginAirportName(segmentKey: string): string {
     try {
@@ -2099,7 +2014,6 @@ export class FlightSeatComponent {
         } else if (direction === 'inbound' && flightData?.inbound_flight_select?.service_bundle) {
           hasService = flightData.inbound_flight_select.service_bundle.serviceName !== '';
         }
-        console.log(`${direction} hasService:`, hasService);
 
         // วนลูปผ่านทุก seat เพื่อหา Max ราคาแต่ละประเภทบริการ
         aggregateSeatMaps.forEach((row: any) => {
@@ -2127,10 +2041,6 @@ export class FlightSeatComponent {
           });
         });
 
-        console.log(`updatePricingFromAPI ${direction} - premiumPlusPrice:`, this.premiumPlusPrice);
-        console.log(`updatePricingFromAPI ${direction} - premiumPrice:`, this.premiumPrice);
-        console.log(`updatePricingFromAPI ${direction} - regularPrice:`, this.regularPrice);
-        console.log(`updatePricingFromAPI ${direction} - hasService:`, hasService);
       }).catch((error) => {
         console.error(`Error in updatePricingFromAPI promise for ${direction}:`, error);
       });
@@ -2194,28 +2104,7 @@ export class FlightSeatComponent {
     return { hasUnselectedService, unselectedSegments };
   }
 
-  // ฟังก์ชันเช็คว่า segment ปัจจุบันเลือกที่นั่งครบแล้วหรือยัง
-  isCurrentSegmentComplete(): boolean {
-    const currentSegmentSeatMap = this.segmentSeatMap[this.currentSegmentKey] || {};
-    const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
-    let selectedSeatsCount = 0;
-    Object.keys(currentSegmentSeatMap).forEach((pIdxStr: string) => {
-      const pIdx = parseInt(pIdxStr, 10);
-      if (eligibleIndexes.has(pIdx) && currentSegmentSeatMap[pIdx]) selectedSeatsCount++;
-    });
-    return selectedSeatsCount >= eligibleIndexes.size;
-  }
-
-  // ฟังก์ชันเช็คว่า segment ปัจจุบันมี service bundle และยังไม่ได้เลือกที่นั่งครบ
-  isCurrentSegmentIncomplete(): boolean {
-    const currentSegmentHasService = this.getCurrentSegmentFreeSeat();
-    
-    if (!currentSegmentHasService) {
-      return false; // ไม่มี service bundle ไม่ต้องเช็ค
-    }
-    
-    return !this.isCurrentSegmentComplete();
-  }
+  
 
   // เพิ่มฟังก์ชัน loadSeatMapData หลังจาก getTotalPrice()
   loadSeatMapData() {
@@ -2239,7 +2128,6 @@ export class FlightSeatComponent {
           const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
           this.updatePricingFromAPI(promise, 'outbound');
           promise.then((data: any) => {
-            console.log('SeatMap Outbound (merged):', data);
             this.processSeatMapResponseForDirection(data, 'outbound', outboundFlights.length);
             loadedCount++;
             this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
@@ -2261,7 +2149,6 @@ export class FlightSeatComponent {
           const promise = this.apiService.getSeatMap(journeyKey, fareKey).toPromise();
           this.updatePricingFromAPI(promise, 'inbound');
           promise.then((data: any) => {
-            console.log('SeatMap Inbound (merged):', data);
             this.processSeatMapResponseForDirection(data, 'inbound', inboundFlights.length);
             loadedCount++;
             this.checkAllSeatMapsLoaded(loadedCount, totalToLoad);
@@ -2273,7 +2160,6 @@ export class FlightSeatComponent {
         }
       }
 
-      console.log(`loadSeatMapData - totalToLoad: ${totalToLoad}`);
     } catch (error) {
       console.error('Error in loadSeatMapData:', error);
     }
@@ -2330,10 +2216,8 @@ export class FlightSeatComponent {
 
   // เพิ่มฟังก์ชัน checkAllSeatMapsLoaded
   checkAllSeatMapsLoaded(loadedCount: number, totalToLoad: number) {
-    console.log(`checkAllSeatMapsLoaded - loadedCount: ${loadedCount}, totalToLoad: ${totalToLoad}`);
     
     if (loadedCount >= totalToLoad) {
-      console.log("checkAllSeatMapsLoaded - โหลดเสร็จแล้ว เริ่มโหลดข้อมูลที่นั่ง");
       
       // อัปเดต seatmap ตาม segment ปัจจุบัน
       this.updateSeatMapForCurrentSegment();
@@ -2344,24 +2228,7 @@ export class FlightSeatComponent {
     }
   }
 
-  // เพิ่มฟังก์ชันใหม่: หา segment ที่มีสิทธิ์เลือกที่นั่งแต่ยังไม่ได้เลือก
-  findNextIncompleteServiceSegment(): string | null {
-    // หา segment ที่มี service bundle แต่ยังไม่ได้เลือกที่นั่งครบ
-    for (const segment of this.segmentList) {
-      const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
-      
-      if (segmentHasService) {
-        const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
-        const selectedSeatsCount = Object.keys(segmentSeatMap).length;
-        
-        // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสาร)
-        if (selectedSeatsCount < this.passengers.length) {
-          return segment.key;
-        }
-      }
-    }
-    return null;
-  }
+  
 
   // ปรับปรุงฟังก์ชัน subscribeToSeatData เพื่อตรวจสอบและไปยัง segment ที่เหมาะสม
   // checkAndNavigateToIncompleteSegment() {
@@ -2378,7 +2245,6 @@ export class FlightSeatComponent {
   //     // หา segment ที่มี service bundle แต่ยังไม่ได้เลือกครบ
   //     const nextSegment = this.findNextIncompleteServiceSegment();
   //     if (nextSegment && nextSegment !== this.currentSegmentKey) {
-  //       console.log(`checkAndNavigateToIncompleteSegment - ไปยัง segment: ${nextSegment}`);
   //       this.switchSegment(nextSegment);
   //     }
   //   }
@@ -2444,18 +2310,7 @@ export class FlightSeatComponent {
     return next === passengerIndex;
   }
 
-  // เพิ่มฟังก์ชันใหม่สำหรับหา segment ที่ไม่มี service bundle
-  findNextNonServiceSegment(): string | null {
-    // หา segment ที่ไม่มี service bundle
-    for (const segment of this.segmentList) {
-      const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
-      
-      if (!segmentHasService) {
-        return segment.key;
-      }
-    }
-    return null;
-  }
+  
 
   hasServiceBundle(passengerIndex: number): boolean {
     const passenger: any = this.passengers[passengerIndex];
