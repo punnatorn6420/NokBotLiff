@@ -229,7 +229,7 @@
                     </div>
 
                     <div *ngIf="hasOutboundSeats()">
-                        <p class="title-type-seat">{{ 'REVIEW_PAGE_OUTBOUND' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_OUTBOUND' | translate }}</p>
                         <!-- แสดงตาม seat ที่ถูกเลือกจริง พร้อมชื่อผู้โดยสารที่เลือก -->
                         <ng-container *ngFor="let s of getSelectedSeatsForSegment('outbound1')">
                           <div class="list-item">
@@ -242,7 +242,8 @@
                     </div>
 
                     <div *ngIf="hasOutbound2Seats()">
-                        <p class="title-type-seat">{{ 'REVIEW_PAGE_OUTBOUND_CONNECTING' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_OUTBOUND_CONNECTING' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="!hasInboundDirection() && hasOutboundDirection()">{{ 'CONNECT_FLIGHT' | translate }}</p>
                         <!-- แสดงตาม seat ที่ถูกเลือกจริง พร้อมชื่อผู้โดยสารที่เลือก -->
                         <ng-container *ngFor="let s of getSelectedSeatsForSegment('outbound2')">
                           <div class="list-item">
@@ -256,7 +257,7 @@
 
                     
                     <div *ngIf="hasInboundSeats()">
-                        <p class="title-type-seat">{{ 'REVIEW_PAGE_INBOUND' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_INBOUND' | translate }}</p>
                         <!-- แสดงตาม seat ที่ถูกเลือกจริง พร้อมชื่อผู้โดยสารที่เลือก -->
                         <ng-container *ngFor="let s of getSelectedSeatsForSegment('inbound1')">
                           <div class="list-item">
@@ -269,7 +270,8 @@
                     </div>
 
                     <div *ngIf="hasInbound2Seats()">
-                        <p class="title-type-seat">{{ 'REVIEW_PAGE_INBOUND_CONNECTING' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="hasInboundDirection()">{{ 'REVIEW_PAGE_INBOUND_CONNECTING' | translate }}</p>
+                        <p class="title-type-seat" *ngIf="!hasInboundDirection() && hasOutboundDirection()">{{ 'CONNECT_FLIGHT' | translate }}</p>
                         <!-- แสดงตาม seat ที่ถูกเลือกจริง พร้อมชื่อผู้โดยสารที่เลือก -->
                         <ng-container *ngFor="let s of getSelectedSeatsForSegment('inbound2')">
                           <div class="list-item">

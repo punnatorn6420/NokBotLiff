@@ -5,13 +5,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
+import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from '../../core/services/date-adapter-th';
 
 import { BookingRoutingModule } from './booking-routing.module';
 import { PassengerFormComponent } from '../../page/passenger-form/passenger-form.component';
@@ -46,6 +47,10 @@ import { PaymentStatusSuccessComponent } from '../../page/payment-status-success
     MatIconModule,
     MatCheckboxModule,
     TranslateModule,
+  ],
+  providers: [
+    { provide: DateAdapter, useClass: ThaiNativeDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: TH_DATE_FORMATS },
   ],
 })
 export class BookingModule { }

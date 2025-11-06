@@ -396,8 +396,6 @@ export class PassengerFormComponent {
     private route: ActivatedRoute,
     private apiService: ApiService, 
     private passDataService: PassDataService) {
-      // this.translate.setDefaultLang('th');
-      // this.translate.use('th');
       this.route.queryParams.subscribe((params: any) => {
         const idx = Number(params?.passengerIndex);
         if (!isNaN(idx)) {
@@ -467,16 +465,17 @@ export class PassengerFormComponent {
           take(1)
         );
 
-      combineLatest([language$, passengerInfo$]).subscribe(([language, passengerInfo]: [string, any]) => {
-        const currency = passengerInfo?.flight_search?.currency;
-        if (!currency) {
-          return;
-        }
-        this.apiService.getServiceBundle(userId, language, currency).subscribe((data: any) => {
-          this.convertServiceBundle(data);
-          this.isLoading = false;
-        });
-      });
+      // combineLatest([language$, passengerInfo$]).subscribe(([language, passengerInfo]: [string, any]) => {
+      //   const currency = passengerInfo?.flight_search?.currency;
+      //   if (!currency) {
+      //     return;
+      //   }
+      //   this.apiService.getServiceBundle(userId, language, currency).subscribe((data: any) => {
+      //     this.convertServiceBundle(data);
+      //     this.isLoading = false;
+      //   });
+      // });
+      this.isLoading = false;
     });
 
     // โหลดข้อมูลจาก service และโหลดข้อมูลเพียงครั้งเดียว
@@ -511,25 +510,20 @@ export class PassengerFormComponent {
       const root = country.idd.root;
       const suffixes = country.idd.suffixes || [];
       
-      // สร้างรายการรหัสประเทศทั้งหมด
       const allDialCodes: string[] = [];
       
-      // กรณีพิเศษสำหรับ USA - แสดงแค่ root
       if (country.cca2 === 'US') {
         allDialCodes.push(root);
       } else {
-        // ประเทศอื่นๆ - เพิ่มเฉพาะ root + suffixes ทุกตัว (ไม่รวม root เปล่าๆ)
         suffixes.forEach((suffix: string) => {
           allDialCodes.push(root + suffix);
         });
         
-        // ถ้าไม่มี suffixes ให้เพิ่ม root เปล่าๆ
         if (suffixes.length === 0) {
           allDialCodes.push(root);
         }
       }
       
-      // สร้างข้อมูลสำหรับแต่ละรหัสประเทศ
       allDialCodes.forEach(dialCode => {
         _data.push({
           flag: country.flags.png,
@@ -544,14 +538,12 @@ export class PassengerFormComponent {
     this.issuedByOptions = res.map((item: any) => item.name.common);
     this.nationalityOptions = res.map((item: any) => item.name.common);
     
-    // เก็บข้อมูล dialCode ทั้งหมด
     this.dialCodeOptions = _data;
 
     this.revalidateOptionControls();
 
     // ตั้งค่า default สำหรับทริปในประเทศ: สัญชาติไทย และ dial code +66
     if (!this.isInternationalTrip) {
-      // ตั้งสัญชาติเป็น Thailand หากยังว่าง
       Object.values(this.passengerForms).forEach((form: FormGroup) => {
         const nat = form?.get('nationality');
         if (nat && !nat.value) {
@@ -570,49 +562,39 @@ export class PassengerFormComponent {
     }
   }
 
-  // ปรับปรุงฟังก์ชัน extractDialCode
   extractDialCode(option: any): string {
     if (typeof option === 'string') {
-      // กรณีที่ option เป็น string (backward compatibility)
       const colonIndex = option.indexOf(': ');
       if (colonIndex !== -1) {
         return option.substring(colonIndex + 2);
       }
       return option;
     }
-    // กรณีที่ option เป็น object
     return option.idd;
   }
 
-  // ปรับปรุงฟังก์ชัน getDisplayText
   getDisplayText(option: any): string {
     if (typeof option === 'string') {
-      // กรณีที่ option เป็น string (backward compatibility)
       const colonIndex = option.indexOf(': ');
       if (colonIndex !== -1) {
         return option.substring(0, colonIndex);
       }
       return option;
     }
-    // กรณีที่ option เป็น object
     return option.displayText;
   }
 
-  // เพิ่มฟังก์ชันใหม่สำหรับดึง URL ของ flag
   getFlagUrl(option: any): string {
     if (typeof option === 'string') {
-      // กรณีที่ option เป็น string (backward compatibility)
       const parts = option.split(': ');
       if (parts.length >= 3) {
         return parts[0]; // flag URL
       }
       return '';
     }
-    // กรณีที่ option เป็น object
     return option.flag;
   }
 
-  // หารหัสโทรศัพท์จากชื่อประเทศ (สัญชาติ)
   private getDialCodeByCountryName(countryName: string): string | null {
     if (!countryName) return null;
     const lower = countryName.toLowerCase();
@@ -621,7 +603,6 @@ export class PassengerFormComponent {
       return (opt.name || '').toLowerCase() === lower;
     });
     if (matches.length === 0) return null;
-    // เลือก idd ที่สั้นสุด (เช่น root) หากมีหลายรายการ
     const best = matches.reduce((prev: any, curr: any) => {
       const prevLen = (this.extractDialCode(prev) || '').length;
       const currLen = (this.extractDialCode(curr) || '').length;
@@ -636,7 +617,6 @@ export class PassengerFormComponent {
     const dialCodeControl = form.get('dialCode');
     if (!nationalityControl || !dialCodeControl) return;
 
-    // ตั้งค่าครั้งแรกจากค่าปัจจุบัน (ถ้ามี)
     const initialNat = (nationalityControl.value ?? '').toString();
     const initialDial = this.getDialCodeByCountryName(initialNat);
     if (initialDial && !dialCodeControl.value) {
@@ -788,14 +768,29 @@ export class PassengerFormComponent {
       const age = this.getPassengerAge(passengerNumber);
       const isInfant = age !== null && age < 2;
 
+      // คำนวณว่าอายุน้อยกว่า 2 สัปดาห์หรือไม่ (นับเป็นจำนวนวัน)
+      const birthRaw = form.get('birthDate')?.value;
+      let isUnderTwoWeeks = false;
+      if (birthRaw) {
+        const birthDate = new Date(birthRaw);
+        if (!isNaN(birthDate.getTime())) {
+          const today = new Date();
+          birthDate.setHours(0, 0, 0, 0);
+          today.setHours(0, 0, 0, 0);
+          const diffDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
+          isUnderTwoWeeks = diffDays >= 0 && diffDays < 14;
+        }
+      }
+
       const passportNumber = form.get('passportNumber');
       const issuedBy = form.get('issuedBy');
       const expireDate = form.get('expireDate');
       const nationality = form.get('nationality');
       const country = form.get('country');
 
-      // เงื่อนไขบังคับเอกสารเฉพาะทริปต่างประเทศ และไม่ใช่ Infant
-      const requirePassport = this.isInternationalTrip && !isInfant;
+
+      // - หากเป็น Infant แต่มีอายุน้อยกว่า 2 สัปดาห์ ให้บังคับด้วย
+      const requirePassport = this.isInternationalTrip && (!isInfant || isUnderTwoWeeks);
 
       if (passportNumber) {
         passportNumber.setValidators(requirePassport ? [Validators.required] : []);
@@ -810,8 +805,9 @@ export class PassengerFormComponent {
         expireDate.setValidators(requirePassport ? [Validators.required, this.notPastDateValidator()] : []);
         expireDate.updateValueAndValidity({ emitEvent: false });
       }
-      // สัญชาติ/ประเทศ: ถ้าเป็น Infant ไม่ตรวจเลย
-      const requireDemographic = this.isInternationalTrip && !isInfant;
+
+      // - หากเป็น Infant แต่มีอายุน้อยกว่า 2 สัปดาห์ ให้บังคับด้วย
+      const requireDemographic = this.isInternationalTrip && (!isInfant || isUnderTwoWeeks);
       if (nationality) {
         nationality.setValidators(requireDemographic ? [Validators.required, this.optionExistsValidator(() => this.nationalityOptions)] : []);
         nationality.updateValueAndValidity({ emitEvent: false });
@@ -893,18 +889,6 @@ export class PassengerFormComponent {
     return this.issuedByOptions.filter(option => option.toLowerCase().includes(filterValue));
   }
 
-  // private _filterPhone(value: string): string[] {
-  //   const filterValue = value.toLowerCase();
-  //   return this.phonePrefixOptions.filter(option => option.toLowerCase().includes(filterValue));
-  // }
-
-  // private _filterDialCode(value: any): { letter: string; names: string[] }[] {
-  //   const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
-  //   return this.dialCodeOptions.filter(option => 
-  //     option.letter.toLowerCase().includes(filterValue) || 
-  //     option.names.some(name => name.includes(filterValue))
-  //   );
-  // }
   private _filterDialCode(value: string): any[] {
     const filterValue = value.toLowerCase();
     return this.dialCodeOptions.filter(option => {
@@ -1049,15 +1033,6 @@ export class PassengerFormComponent {
     this.setupAutocompleteFilters();
   }
 
-  // // ตรวจสอบ validation ของผู้โดยสารปัจจุบัน
-  // isCurrentPassengerValid(): boolean {
-  //   return this.currentForm ? this.currentForm.valid : false;
-  // }
-
-  // // ตรวจสอบ validation ของผู้โดยสารทุกคน
-  // areAllPassengersValid(): boolean {
-  //   return this.numberPassengerArray.every(passengerNumber => this.passengerForms[passengerNumber]?.valid);
-  // }
 
   isAllPassengersValid(): boolean {
     return this.numberPassengerArray.every(passengerNumber => {

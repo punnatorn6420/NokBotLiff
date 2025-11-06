@@ -5,75 +5,70 @@ import liff from '@line/liff';
   providedIn: 'root'
 })
 export class LiffService {
-  private liffId: string = '2007963873-Nm3zln4x'; 
+  private readonly liffId: string = '2007963873-Nm3zln4x';
   constructor() { }
 
   async initializeLiff(): Promise<boolean> {
     try {
       await liff.init({ liffId: this.liffId });
-      console.log('LIFF initialized successfully');
       return true;
     } catch (error) {
-      console.error('LIFF initialization failed:', error);
       return false;
     }
   }
 
-  isInClient(): boolean {
+  public isInClient(): boolean {
     return liff.isInClient();
   }
 
-  isLoggedIn(): boolean {
+  public isLoggedIn(): boolean {
     return liff.isLoggedIn();
   }
 
-  async login(token: string): Promise<void> {
-    if (!this.isLoggedIn()) {
-      liff.login({ redirectUri: window.location.href + '?token=' + token });
+  public async login(token?: string): Promise<void> {
+    if (this.isLoggedIn()) return;
+
+    const url = new URL(window.location.href);
+    const trimmedToken = (token || '').trim();
+    if (trimmedToken.length > 0) {
+      url.searchParams.set('token', trimmedToken);
+    } else {
+      url.searchParams.delete('token');
     }
+
+    liff.login({ redirectUri: url.toString() });
   }
 
-  async logout(): Promise<void> {
-    if (this.isLoggedIn()) {
-      liff.logout();
-    }
+  public logout(): void {
+    if (!this.isLoggedIn()) return;
+    liff.logout();
   }
 
-  async getProfile(): Promise<any> {
-    if (this.isLoggedIn()) {
-      return await liff.getProfile();
-    }
-    return null;
+  public async getProfile(): Promise<any> {
+    if (!this.isLoggedIn()) return null;
+    return await liff.getProfile();
   }
 
-  getOS(): 'ios' | 'android' | 'web' {
+  public getOS(): 'ios' | 'android' | 'web' {
     return liff.getOS() as 'ios' | 'android' | 'web';
   }
 
-  async sendMessage(message: string): Promise<void> {
-    if (this.isInClient()) {
-      await liff.sendMessages([{
-        type: 'text',
-        text: message
-      }]);
-    }
+  public async sendMessage(message: string): Promise<void> {
+    if (!this.isInClient()) return;
+    await liff.sendMessages([{ type: 'text', text: message }]);
   }
 
-  async closeWindow(): Promise<void> {
-    if (this.isInClient()) {
-      liff.closeWindow();
-    }
+  public closeWindow(): void {
+    if (!this.isInClient()) return;
+    liff.closeWindow();
   }
 
-  async openWindow(url: string, external?: boolean): Promise<void> {
+  public openWindow(url: string, external: boolean = false): void {
     if (this.isInClient()) {
-      liff.openWindow({
-        url: url,
-        external: external || false
-      });
-    } else {
-      window.open(url, '_blank');
+      liff.openWindow({ url, external });
+      return;
     }
+    window.open(url, '_blank');
   }
 }
 

@@ -592,38 +592,19 @@ export class FlightSeatComponent {
           this.connectFlightCountOutbound = 1;
           this.isConnectFlight = false;
         }
-        // if (data.outbound_flight_select.service_bundle.serviceName !== '') {
-        //   this.freeSeatOutbound = true;
-        // } else {
-        //   this.freeSeatOutbound = false;
-        // }
       } else if (data.flight_search.trip_type === "round-trip") {
         if (data.outbound_flight_select.flight_detail.length > 1) {
           this.connectFlightCountOutbound = 2;
           this.isConnectFlight = true;
-          // if (data.inbound_flight_select.service_bundle.serviceName !== '') {
-          //   this.freeSeatInbound = true;
-          // } else {
-          //   this.freeSeatInbound = false;
-          // }
         }else{
           this.connectFlightCountOutbound = 1;
           this.isConnectFlight = false;
         }
 
-        // if (data.inbound_flight_select.flight_detail.length > 1) {
-        //   this.connectFlightCountInbound = 2;
-        //   this.isConnectFlight = true;
-        // }else{
-        //   this.connectFlightCountInbound = 1;
-        // }
       }
       // --- ตรวจสอบประเภทเที่ยวบินและเตรียม segment ---
       this.setupSegments();
       this.currentSegmentKey = (this.segmentList[0]?.key || '').trim();
-      
-      // อัปเดตข้อมูล pricing จาก API
-      // this.updatePricingFromAPI(data);
       
       // โหลดข้อมูล seatmap สำหรับ outbound และ inbound
       this.loadSeatMapData();
@@ -640,11 +621,6 @@ export class FlightSeatComponent {
       }
     });
   }
-
-  // switchLanguage(lang: 'th' | 'en') {
-  //   this.translate.use(lang);
-  // }
-
 
 
   // อัปเดตสถานะที่นั่งใน seatMap
@@ -709,45 +685,6 @@ export class FlightSeatComponent {
     }
   }
 
-  // onCancelSelect() {
-  //   const dialogRef = this.dialog.open(DialogComponent, {
-  //     width: '350px',
-  //     disableClose: true,
-  //     data: {
-  //       isDialog: 'cancel_select_seat'
-  //     }
-  //   });
-  //   dialogRef.afterClosed().subscribe((result: any) => {
-  //     if (result.result === 'confirm') {
-  //       this.clearAllSeats();
-  //     }
-  //   });
-  // }
-  
-  // clearAllSeats() {
-  //   // ล้างข้อมูลในทุก segment
-  //   this.segmentList.forEach(segment => {
-  //     // ล้างข้อมูลใน segmentSeatMap
-  //     this.segmentSeatMap[segment.key] = {};
-  //     this.segmentSelectedSeat[segment.key] = [];
-  //     this.segmentSelectedSeatPrice[segment.key] = 0;
-  //   });
-    
-  //   // ล้างข้อมูลใน segment ปัจจุบัน
-  //   this.passengerSeatMap = {};
-  //   this.selectedSeat = [];
-  //   this.selectedSeatPrice = 0;
-  //   this.SelectedSeat = [];
-    
-  //   // อัปเดตสถานะที่นั่งใน seatMap
-  //   this.updateSeatMapStatus();
-  //   this.saveCurrentSegmentData();
-
-  //   // เคลียร์ข้อมูลที่นั่งใน service และรีเซ็ตราคารวม
-  //   this.setSeatData({});
-  //   this.passDataService.setTotalPrice(0);
-  // }
-
   goToPassengerForm() {
     this.saveAllSegmentData();
     this.router.navigate(['/form']);
@@ -783,29 +720,6 @@ export class FlightSeatComponent {
     
     return !!passengerSeat;
   }
-
-  // // เพิ่มฟังก์ชันใหม่สำหรับเช็คการเลือกที่นั่งในทุก segment ที่มี service bundle
-  // hasSeatInAllServiceSegments(passengerIndex: number): boolean {
-  //   let hasSeatInAllServiceSegments = true;
-    
-  //   this.segmentList.forEach(segment => {
-  //     // เช็คว่า segment นี้มี service bundle หรือไม่
-  //     const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
-      
-  //     // ถ้ามี service bundle ให้เช็คว่าเลือกที่นั่งแล้วหรือยัง
-  //     if (segmentHasService) {
-  //       const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
-  //       const passengerSeat = segmentSeatMap[passengerIndex];
-        
-  //       // ถ้าไม่มีที่นั่งใน segment นี้ แสดงว่ายังไม่ครบ
-  //       if (!passengerSeat) {
-  //         hasSeatInAllServiceSegments = false;
-  //       }
-  //     }
-  //   });
-    
-  //   return hasSeatInAllServiceSegments;
-  // }
 
   // Method สำหรับแปลงข้อมูล Cabin Info เป็น seatMap
   transformCabinInfoToSeatMap(cabinInfoData: CabinInfoResponse): SeatMap[][] {
@@ -904,33 +818,6 @@ export class FlightSeatComponent {
             }
           });
         } 
-        // else {
-        //   // ไม่มีข้อมูลแถวนี้ - ใส่ ที่นั่งจองแล้ว ทั้งหมด
-        //   const seatPositions = ['A', 'B', 'C', null, 'H', 'J', 'K'];
-          
-        //   seatPositions.forEach((position, index) => {
-        //     if (position === null) {
-        //       seatRow.push(null as any);
-        //     } else {
-        //       const seatMapItem: SeatMap = {
-        //         label: `${rowNumber} ${position}`,
-        //         status: 'unavailable',
-        //         type: 'regular',
-        //         price: 0,
-        //         exit: false,
-        //         seatId: `${rowNumber}:${position}`,
-        //         serviceCode: '',
-        //         amount: 0,
-        //         vat: 0,
-        //         amountIncludingVat: 0,
-        //         currency: 'THB',
-        //         wingSeat: false,
-        //         preBlockedSeat: false
-        //       };
-        //       seatRow.push(seatMapItem);
-        //     }
-        //   });
-        // }
         
         seatMap.push(seatRow);
       });
@@ -953,7 +840,7 @@ export class FlightSeatComponent {
 
   
 
-  // แยก method สำหรับ subscribe getSeatData
+  // getSeatData
   subscribeToSeatData() {
     this.passDataService.getSeatData().subscribe((data: any) => {
       if (data && Object.keys(data).length > 0) {
@@ -963,18 +850,9 @@ export class FlightSeatComponent {
         // โหลดข้อมูล segment ปัจจุบัน
         this.loadSegmentData();
         
-        // ตรวจสอบและไปยัง segment ที่เหมาะสม
-        // setTimeout(() => {
-        //   this.checkAndNavigateToIncompleteSegment();
-        // }, 100);
       } else {
-        // แม้ไม่มีข้อมูลที่บันทึกไว้ ก็ต้องโหลด segment ปัจจุบันเพื่อแสดง seatmap
         this.loadSegmentData();
         
-        // ตรวจสอบและไปยัง segment ที่เหมาะสม
-        // setTimeout(() => {
-        //   this.checkAndNavigateToIncompleteSegment();
-        // }, 100);
       }
     });
   }
@@ -1295,28 +1173,6 @@ export class FlightSeatComponent {
       });
       return;
     }
-
-    // // หา passenger ที่ไม่มี bundle ในทิศทางปัจจุบัน
-    // const passengersWithoutBundle = this.passengers
-    //   .map((p, index) => ({ p, index }))
-    //   .filter(({ index }) => !this.passengerHasS150Bundle(index, direction) )
-    //   .map(({ p }) => `${p.firstName} ${p.lastName}`);
-    
-    // // ถ้าผู้โดยสารไม่มี bundle ใดๆ ให้แสดง dialog แจ้งเตือนก่อน (ตาม requirement)
-    // if (!hasS150Entitlement && passengersWithoutBundle.length > 0) {
-    //   const message = passengersWithoutBundle.join(', ');
-    //   const dialogRef = this.dialog.open(DialogComponent, {
-    //     width: '350px',
-    //     disableClose: true,
-    //     data: { isDialog: 'alert_passenger_no_bundle', message }
-    //   });
-    //   dialogRef.afterClosed().subscribe((result: any) => {
-    //     if (result.result === 'confirm') {
-    //       this.selectSeatFinal(seat);
-    //     }
-    //   });
-    //   return;
-    // }
     
     // เลือกที่นั่งปกติ
     this.selectSeatFinal(seat);
@@ -1665,40 +1521,7 @@ export class FlightSeatComponent {
     return totalPrice;
   }
 
-  // คำนวณยอดชำระเฉพาะทิศทาง (outbound/inbound)
-  private calculateDirectionPaidAmount(direction: 'outbound' | 'inbound'): number {
-    let directionTotal = 0;
-
-    this.segmentList
-      .filter(segment => this.getDirectionFromSegmentKey(segment.key) === direction)
-      .forEach(segment => {
-        const segmentSeats = this.segmentSelectedSeat[segment.key] || [];
-        const seatMap = this.segmentSeatMap[segment.key] || {};
-
-        const labelToPassengerIndex: { [label: string]: number } = {};
-        Object.keys(seatMap).forEach((pIdxStr: string) => {
-          const label = seatMap[parseInt(pIdxStr, 10)];
-          if (label) labelToPassengerIndex[label] = parseInt(pIdxStr, 10);
-        });
-
-        segmentSeats.forEach((seat: any) => {
-          const passengerIndex = labelToPassengerIndex[seat.label];
-          const hasS150Entitlement = typeof passengerIndex === 'number' && this.passengerHasS150Bundle(passengerIndex, direction);
-          if (hasS150Entitlement && seat.serviceCode === 'S150') {
-            directionTotal += 0;
-          } else {
-            directionTotal += seat.amountIncludingVat || 0;
-          }
-        });
-      });
-
-    return directionTotal;
-  }
-
-  // เช็คว่ามีการซื้อที่นั่งเพิ่มในทิศทางที่กำหนดหรือไม่
-  private hasPaidSeatInDirection(direction: 'outbound' | 'inbound'): boolean {
-    return this.calculateDirectionPaidAmount(direction) > 0;
-  }
+  
 
   // คืนค่า index ผู้โดยสารที่มีค่าใช้จ่ายที่นั่งในทิศทางนั้นๆ (ยกเว้นสิทธิ์ฟรี S150)
   private getPaidPassengerIndexesByDirection(direction: 'outbound' | 'inbound'): number[] {
@@ -2064,24 +1887,6 @@ export class FlightSeatComponent {
     let hasUnselectedService = false;
 
     this.segmentList.forEach(segment => {
-      // // เช็คว่า segment นี้มี service bundle หรือไม่
-      // const segmentHasService = segment.key.startsWith('inbound') ? this.freeSeatInbound : this.freeSeatOutbound;
-      
-      // // ถ้ามี service bundle ให้เช็คว่าเลือกที่นั่งครบแล้วหรือยัง
-      // if (segmentHasService) {
-      //   const segmentSeatMap = this.segmentSeatMap[segment.key] || {};
-      //   const eligibleIndexes = new Set(this.getSeatEligiblePassengerIndexes());
-      //   let selectedSeatsCount = 0;
-      //   Object.keys(segmentSeatMap).forEach((pIdxStr: string) => {
-      //     const pIdx = parseInt(pIdxStr, 10);
-      //     if (eligibleIndexes.has(pIdx) && segmentSeatMap[pIdx]) selectedSeatsCount++;
-      //   });
-      //   // ถ้าเลือกที่นั่งไม่ครบ (น้อยกว่าจำนวนผู้โดยสารที่มีสิทธิ์)
-      //   if (selectedSeatsCount < eligibleIndexes.size) {
-      //     hasUnselectedService = true;
-      //     unselectedSegments.push(segment.key);
-      //   }
-      // }
       // // ถ้าไม่มี service bundle ไม่ต้องเช็คการเลือกที่นั่ง
       const direction = this.getDirectionFromSegmentKey(segment.key);
       // ใช้สิทธิ์จากระดับผู้โดยสารเป็นเกณฑ์หลัก (ไม่พึ่งพา flight-level service_bundle)
@@ -2227,28 +2032,6 @@ export class FlightSeatComponent {
       this.isLoading = false;
     }
   }
-
-  
-
-  // ปรับปรุงฟังก์ชัน subscribeToSeatData เพื่อตรวจสอบและไปยัง segment ที่เหมาะสม
-  // checkAndNavigateToIncompleteSegment() {
-  //   // ถ้าพึ่งสลับทิศทาง ให้ข้ามการนำทางอัตโนมัติครั้งนี้
-  //   // if (this.skipAutoNavigateOnce) {
-  //   //   this.skipAutoNavigateOnce = false;
-  //   //   return;
-  //   // }
-  //   // ถ้า segment ปัจจุบันไม่มี service bundle หรือเลือกครบแล้ว
-  //   const currentSegmentHasService = this.getCurrentSegmentFreeSeat();
-  //   const isCurrentComplete = this.isCurrentSegmentComplete();
-    
-  //   if (!currentSegmentHasService || isCurrentComplete) {
-  //     // หา segment ที่มี service bundle แต่ยังไม่ได้เลือกครบ
-  //     const nextSegment = this.findNextIncompleteServiceSegment();
-  //     if (nextSegment && nextSegment !== this.currentSegmentKey) {
-  //       this.switchSegment(nextSegment);
-  //     }
-  //   }
-  // }
 
   // เลื่อนให้ผู้โดยสารที่กำลังถูกเลือกให้อยู่กลาง viewport ของแถบแนวนอน
   private scrollSelectingPassengerIntoView() {

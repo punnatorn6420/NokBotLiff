@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
 import { PassDataService } from './core/services/pass-data.service';
 import { LiffService } from './core/services/liff.service';
 import { ApiService } from './core/services/api.service';
@@ -21,12 +20,11 @@ export class AppComponent implements OnInit {
     private readonly passDataService: PassDataService,
     private readonly liffService: LiffService,
     private readonly apiService: ApiService,
-    private readonly translate: TranslateService,
     private readonly router: Router
   ) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const { uid, token } = this.resolveUidAndToken();
 
     if (token) {
@@ -74,7 +72,7 @@ export class AppComponent implements OnInit {
     };
   }
 
-   fetchInitialData(userId: string): void {
+  private fetchInitialData(userId: string): void {
     let passengerInfoFull: any = null;
     this.apiService
       .getPassengerInfo(userId)
@@ -108,7 +106,7 @@ export class AppComponent implements OnInit {
 
           if (hasBooked) {
             this.router.navigate(['/payment-page']);
-          }else if (hasBookTimeout) {
+          } else if (hasBookTimeout) {
             this.router.navigate(['/error'], { queryParams: { isTimeout: true }, replaceUrl: true });
           } else {
             this.router.navigate(['/form']);

@@ -1,7 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { PassDataService } from '../../core/services/pass-data.service';
-import { TranslateService } from '@ngx-translate/core';
 
 interface Passenger {
   birthDate: Date;
@@ -104,7 +103,7 @@ interface SeatData {
 }
 
 interface ConvertedSeatData {
-  segment: string;
+  segment: Segment;
   seats: string[];
   selectedSeats: SelectedSeat[];
   price: number;
@@ -122,32 +121,9 @@ interface SelectedSeat {
   exit: boolean;
 }
 
-// Type guard functions
-// function isSeatData(value: any): value is { [key: number]: string } {
-//   return typeof value === 'object' && value !== null && !Array.isArray(value);
-// }
-
-// interface FlightSelection {
-//   fare_key: string;
-//   flight_detail: FlightDetail[];
-//   journey_key: string;
-//   service_bundle: ServiceBundle;
-//   trip_type: string;
-// }
-
-// interface FlightSearch {
-//   user_id: string;
-//   origin: string;
-//   destination: string;
-//   adults: string;
-//   children: string;
-// }
-
-// interface FlightData {
-//   flight_search: FlightSearch;
-//   inbound_flight_select: FlightSelection;
-//   outbound_flight_select: FlightSelection;
-// }
+type Direction = 'outbound' | 'inbound';
+type Segment = 'outbound1' | 'outbound2' | 'inbound1' | 'inbound2';
+const FLIGHT_SEGMENTS: Segment[] = ['outbound1', 'outbound2', 'inbound1', 'inbound2'];
 
 @Component({
   selector: 'app-review-page',
@@ -249,68 +225,54 @@ export class ReviewPageComponent {
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // this.passDataService.getFormData().subscribe((data: any) => {
-    //   if (data && Object.keys(data).length > 0) {
-    //     this.formData = data as Passenger[];
-    //     this.passengers = Object.values(this.formData);
-    //     this.isPassengerInfoOpen = new Array(this.passengers.length).fill(true);
-    //   } else {
-    //     this.formData = [];
-    //     this.passengers = [];
-    //     this.isPassengerInfoOpen = [];
-    //   }
-    // });
   }
 
-  convertSeatData(seatData: any) {
-    
+  convertSeatData(seatData: any): ConvertedSeatData[] {
     if (!seatData || typeof seatData !== 'object') {
       return [];
     }
 
-    let convertedData: any[] = [];
-    
+    const convertedData: ConvertedSeatData[] = [];
+    const flightSegments: Segment[] = FLIGHT_SEGMENTS;
+
     // ตรวจสอบและแปลงข้อมูลแต่ละ flight segment
-    const flightSegments = ['outbound1', 'outbound2', 'inbound1', 'inbound2'];
-    
-    flightSegments.forEach(segment => {
+    flightSegments.forEach((segment: Segment) => {
       if (seatData[segment]) {
         // เก็บ map เดิม (passengerIndex -> seatLabel) และแปลงข้อมูลที่นั่งเป็น array
         const seatMapObj = seatData[segment] as { [key: number]: string };
         const seatArray = Object.values(seatMapObj);
         const selectedSeats = seatData[`${segment}SelectedSeat`] || [];
         const price = seatData[`${segment}Price`] || 0;
-        
+
         convertedData.push({
-          segment: segment,
+          segment,
           seats: seatArray,
-          selectedSeats: selectedSeats,
-          price: price,
+          selectedSeats,
+          price,
           totalSeats: seatArray.length,
           selectedCount: selectedSeats.length,
           seatMap: seatMapObj
         });
       }
     });
-    
-    
+
     this.seatData = convertedData;
     return convertedData;
   }
 
   // หาข้อมูล segment
-  private getSegmentData(segment: string): ConvertedSeatData | undefined {
+  private getSegmentData(segment: Segment): ConvertedSeatData | undefined {
     return this.seatData.find(item => item.segment === segment);
   }
 
   // ดึงรายการที่นั่งที่เลือกของ segment
-  getSelectedSeatsForSegment(segment: string): SelectedSeat[] {
+  getSelectedSeatsForSegment(segment: Segment): SelectedSeat[] {
     const seg = this.getSegmentData(segment);
     return seg && Array.isArray(seg.selectedSeats) ? seg.selectedSeats : [];
   }
 
   // หา passengerIndex จาก seat label ใน segment
-  getPassengerIndexBySeat(segment: string, label: string): number {
+  getPassengerIndexBySeat(segment: Segment, label: string): number {
     const seg = this.getSegmentData(segment);
     if (!seg || !seg.seatMap) return -1;
     const entries = Object.entries(seg.seatMap);
@@ -328,7 +290,7 @@ export class ReviewPageComponent {
   }
 
   // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งตาม segment และ passenger index
-  getSeatBySegmentAndPassenger(segment: string, passengerIndex: number): string {
+  getSeatBySegmentAndPassenger(segment: Segment, passengerIndex: number): string {
     if (!this.seatData || !Array.isArray(this.seatData)) {
       return '';
     }
@@ -393,101 +355,12 @@ export class ReviewPageComponent {
     return this.seatData.some(item => item.segment === 'inbound2' && item.seats && item.seats.length > 0);
   }
 
-  // // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งทั้งหมด
-  // getAllSeatData(): any[] {
-  //   const segments = ['outbound1', 'outbound2', 'inbound1', 'inbound2'];
-  //   const allSeatData: any[] = [];
-    
-  //   segments.forEach(segment => {
-  //     const seatInfo = this.getSeatDataBySegment(segment);
-  //     if (seatInfo) {
-  //       allSeatData.push(seatInfo);
-  //     }
-  //   });
-    
-  //   return allSeatData;
-  // }
-
-  // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งที่เลือกแล้ว
-  // getSelectedSeatsBySegment(segment: string): SelectedSeat[] {
-  //   const seatInfo = this.getSeatDataBySegment(segment);
-  //   return seatInfo ? seatInfo.selectedSeats : [];
-  // }
-
-  // ฟังก์ชันสำหรับดึงราคาตาม segment
-  // getSeatPriceBySegment(segment: string): number {
-  //   const seatInfo = this.getSeatDataBySegment(segment);
-  //   return seatInfo ? seatInfo.price : 0;
-  // }
-
-  // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งที่เลือกแล้วทั้งหมด
-  // getAllSelectedSeats(): SelectedSeat[] {
-  //   const segments = ['outbound1', 'outbound2', 'inbound1', 'inbound2'];
-  //   let allSelectedSeats: SelectedSeat[] = [];
-    
-  //   segments.forEach(segment => {
-  //     const selectedSeats = this.getSelectedSeatsBySegment(segment);
-  //     allSelectedSeats = allSelectedSeats.concat(selectedSeats);
-  //   });
-    
-  //   return allSelectedSeats;
-  // }
-
-  // // ฟังก์ชันสำหรับคำนวณราคารวมทั้งหมด
-  // getTotalSeatPrice(): number {
-  //   const segments = ['outbound1', 'outbound2', 'inbound1', 'inbound2'];
-  //   let totalPrice = 0;
-    
-  //   segments.forEach(segment => {
-  //     totalPrice += this.getSeatPriceBySegment(segment);
-  //   });
-    
-  //   return totalPrice;
-  // }
-
-  // // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งที่เลือกแล้วเป็น string
-  // getSelectedSeatsString(segment: string): string {
-  //   const selectedSeats = this.getSelectedSeatsBySegment(segment);
-  //   if (selectedSeats.length === 0) {
-  //     return 'ไม่มีการเลือกที่นั่ง';
-  //   }
-    
-  //   return selectedSeats.map(seat => seat.label).join(', ');
-  // }
-
-  // // ฟังก์ชันสำหรับตรวจสอบว่ามีการเลือกที่นั่งหรือไม่
-  // hasSelectedSeats(segment: string): boolean {
-  //   const selectedSeats = this.getSelectedSeatsBySegment(segment);
-  //   return selectedSeats.length > 0;
-  // }
-
-  // // ฟังก์ชันสำหรับดึงข้อมูลที่นั่งที่เลือกแล้วทั้งหมดเป็น string
-  // getAllSelectedSeatsString(): string {
-  //   const allSelectedSeats = this.getAllSelectedSeats();
-  //   if (allSelectedSeats.length === 0) {
-  //     return 'ไม่มีการเลือกที่นั่ง';
-  //   }
-    
-  //   return allSelectedSeats.map(seat => seat.label).join(', ');
-  // }
-
-  // getPassengerSeat(passengerIndex: number, flight: string, segment: number = 1): string {
-  //   const seatKey = `${flight}${segment}` as keyof SeatData;
-  //   const seatData = this.seatData[seatKey];
-  //   if (seatData && typeof seatData === 'object' && !Array.isArray(seatData) && seatData[passengerIndex]) {
-  //     return seatData[passengerIndex];
-  //   }
-  //   return '';
-  // }
+  
 
   hasSeatData(): boolean {
-    return Object.keys(this.seatData).length > 0;
+    return Array.isArray(this.seatData) && this.seatData.length > 0;
   }
 
-  getFlightSegments(flightType: string): string[] {
-    
-    return Object.keys(this.seatData).filter(key => key.startsWith(flightType));
-  }
 
   getFlightDetail(data: any): void {
     
@@ -773,31 +646,7 @@ export class ReviewPageComponent {
     this.router.navigate(['/select-seat']);
   }
 
-  // hasOutboundSeat(passengerIndex: number): boolean {
-  //   return this.getFlightSegments('outbound').some(segment => 
-  //     this.getPassengerSeat(passengerIndex, 'outbound', parseInt(segment.replace('outbound', ''))) !== ''
-  //   );
-  // }
-
-  // hasInboundSeat(passengerIndex: number): boolean {
-  //   return this.getFlightSegments('inbound').some(segment => 
-  //     this.getPassengerSeat(passengerIndex, 'inbound', parseInt(segment.replace('inbound', ''))) !== ''
-  //   );
-  // }
-
-  // getAllOutboundSeats(passengerIndex: number): string {
-  //   const seats = this.getFlightSegments('outbound')
-  //     .map(segment => this.getPassengerSeat(passengerIndex, 'outbound', parseInt(segment.replace('outbound', ''))))
-  //     .filter(seat => seat !== '');
-  //   return seats.join(', ');
-  // }
-
-  // getAllInboundSeats(passengerIndex: number): string {
-  //   const seats = this.getFlightSegments('inbound')
-  //     .map(segment => this.getPassengerSeat(passengerIndex, 'inbound', parseInt(segment.replace('inbound', ''))))
-  //     .filter(seat => seat !== '');
-  //   return seats.join(', ');
-  // }
+  
 
   // getOutboundSeatInfo(passengerIndex: number): string {
   //   const segments = this.getFlightSegments('outbound');
@@ -961,60 +810,7 @@ export class ReviewPageComponent {
     return Boolean(outboundIntl || inboundIntl);
   }
 
-  // // ฟังก์ชันสำหรับแสดงข้อมูลที่นั่งพร้อมข้อมูลเครื่องบิน
-  // getOutboundSeatInfoWithAircraft(passengerIndex: number): string {
-  //   const segments = this.getFlightSegments('outbound');
-    
-  //   if (segments.length === 1) {
-  //     const seat = this.getPassengerSeat(passengerIndex, 'outbound', parseInt(segments[0].replace('outbound', '')));
-  //     return seat;
-  //   } else {
-  //     return segments.map((segment, index) => {
-  //       const seat = this.getPassengerSeat(passengerIndex, 'outbound', parseInt(segment.replace('outbound', '')));
-  //       return seat ? `เครื่อง${index + 1}: ${seat}` : '';
-  //     }).filter(info => info !== '').join(', ');
-  //   }
-  // }
+  
 
-  // getInboundSeatInfoWithAircraft(passengerIndex: number): string {
-  //   const segments = this.getFlightSegments('inbound');
-    
-  //   if (segments.length === 1) {
-  //     const seat = this.getPassengerSeat(passengerIndex, 'inbound', parseInt(segments[0].replace('inbound', '')));
-  //     return seat;
-  //   } else {
-  //     return segments.map((segment, index) => {
-  //       const seat = this.getPassengerSeat(passengerIndex, 'inbound', parseInt(segment.replace('inbound', '')));
-  //       return seat ? `เครื่อง${index + 1}: ${seat}` : '';
-  //     }).filter(info => info !== '').join(', ');
-  //   }
-  // }
-
-  // // ฟังก์ชันใหม่สำหรับเข้าถึงข้อมูลแบบ object
-  // getSeatData(flight: string, segment: number): { [key: number]: string } | undefined {
-  //   const seatKey = `${flight}${segment}` as keyof SeatData;
-  //   const seatData = this.seatData[seatKey];
-  //   if (seatData && typeof seatData === 'object' && !Array.isArray(seatData)) {
-  //     return seatData as { [key: number]: string };
-  //   }
-  //   return undefined;
-  // }
-
-  // getSeatPrice(flight: string, segment: number): number | undefined {
-  //   const priceKey = `${flight}${segment}Price` as keyof SeatData;
-  //   const price = this.seatData[priceKey];
-  //   if (typeof price === 'number') {
-  //     return price;
-  //   }
-  //   return undefined;
-  // }
-
-  // getSelectedSeats(flight: string, segment: number): SelectedSeat[] | undefined {
-  //   const selectedKey = `${flight}${segment}SelectedSeat` as keyof SeatData;
-  //   const selectedSeats = this.seatData[selectedKey];
-  //   if (Array.isArray(selectedSeats)) {
-  //     return selectedSeats as SelectedSeat[];
-  //   }
-  //   return undefined;
-  // }
+  
 }
