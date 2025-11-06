@@ -465,17 +465,16 @@ export class PassengerFormComponent {
           take(1)
         );
 
-      // combineLatest([language$, passengerInfo$]).subscribe(([language, passengerInfo]: [string, any]) => {
-      //   const currency = passengerInfo?.flight_search?.currency;
-      //   if (!currency) {
-      //     return;
-      //   }
-      //   this.apiService.getServiceBundle(userId, language, currency).subscribe((data: any) => {
-      //     this.convertServiceBundle(data);
-      //     this.isLoading = false;
-      //   });
-      // });
-      this.isLoading = false;
+      combineLatest([language$, passengerInfo$]).subscribe(([language, passengerInfo]: [string, any]) => {
+        const currency = passengerInfo?.flight_search?.currency;
+        if (!currency) {
+          return;
+        }
+        this.apiService.getServiceBundle(userId, language, currency).subscribe((data: any) => {
+          this.convertServiceBundle(data);
+          this.isLoading = false;
+        });
+      });
     });
 
     // โหลดข้อมูลจาก service และโหลดข้อมูลเพียงครั้งเดียว
