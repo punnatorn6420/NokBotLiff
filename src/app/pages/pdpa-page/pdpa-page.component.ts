@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { PassDataService } from '../../core/services/pass-data.service';
-import { ApiService } from '../../core/services/api.service';
+import { PassDataService } from '../../services/pass-data.service';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-pdpa-page',

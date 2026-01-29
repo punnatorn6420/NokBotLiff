@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { PassDataService } from './core/services/pass-data.service';
-import { LiffService } from './core/services/liff.service';
-import { ApiService } from './core/services/api.service';
+import { PassDataService } from './services/pass-data.service';
+import { LiffService } from './services/liff.service';
+import { ApiService } from './services/api.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';

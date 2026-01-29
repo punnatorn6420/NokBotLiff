@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PassengerFormComponent } from '../../page/passenger-form/passenger-form.component';
-import { FlightSeatComponent } from '../../page/flight-seat/flight-seat.component';
-import { PdpaPageComponent } from '../../page/pdpa-page/pdpa-page.component';
-import { ReviewPageComponent } from '../../page/review-page/review-page.component';
-import { ConfirmPayComponent } from '../../page/confirm-pay/confirm-pay.component';
-import { PaymentStatusSuccessComponent } from '../../page/payment-status-success/payment-status-success.component';
+import { PassengerFormComponent } from '../../pages/passenger-form/passenger-form.component';
+import { FlightSeatComponent } from '../../pages/flight-seat/flight-seat.component';
+import { PdpaPageComponent } from '../../pages/pdpa-page/pdpa-page.component';
+import { ReviewPageComponent } from '../../pages/review-page/review-page.component';
+import { ConfirmPayComponent } from '../../pages/confirm-pay/confirm-pay.component';
+import { PaymentStatusSuccessComponent } from '../../pages/payment-status-success/payment-status-success.component';
 
 const routes: Routes = [
   { path: 'pdpa', component: PdpaPageComponent },
@@ -21,5 +21,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class BookingRoutingModule {}
-
 

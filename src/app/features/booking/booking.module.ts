@@ -12,15 +12,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
-import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from '../../core/services/date-adapter-th';
+import { ThaiNativeDateAdapter, TH_DATE_FORMATS } from '../../services/date-adapter-th';
 
 import { BookingRoutingModule } from './booking-routing.module';
-import { PassengerFormComponent } from '../../page/passenger-form/passenger-form.component';
-import { FlightSeatComponent } from '../../page/flight-seat/flight-seat.component';
-import { PdpaPageComponent } from '../../page/pdpa-page/pdpa-page.component';
-import { ReviewPageComponent } from '../../page/review-page/review-page.component';
-import { ConfirmPayComponent } from '../../page/confirm-pay/confirm-pay.component';
-import { PaymentStatusSuccessComponent } from '../../page/payment-status-success/payment-status-success.component';
+import { PassengerFormComponent } from '../../pages/passenger-form/passenger-form.component';
+import { FlightSeatComponent } from '../../pages/flight-seat/flight-seat.component';
+import { PdpaPageComponent } from '../../pages/pdpa-page/pdpa-page.component';
+import { ReviewPageComponent } from '../../pages/review-page/review-page.component';
+import { ConfirmPayComponent } from '../../pages/confirm-pay/confirm-pay.component';
+import { PaymentStatusSuccessComponent } from '../../pages/payment-status-success/payment-status-success.component';
 
 @NgModule({
   declarations: [
@@ -54,5 +54,4 @@ import { PaymentStatusSuccessComponent } from '../../page/payment-status-success
   ],
 })
 export class BookingModule { }
-
 

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { PassDataService } from '../../services/pass-data.service';
 
 interface Passenger {
   birthDate: Date;
