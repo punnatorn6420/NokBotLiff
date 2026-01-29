@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PassDataService } from '../../core/services/pass-data.service';
-import { ApiService } from '../../core/services/api.service';
+import { PassDataService } from '../../services/pass-data.service';
+import { ApiService } from '../../services/api.service';
 import { of } from 'rxjs';
 import { finalize, switchMap, tap, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';

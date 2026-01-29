@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../core/services/api.service';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { ApiService } from '../../services/api.service';
+import { PassDataService } from '../../services/pass-data.service';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';

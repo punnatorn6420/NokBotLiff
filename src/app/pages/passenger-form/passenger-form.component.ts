@@ -6,8 +6,8 @@ import { map, startWith, take, filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { ApiService } from '../../core/services/api.service';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { ApiService } from '../../services/api.service';
+import { PassDataService } from '../../services/pass-data.service';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 // import { TranslateService } from '@ngx-translate/core';
 

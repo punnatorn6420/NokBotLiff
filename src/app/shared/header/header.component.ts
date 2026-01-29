@@ -1,6 +1,6 @@
 import { Component, Input, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { PassDataService } from '../../services/pass-data.service';
 
 @Component({
   selector: 'app-header',

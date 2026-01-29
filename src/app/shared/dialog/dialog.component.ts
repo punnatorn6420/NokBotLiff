@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { PassDataService } from '../../services/pass-data.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({

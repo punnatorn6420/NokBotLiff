@@ -2,9 +2,9 @@ import { Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { PassDataService } from '../../services/pass-data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { ApiService } from '../../core/services/api.service';
+import { ApiService } from '../../services/api.service';
 
 interface Passenger {
   birthDate: Date;

@@ -9,7 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { PassDataService } from '../../core/services/pass-data.service';
+import { PassDataService } from '../../services/pass-data.service';
 
 @Injectable()
 export class HttpErrorInterceptorInterceptor implements HttpInterceptor {
